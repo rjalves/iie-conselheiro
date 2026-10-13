@@ -41,3 +41,43 @@ def test_indicadores_e_alertas():
         "P1", "F2", "F1", "A1", "A2", "A3", "E1", "E2", "E3", "Q1", "D1"]
     alertas = ler_alertas(SEEDS / "alertas.csv", _ids())
     assert ("UF-29", 2019, "D1", "ambos", "alta") == alertas[0][:5]
+
+
+INDICADORES = {"P1", "F2", "F1", "A1", "A2", "A3", "E1", "E2", "E3", "Q1", "D1"}
+
+
+def test_catalogo_tem_541_praticas_e_confere_com_as_ancoras():
+    from dados.carregar_iie import ler_catalogo
+    from dados.conferir_catalogo import conferir, ler_ancoras
+    from dados.conferir_catalogo import ler_catalogo as ler_para_conferir
+    catalogo = ler_catalogo(ANEXOS / "catalogo_praticas.csv")
+    assert len(catalogo) == len({p[0] for p in catalogo}) == 541
+    erros, _ = conferir(ler_para_conferir([ANEXOS / "catalogo_praticas.csv"]), ler_ancoras())
+    assert erros == []
+
+
+def test_precondicoes_vem_das_linhas_base_da_matriz():
+    from dados.carregar_iie import ler_precondicoes
+    precondicoes, vinculos = ler_precondicoes(ANEXOS / "matriz_indicador_pratica.csv")
+    assert [p[0] for p in precondicoes] == ["lideranca", "acompanhamento", "planejamento", "monitoramento",
+                                            "recursos", "coerencia"]
+    recursos = [v[1] for v in vinculos if v[0] == "recursos"]
+    assert recursos[:3] == ["SM-17", "SM-33", "SM-34"] and "SM-49" in recursos and recursos[-1] == "GE-208"
+    assert len(vinculos) == 50
+
+
+def test_perfis_e_lacunas():
+    from dados.carregar_iie import ler_lacunas, ler_perfis
+    perfis, vinculos = ler_perfis(SEEDS / "perfis.json", INDICADORES)
+    assert [p[0] for p in perfis] == ["fluxo", "aprendizagem", "duplo", "evasao", "perda_em", "dado"]
+    assert len(vinculos) == 26
+    assert len(ler_lacunas(SEEDS / "lacunas.json", INDICADORES)) == 8
+
+
+def test_perfil_com_indicador_desconhecido_e_recusado(tmp_path):
+    import pytest
+    from dados.carregar_iie import ler_perfis
+    arquivo = tmp_path / "perfis.json"
+    arquivo.write_text('[{"id": "x", "nome": "X", "criterio": "c", "sequencia": ["Z9"], "descricao": "d", "praticas": []}]')
+    with pytest.raises(ValueError, match="Z9"):
+        ler_perfis(arquivo, INDICADORES)

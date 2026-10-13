@@ -1,4 +1,4 @@
-"""Carrega os dados do IIE, os indicadores, as práticas e os alertas no esquema `iie` do Supabase.
+"""Carrega os dados do IIE, os indicadores, a base de práticas e os alertas no esquema `iie` do Supabase.
 
 Uso (a partir de agente/):
     python -m dados.carregar_iie --database-url "$DATABASE_URL_CARGA" --responsavel "nome"
@@ -13,6 +13,8 @@ import unicodedata
 from pathlib import Path
 
 import psycopg
+
+from dados.conferir_catalogo import citacoes
 
 AGENTE = Path(__file__).resolve().parents[1]
 ANEXOS = AGENTE.parent / "contexto" / "anexos"
@@ -83,6 +85,49 @@ def ler_matriz(caminho: Path) -> tuple[list[tuple], list[tuple]]:
     return list(praticas.values()), vinculos
 
 
+def ler_catalogo(caminho: Path) -> list[tuple]:
+    """Catálogo completo de práticas (contexto/anexos/catalogo_praticas.csv)."""
+    return [(r["id"], r["fonte"], r["documento"], r["linhas"], r["nivel"], r["secao"], r["nome"], r["descricao"],
+             [a for a in r["alavancas"].split("|") if a]) for r in _ler_csv(caminho)]
+
+
+def ler_precondicoes(caminho_matriz: Path) -> tuple[list[tuple], list[tuple]]:
+    """Pré-condições: linhas BASE da matriz, no formato "o que garantir — práticas citadas com linhas"."""
+    precondicoes, vinculos = [], []
+    for r in _ler_csv(caminho_matriz):
+        if r["indicador_id"] != "BASE":
+            continue
+        precondicao_id = normalizar(r["pratica"]).split()[0]  # "Liderança escolar" -> "lideranca"
+        texto, _, referencias = r["o_que_fazer"].partition(" — ")
+        precondicoes.append((precondicao_id, r["pratica"], texto.strip(), len(precondicoes) + 1))
+        citadas = list(dict.fromkeys(pid for pid, _ in citacoes(referencias)))
+        vinculos.extend((precondicao_id, pid, ordem) for ordem, pid in enumerate(citadas, start=1))
+    return precondicoes, vinculos
+
+
+def ler_perfis(caminho: Path, indicadores: set[str]) -> tuple[list[tuple], list[tuple]]:
+    """Pacotes por perfil de território (doc 09 §7). A sequência usa IDs de indicador ou "base" (pré-condições)."""
+    dados = json.loads(caminho.read_text(encoding="utf-8"))
+    for d in dados:
+        invalidos = set(d["sequencia"]) - indicadores - {"base"}
+        if invalidos:
+            raise ValueError(f"perfil {d['id']}: sequência com indicadores desconhecidos {sorted(invalidos)}")
+    perfis = [(d["id"], d["nome"], d["criterio"], d["sequencia"], d["descricao"], ordem)
+              for ordem, d in enumerate(dados, start=1)]
+    vinculos = [(d["id"], pid, ordem) for d in dados for ordem, pid in enumerate(d["praticas"], start=1)]
+    return perfis, vinculos
+
+
+def ler_lacunas(caminho: Path, indicadores: set[str]) -> list[tuple]:
+    """Lacunas dos referenciais em relação ao IIE (doc 09 §8)."""
+    dados = json.loads(caminho.read_text(encoding="utf-8"))
+    for d in dados:
+        if not d["indicadores"] or not set(d["indicadores"]) <= indicadores:
+            raise ValueError(f"lacuna {d['id']}: indicadores inválidos {d['indicadores']}")
+    return [(d["id"], d["tema"], d["cobertura"], d["complemento"], d["indicadores"], ordem)
+            for ordem, d in enumerate(dados, start=1)]
+
+
 def ler_indicadores(caminho: Path) -> list[tuple]:
     dados = json.loads(caminho.read_text(encoding="utf-8"))
     return [(d["id"], d["nome"], d["grupo"], d["pergunta"], d["metrica"], d["sentido"], d["gatilho_atencao"],
@@ -113,13 +158,21 @@ def carregar(conn: psycopg.Connection, responsavel: str, anexos: Path = ANEXOS, 
         "oficial": anexos / "iie_uf_oficial_2013_2019.csv",
         "componentes": anexos / "iie_uf_reproducao.csv",
         "matriz": anexos / "matriz_indicador_pratica.csv",
+        "catalogo": anexos / "catalogo_praticas.csv",
+        "perfis": seeds / "perfis.json",
+        "lacunas": seeds / "lacunas.json",
     }
     territorios = ler_territorios(arquivos["territorios"])
     id_por_sigla = {t[3]: t[0] for t in territorios}
     oficial = ler_oficial(arquivos["oficial"], id_por_sigla)
     componentes = ler_componentes(arquivos["componentes"], id_por_sigla)
-    praticas, vinculos = ler_matriz(arquivos["matriz"])
+    _, vinculos = ler_matriz(arquivos["matriz"])
+    praticas = ler_catalogo(arquivos["catalogo"])
     indicadores = ler_indicadores(arquivos["indicadores"])
+    ids_indicador = {i[0] for i in indicadores}
+    precondicoes, vinculos_precondicao = ler_precondicoes(arquivos["matriz"])
+    perfis, vinculos_perfil = ler_perfis(arquivos["perfis"], ids_indicador)
+    lacunas = ler_lacunas(arquivos["lacunas"], ids_indicador)
     alertas = ler_alertas(arquivos["alertas"], id_por_sigla)
 
     with conn.transaction(), conn.cursor() as cur:
@@ -149,8 +202,10 @@ def carregar(conn: psycopg.Connection, responsavel: str, anexos: Path = ANEXOS, 
                  p_basico_atrasado1 = excluded.p_basico_atrasado1, coorte_ajustada = excluded.coorte_ajustada,
                  fonte = excluded.fonte""",
             componentes)
-        cur.execute("delete from iie.indicador_pratica")
-        cur.execute("delete from iie.alerta_dado")
+        for tabela in ("indicador_pratica", "precondicao_pratica", "perfil_pratica", "alerta_dado",
+                       "precondicao", "perfil_territorio", "lacuna"):
+            cur.execute(f"delete from iie.{tabela}")
+        cur.execute("delete from iie.pratica where id <> all(%s)", ([p[0] for p in praticas],))
         cur.executemany(
             """insert into iie.indicador (id, nome, grupo, pergunta, metrica, sentido, gatilho_atencao, gatilho_critico,
                  significado, diagnostico, monitorar, horizonte)
@@ -161,9 +216,22 @@ def carregar(conn: psycopg.Connection, responsavel: str, anexos: Path = ANEXOS, 
                  diagnostico = excluded.diagnostico, monitorar = excluded.monitorar, horizonte = excluded.horizonte""",
             indicadores)
         cur.executemany(
-            """insert into iie.pratica (id, fonte, documento, linhas) values (%s, %s, %s, %s)
-               on conflict (id) do update set fonte = excluded.fonte, documento = excluded.documento, linhas = excluded.linhas""",
+            """insert into iie.pratica (id, fonte, documento, linhas, nivel, secao, nome, descricao, alavancas)
+               values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+               on conflict (id) do update set fonte = excluded.fonte, documento = excluded.documento,
+                 linhas = excluded.linhas, nivel = excluded.nivel, secao = excluded.secao, nome = excluded.nome,
+                 descricao = excluded.descricao, alavancas = excluded.alavancas""",
             praticas)
+        cur.executemany("insert into iie.precondicao (id, nome, o_que_garantir, ordem) values (%s, %s, %s, %s)",
+                        precondicoes)
+        cur.executemany("insert into iie.precondicao_pratica (precondicao_id, pratica_id, ordem) values (%s, %s, %s)",
+                        vinculos_precondicao)
+        cur.executemany("""insert into iie.perfil_territorio (id, nome, criterio, sequencia, descricao, ordem)
+                           values (%s, %s, %s, %s, %s, %s)""", perfis)
+        cur.executemany("insert into iie.perfil_pratica (perfil_id, pratica_id, ordem) values (%s, %s, %s)",
+                        vinculos_perfil)
+        cur.executemany("""insert into iie.lacuna (id, tema, cobertura, complemento, indicadores, ordem)
+                           values (%s, %s, %s, %s, %s, %s)""", lacunas)
         cur.executemany(
             """insert into iie.indicador_pratica (indicador_id, pratica_id, nivel, papel, nome, o_que_fazer, ordem)
                values (%s, %s, %s, %s, %s, %s, %s)""",
@@ -174,7 +242,9 @@ def carregar(conn: psycopg.Connection, responsavel: str, anexos: Path = ANEXOS, 
             alertas)
         contagem = {"territorios": len(territorios), "resultados_oficiais": len(oficial),
                     "componentes": len(componentes), "indicadores": len(indicadores), "praticas": len(praticas),
-                    "vinculos": len(vinculos), "alertas": len(alertas)}
+                    "vinculos": len(vinculos), "alertas": len(alertas), "precondicoes": len(precondicoes),
+                    "vinculos_precondicao": len(vinculos_precondicao), "perfis": len(perfis),
+                    "vinculos_perfil": len(vinculos_perfil), "lacunas": len(lacunas)}
         cur.execute("insert into iie.carga (hash, linhas, responsavel) values (%s, %s, %s)",
                     (_hash_arquivos(list(arquivos.values())), json.dumps(contagem), responsavel))
     return contagem
