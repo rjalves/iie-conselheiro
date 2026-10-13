@@ -464,6 +464,7 @@ Se o MCP não estiver disponível, a publicação usa a API REST do n8n com uma 
 | Troca dos governos estaduais em 01/01/2027 (eleições de 2026) | alta | médio | Piloto com secretarias **a partir de fevereiro de 2027**, ou com secretarias municipais |
 | Usuários esperarem dados do município | alta | médio | Aviso no cadastro e na resposta; registrar as perguntas para priorizar a carga do IIEM |
 | MCP do n8n indisponível | média | baixo | API REST do n8n com o mesmo JSON |
+| Supabase auto-hospedado com as chaves de demonstração (situação encontrada em 2026-10-13) | alta | alto | Trocar `JWT_SECRET`, chaves e senhas antes de qualquer dado real (plano 02, seção 4.4); não expor a porta do Postgres; manter o *postgres-meta* acessível só com a chave nova |
 
 ## 14. Pontos a confirmar na prova técnica (Fase 0)
 

@@ -2,7 +2,7 @@
 
 > **Para agentes executores:** SUB-SKILL OBRIGATÓRIA: use superpowers:subagent-driven-development (recomendado) ou superpowers:executing-plans para implementar este plano tarefa a tarefa. Os passos usam caixas de seleção (`- [ ]`) para acompanhamento.
 >
-> **Versão 2, 2026-10-13.** Revisada para o site ([proposta 03](../03_proposta_sistema_web.md)) e para a base de práticas completa. As Tarefas 1 a 7 foram **executadas e validadas** em 2026-10-13, na *branch* `feat/p1-camada-de-dados`: 68 testes passando num Postgres 17 descartável. O código abaixo é o que está no repositório. **Falta a Tarefa 8** (aplicar no Supabase), que depende do responsável pelo projeto.
+> **Versão 2, 2026-10-13.** Revisada para o site ([proposta 03](../03_proposta_sistema_web.md)) e para a base de práticas completa. As Tarefas 1 a 7 foram **executadas e validadas** em 2026-10-13, na *branch* `feat/p1-camada-de-dados`: 68 testes passando num Postgres 17 descartável. O código abaixo é o que está no repositório. A Tarefa 8 foi aplicada no Supabase auto-hospedado de desenvolvimento em 2026-10-13, com Postgres 15.8. Ficaram pendentes 3 passos que dependem do responsável: expor o esquema `app`, criar o primeiro administrador e trocar as chaves de demonstração.
 
 **Objetivo:** criar no Supabase os esquemas `iie` e `app` com:
 - os dados do IIE;
@@ -25,7 +25,7 @@
 
 ## Restrições globais
 
-- PostgreSQL 17. Extensões no esquema `extensions` (padrão do Supabase).
+- PostgreSQL 15 ou mais novo. O Supabase de desenvolvimento roda a 15.8, e a suíte foi validada na 15 e na 17. Extensões no esquema `extensions` (padrão do Supabase).
 - `iie` (analítico) **não** é exposto na API do Supabase. `app` (operação) **é** exposto, sempre com RLS.
 - **Funções `iie.fn_*`:** `STABLE`, somente leitura, devolvem `jsonb`.
   - As de dados trazem `natureza` (`oficial` ou `reproducao`), `fonte` e `alertas`.
@@ -2804,6 +2804,22 @@ git commit -m "feat(dados): relação completa indicadores × práticas no banco
 ### Tarefa 8: Aplicar no Supabase (desenvolvimento e depois produção)
 
 Esta tarefa é operacional e não tem código novo. **Antes de começar, confirme com o responsável pelo projeto qual projeto (ou *branch*) de desenvolvimento usar.** Repita em produção só depois de a P2 estar aprovada.
+
+> **Como foi feita em 2026-10-13.** O ambiente é um Supabase auto-hospedado no Easypanel (`supabase-iie.9cyl9k.easypanel.host`), com Postgres 15.8, sem acesso direto à porta do Postgres. Os passos 2 a 5 foram feitos pelo *postgres-meta* da própria instância.
+>
+> | O que foi feito | Como |
+> |---|---|
+> | Migrações (passo 2) | `POST <url>/pg/query`, com a chave `service_role` e o corpo `{"query": "<conteúdo do arquivo>"}`. Um envio por arquivo, e cada envio roda numa transação só. Tudo foi ensaiado antes num banco limpo |
+> | Usuários de login (passo 3) | A senha vai em hash SCRAM gerado localmente (`password 'SCRAM-SHA-256$…'`), para não trafegar nem ficar registrada em texto. As senhas ficam em `agente/.env.dev`, fora do git |
+> | Carga (passo 4) | Feita a partir do banco de teste validado: `pg_dump --data-only --column-inserts --schema=iie` gerado por um pg_dump 15, mantendo só as linhas `INSERT` e `setval`, enviado num único envio |
+> | Conferência (passo 5) | Feita com `has_table_privilege` e `has_function_privilege`, sem trocar de papel na conexão compartilhada. Resultado: o agente executa as funções e não grava; o n8n grava mensagens e não altera usuários; `anon` e `authenticated` não acessam `iie`; as 20 tabelas estão com RLS |
+>
+> **No auto-hospedado, o passo 1 é diferente:** acrescente `app` à variável `PGRST_DB_SCHEMAS` do serviço `rest` no Easypanel e reinicie o serviço.
+>
+> **Pendente:**
+> - passo 1 (expor `app`);
+> - passo 6 (primeiro administrador);
+> - a troca das chaves de demonstração, que é obrigatória (ver o plano 02, seção 4.4).
 
 **Interfaces:**
 - Produz os usuários de login `agente_app` (membro de `agente_leitura`) e `n8n_app` (membro de `n8n_operacao`). As *strings* de conexão desses usuários vão para o cofre de segredos: o n8n as consome nas credenciais `iie-leitura` e `iie-operacao` (P2).

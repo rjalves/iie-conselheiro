@@ -113,7 +113,13 @@ gantt
 
 ### 4.4 Supabase
 
-- [ ] Projeto ou *branch* de desenvolvimento.
+- [x] Projeto de desenvolvimento: Supabase auto-hospedado no Easypanel (Postgres 15.8). A P1 foi aplicada em 2026-10-13.
+- [ ] **Obrigatório antes de qualquer dado real: trocar as chaves de demonstração.** Em 2026-10-13, o `JWT_SECRET` do Supabase auto-hospedado ainda era o segredo público do `.env.example`, o que foi verificado pela assinatura das chaves. Com isso, qualquer pessoa gera uma chave `service_role` válida e executa SQL como **superusuário** pela rota `/pg/query`. O que fazer no Easypanel:
+  - gerar um `JWT_SECRET` novo e, a partir dele, as chaves `ANON_KEY` e `SERVICE_ROLE_KEY`;
+  - trocar `DASHBOARD_PASSWORD` e a senha do Postgres (`POSTGRES_PASSWORD` e `alter role … password` dentro do banco);
+  - reiniciar os serviços;
+  - atualizar `agente/.env.dev` e as credenciais do n8n e do site;
+  - depois, rodar a carga de novo, por segurança.
 - [ ] Esquema `app` exposto na API; `iie` **não** exposto.
 - [ ] Auth:
   - confirmação de e-mail ligada;
