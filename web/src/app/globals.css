@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+/* Identidade do IIE Conselheiro (plano P3, "Direção visual"): caderno escolar, caneta azul e marca-texto. */
+@theme {
+  --color-tinta: #1d3a8a;
+  --color-tinta-escura: #152b66;
+  --color-tinta-clara: #e8edf8;
+  --color-grafite: #1e2228;
+  --color-grafite-suave: #5a6170;
+  --color-papel: #f6f7f9;
+  --color-linha: #dde1e8;
+  --color-marca: #ffe066;
+  --color-erro: #b42318;
+  --color-erro-fundo: #fdecea;
+  --color-sucesso: #1f7a4d;
+  --color-sucesso-fundo: #e7f4ec;
+  --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-papel);
+  color: var(--color-grafite);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Foco sempre visível, em tinta, com folga para não colar no contorno. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--color-tinta);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.numeros {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Texto das respostas do agente (markdown). O negrito vira marca-texto: o que o agente destacou para o gestor. */
+.resposta {
+  max-width: 72ch;
+}
+.resposta > * + * {
+  margin-top: 0.85em;
+}
+.resposta strong {
+  font-weight: 700;
+  background: linear-gradient(180deg, transparent 52%, var(--color-marca) 52%, var(--color-marca) 94%, transparent 94%);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding: 0 0.12em;
+}
+.resposta em {
+  color: var(--color-grafite-suave);
+}
+.resposta ul,
+.resposta ol {
+  padding-left: 1.25em;
+}
+.resposta ul {
+  list-style: disc;
+}
+.resposta ol {
+  list-style: decimal;
+}
+.resposta li + li {
+  margin-top: 0.3em;
+}
+.resposta a {
+  color: var(--color-tinta);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.resposta h1,
+.resposta h2,
+.resposta h3 {
+  font-weight: 700;
+  font-size: 1.05em;
+}
+.resposta table {
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95em;
+}
+.resposta th,
+.resposta td {
+  border-bottom: 1px solid var(--color-linha);
+  padding: 0.35em 0.75em 0.35em 0;
+  text-align: left;
+}
+.resposta th {
+  font-weight: 700;
+}
+.resposta code {
+  background: var(--color-tinta-clara);
+  padding: 0.05em 0.3em;
+  border-radius: 3px;
+  font-size: 0.92em;
+}
+
+/* Grade da geração: os pontos preenchidos aparecem um a um, uma vez, ao abrir a tela. */
+@keyframes ponto-entra {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.ponto-cheio {
+  animation: ponto-entra 320ms ease-out both;
+}
+@keyframes pulsar {
+  50% {
+    opacity: 0.35;
+  }
+}
+.pulsar {
+  animation: pulsar 1.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ponto-cheio,
+  .pulsar {
+    animation: none;
+  }
+}

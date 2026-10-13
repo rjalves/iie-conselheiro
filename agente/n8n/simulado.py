@@ -11,7 +11,7 @@ n8n_operacao. A resposta traz números reais de iie.fn_consultar_iie.
 Para testar a interface, mensagens com "#erro" simulam uma falha no meio da resposta, e com "#lento" demoram mais.
 
 Uso (a partir de agente/):
-    python -m n8n.simulado --database-url postgresql://postgres:postgres@127.0.0.1:59322/postgres
+    python -m n8n.simulado --database-url postgresql://n8n_app:n8n_app_local@127.0.0.1:59322/postgres
 """
 from __future__ import annotations
 

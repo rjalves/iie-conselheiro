@@ -2,12 +2,16 @@
 
 > **Para agentes executores:** SUB-SKILL OBRIGATÓRIA: use superpowers:subagent-driven-development (recomendado) ou superpowers:executing-plans para implementar este plano tarefa a tarefa. Os passos usam caixas de seleção (`- [ ]`) para acompanhamento.
 >
-> **Versão 1, 2026-10-13.** Este plano descreve tarefas, interfaces e testes. O código fica no repositório (`web/`, `agente/n8n/simulado.py`, `agente/supabase/config.toml`) e não é copiado aqui, para não haver duas versões do mesmo código.
+> **Versão 1, 2026-10-13. Executado em 2026-10-13**, na *branch* `feat/p1-camada-de-dados`. Resultado:
+> - **site:** 34 testes unitários, 3 testes ponta a ponta (Playwright), lint e build limpos;
+> - **camada de dados:** 72 testes, incluindo o contrato do n8n simulado.
+>
+> Este plano descreve tarefas, interfaces e testes. O código fica no repositório (`web/`, `agente/n8n/simulado.py`, `agente/supabase/config.toml`) e não é copiado aqui, para não haver duas versões do mesmo código.
 
 **Objetivo:** o site em que gestores se cadastram (UF e município), esperam a aprovação da equipe e conversam com o IIE Conselheiro. O chat tem várias conversas e respostas em *streaming*.
 
 **Arquitetura:**
-- Next.js (App Router, TypeScript) com `@supabase/ssr`. A sessão fica em *cookies*.
+- Next.js 16.4 (App Router, TypeScript), sem `cacheComponents`, porque o site é todo personalizado pela sessão, e com `@supabase/ssr`. No Next 16, o *middleware* passou a se chamar `src/proxy.ts`. A sessão fica em *cookies*.
 - As páginas leem `app.*` com a sessão do usuário, sob RLS.
 - `POST /api/chat` valida o pedido, cria a conversa e repassa a pergunta ao webhook do n8n. O NDJSON que volta é convertido em texto para o navegador.
 - Em desenvolvimento, usa:
@@ -98,13 +102,14 @@
   - `app.mensagem` recebe a pergunta e a resposta;
   - `app.cota_diaria` soma 1.
 - [ ] Implementar `agente/n8n/simulado.py` (biblioteca padrão + psycopg) até o teste passar. Commit.
+- [ ] `agente/supabase/seed.sql` (só no ambiente local): cria os usuários de login `n8n_app` e `agente_app`. No Supabase, o `postgres` não é superusuário e não pode assumir `n8n_operacao`, por isso o simulado conecta como `n8n_app`, como o n8n real.
 
 ### Tarefa 2: Projeto `web/`, identidade visual e clientes Supabase
 
 - [ ] `create-next-app` em `web/` com TypeScript, Tailwind, App Router, `src/` e ESLint. Dependências: `@supabase/ssr`, `@supabase/supabase-js`, `react-markdown` e `remark-gfm`; Vitest para testes.
 - [ ] Definir os *tokens* de cor e fonte no CSS global (seção "Direção visual"); componente `GradeGeracao` (100 pontos, `aria-label` com a leitura por extenso).
 - [ ] Clientes Supabase (servidor, navegador e *middleware*) e `.env.local.example` com as variáveis da [03 §12](../03_proposta_sistema_web.md#12-implantação).
-- [ ] `scripts/gerar_municipios.mjs`: gera `public/municipios/<UF>.json` (`[{codigo, nome}]`, em ordem alfabética) com os 5.570 municípios. Conferir: 27 arquivos; o do CE tem Sobral com código 2312908.
+- [ ] `scripts/gerar_municipios.mjs`: gera `public/municipios/<UF>.json` (`[{codigo, nome}]`, em ordem alfabética) com os municípios (o IBGE devolveu 5.571 em 2026-10-13). Conferir: 27 arquivos; o do CE tem Sobral com código 2312908.
 - [ ] `npm run build` e `npm run lint` passam. Commit.
 
 ### Tarefa 3: Cadastro, entrada e recuperação de senha

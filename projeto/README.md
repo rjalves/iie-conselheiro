@@ -31,7 +31,8 @@ Gestor ⇄ Site (Next.js) ⇄ n8n: AI Agent + Claude (claude-opus-5-5)
 - **P1 (camada de dados), Tarefas 1 a 7: executadas e testadas** na *branch* `feat/p1-camada-de-dados`.
   - O que existe: migrações 0001 a 0005, carga, catálogo das 541 práticas e 68 testes num Postgres 17 local.
   - O que falta: a Tarefa 8, que aplica tudo no Supabase de desenvolvimento.
+- **P3 (site): executada** com o Supabase local e o n8n simulado. O site está em `web/`; veja o `web/README.md`.
 - Próximos passos:
-  - a Tarefa 8;
+  - pendências da Tarefa 8 (expor `app`, primeiro administrador, trocar as chaves);
   - a prova técnica do agente no n8n (Fase 0);
   - os planos da P2 (agente no n8n) e da P3 (site).

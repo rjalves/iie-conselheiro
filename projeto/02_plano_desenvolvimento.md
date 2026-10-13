@@ -12,7 +12,7 @@ São **6 subplanos**, numerados na ordem de execução. Cada um entrega algo tes
 |---|---|---|---|
 | [P1: camada de dados](planos/P1_camada_de_dados.md) | Esquemas `iie` e `app` no Supabase, carga, funções SQL, papéis e RLS, mais o catálogo completo de práticas e toda a relação do doc 09 | P1 anterior, **revisada** | **Tarefas 1 a 7 executadas** em 2026-10-13 (68 testes, *branch* `feat/p1-camada-de-dados`). Falta a Tarefa 8 (Supabase) |
 | P2: agente no n8n | Workflow `iie-agente-web`: modelo, 7 ferramentas, memória, *streaming*, rastreabilidade, erros | **Substitui** a [P2 em Python](planos/P2_servico_do_agente.md), que fica só como referência | Tarefas e critérios na seção 6. Plano passo a passo a escrever |
-| P3: site | Next.js: cadastro, login, administração, chat com várias conversas, *streaming*, conta | **Novo** | Tarefas e critérios na seção 7. Plano passo a passo a escrever |
+| [P3: site](planos/P3_site.md) | Next.js: cadastro, login, administração, chat com várias conversas, *streaming*, conta | **Novo** | **Executado** em 2026-10-13 com o n8n simulado (34 testes unitários + 3 ponta a ponta). Falta ligar ao agente real (P2) e publicar |
 | P4: base de conhecimento e avaliação | Compilação da base, 85 perguntas, corretores, critérios de liberação | Antiga P3 | Tarefas e critérios na seção 8 |
 | P5: piloto web | Piloto interno, piloto com secretarias, rotina de melhoria, monitoramento | Antiga P5 | Tarefas e critérios na seção 9 |
 | P6: canal WhatsApp | Meta, workflows de entrada e acesso, vínculo do telefone com o cadastro do site | Antiga P4 | Tarefas e critérios na seção 10 |
