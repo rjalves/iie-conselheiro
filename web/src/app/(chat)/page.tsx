@@ -1,5 +1,5 @@
 import { Chat } from "@/components/chat/Chat";
-import { limiteDiario, perguntasRestantes } from "@/lib/conversa";
+import { limiteDiario, perguntasRestantes, usuarioDoChat } from "@/lib/conversa";
 import { obterUsuario } from "@/lib/usuario";
 
 /** Conversa nova: saudação e sugestões. A conversa é criada na primeira pergunta. */
@@ -10,9 +10,10 @@ export default async function PaginaNovaConversa() {
       key="nova"
       conversa={null}
       mensagensIniciais={[]}
-      usuario={{ id: usuario.id, nome: usuario.nome, uf: usuario.uf, municipio: usuario.municipio_nome }}
+      usuario={usuarioDoChat(usuario)}
       restantes={await perguntasRestantes()}
       limite={limiteDiario()}
     />
   );
 }
+

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { TopoSimples } from "@/components/TopoSimples";
+import { acessoDoUsuario, descreverAcesso } from "@/lib/acesso";
 import { PERFIS, STATUS, type Perfil, type Status } from "@/lib/rotulos";
 import { obterUsuario } from "@/lib/usuario";
 import { ExcluirConta } from "./ExcluirConta";
@@ -18,6 +19,7 @@ export default async function PaginaConta() {
     ["Instituição", usuario.instituicao],
     ["Município", `${usuario.municipio_nome}, ${usuario.uf}`],
     ["Situação", STATUS[usuario.status as Status] ?? usuario.status],
+    ["Estados liberados", descreverAcesso(acessoDoUsuario(usuario))],
     ["Termo de uso aceito em", new Date(usuario.aceite_termo_em).toLocaleString("pt-BR")],
   ];
   return (

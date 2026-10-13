@@ -55,8 +55,23 @@ test("cadastro, aprovação, conversa, avaliação e exclusão da conversa", asy
   await paginaAdmin.getByRole("row").filter({ hasText: gestora.email }).getByRole("button", { name: "Aprovar" }).click();
   await expect(paginaAdmin.getByRole("row").filter({ hasText: gestora.email })).toHaveCount(0);
 
+  // Acesso por UF: a gestora começa só com o CE; o administrador libera também Pernambuco.
+  await paginaAdmin.goto("/admin?status=ativo");
+  const linha = paginaAdmin.getByRole("row").filter({ hasText: gestora.email });
+  await expect(linha).toContainText("CE");
+  await linha.getByRole("button", { name: `Editar estados de ${gestora.nome}` }).click();
+  const janela = paginaAdmin.getByRole("dialog", { name: `Estados liberados para ${gestora.nome}` });
+  await janela.getByLabel("Pernambuco (PE)").check();
+  mkdirSync(CAPTURAS, { recursive: true });
+  await paginaAdmin.screenshot({ path: `${CAPTURAS}/admin-estados.png` });
+  await janela.getByRole("button", { name: "Salvar estados" }).click();
+  await expect(janela).toBeHidden();
+  await expect(linha).toContainText("CE, PE");
+  expect(sql(`select ufs_acesso from app.usuario where email = '${gestora.email}'`)).toBe("{CE,PE}");
+
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Olá, Gestora." })).toBeVisible();
+  await expect(page.getByText("Estados liberados: Ceará e Pernambuco.", { exact: false })).toBeVisible();
   await page.getByRole("button", { name: "Como está o Ceará no IIE?" }).click();
   const resposta = page.locator("article").last();
   await expect(resposta).toContainText("21,2", { timeout: 30_000 });

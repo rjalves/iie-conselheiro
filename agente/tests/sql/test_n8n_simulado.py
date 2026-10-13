@@ -28,7 +28,7 @@ def _post(url, corpo, chave="dev"):
 
 def _pedido(uid, conversa, mensagem="Como está o Ceará?"):
     return {"usuario_id": str(uid), "conversa_id": str(conversa), "mensagem": mensagem, "perfil": "secretaria_estadual",
-            "uf": "CE", "municipio": "Sobral", "data_referencia": "2026-10-13"}
+            "uf": "CE", "municipio": "Sobral", "data_referencia": "2026-10-13", "ufs_permitidas": ["CE"]}
 
 
 def test_chave_errada_e_recusada(webhook):
@@ -62,3 +62,12 @@ def test_simula_erro_no_meio_da_resposta(banco, sql, webhook):
     eventos = _post(webhook, _pedido(uid, conversa, "teste #erro"))
     assert eventos[-1]["type"] == "error"
     assert sql("select erro is not null from app.mensagem where conversa_id = %s and papel = 'agente'", conversa)
+
+
+def test_pedido_sem_lista_de_ufs_e_recusado(banco, webhook):
+    uid = ativar(banco, cadastrar(banco))
+    pedido = _pedido(uid, nova_conversa(banco, uid))
+    del pedido["ufs_permitidas"]
+    with pytest.raises(urllib.error.HTTPError) as erro:
+        _post(webhook, pedido)
+    assert erro.value.code == 400

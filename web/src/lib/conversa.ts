@@ -1,6 +1,8 @@
+import { acessoDoUsuario, descreverAcesso } from "./acesso";
 import { LIMITE_PADRAO } from "./chat";
 import { TEXTO_INSTABILIDADE } from "./ndjson";
 import { criarClienteServidor } from "./supabase/servidor";
+import type { Usuario } from "./usuario";
 
 export type MensagemTela = {
   id: string | null;
@@ -41,4 +43,18 @@ export async function carregarConversa(id: string) {
     nota: (m.feedback?.[0]?.nota as 1 | -1 | undefined) ?? null,
   }));
   return { conversa, mensagens: tela };
+}
+
+/** O que o chat precisa saber do usuário: UF padrão e os estados liberados (acesso por UF). */
+export function usuarioDoChat(usuario: Usuario) {
+  const acesso = acessoDoUsuario(usuario);
+  return {
+    id: usuario.id,
+    nome: usuario.nome,
+    uf: acesso.padrao,
+    municipio: usuario.municipio_nome,
+    estados: descreverAcesso(acesso),
+    todosEstados: acesso.todas,
+    variosEstados: acesso.ufs.length > 1,
+  };
 }

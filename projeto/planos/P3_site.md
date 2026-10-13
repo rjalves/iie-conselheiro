@@ -187,3 +187,13 @@ Pré-requisitos: Supabase local, n8n simulado e `npm run dev`. Contas e senhas d
   6. apaga a conversa.
 - [ ] Capturas de tela (computador e celular) das telas de entrada, chat e administração, revisadas contra a "Direção visual".
 - [ ] Commit.
+
+### Tarefa 8: Acesso por UF (2026-10-13)
+
+- **`src/lib/acesso.ts`** (testado): `acessoDoUsuario` calcula os estados liberados (os 27 para administradores) e a UF padrão; `descreverAcesso` e `resumirAcesso` geram os textos.
+- **`/api/chat`:** envia `ufs_permitidas` e a UF padrão ao n8n.
+- **Chat:** a saudação, as sugestões e o rodapé mostram os estados liberados.
+- **Minha conta:** mostra os estados liberados.
+- **`/admin`:** coluna "Estados liberados" e janela "Editar" (`EditarEstados.tsx`), com as 27 UFs, "Marcar todas" e "Desmarcar todas"; a ação de servidor `salvarEstados` grava a lista.
+- **n8n simulado:** exige `ufs_permitidas`.
+- **Testes:** 39 unitários e 3 ponta a ponta. O ponta a ponta inclui o administrador liberando Pernambuco para a gestora.

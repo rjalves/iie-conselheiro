@@ -2,7 +2,7 @@
 
 Cumpre o contrato da proposta 03, seção 5.1:
 - POST /webhook/iie-chat, com o cabeçalho X-IIE-Chave;
-- corpo {usuario_id, conversa_id, mensagem, perfil, uf, municipio, data_referencia};
+- corpo {usuario_id, conversa_id, mensagem, perfil, uf, municipio, data_referencia, ufs_permitidas};
 - resposta em NDJSON: begin, item (com content), end ou error.
 
 Grava a pergunta e a resposta em app.mensagem, como fazem os nós 2 e 6 do workflow real, com as permissões do papel
@@ -23,7 +23,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import psycopg
 from psycopg.types.json import Jsonb
 
-CAMPOS = ("usuario_id", "conversa_id", "mensagem", "perfil", "uf", "municipio", "data_referencia")
+CAMPOS = ("usuario_id", "conversa_id", "mensagem", "perfil", "uf", "municipio", "data_referencia", "ufs_permitidas")
 ERRO_INSTABILIDADE = "Estou com instabilidade agora. Tente de novo em alguns minutos."
 
 
@@ -34,7 +34,8 @@ def _num(valor: float) -> str:
 def montar_resposta(conn: psycopg.Connection, pedido: dict) -> tuple[str, list[dict]]:
     """Texto em markdown e trilha de ferramentas da resposta simulada."""
     ferramentas = [{"nome": "consultar_iie", "args": {"territorio": pedido["uf"], "etapa": "EM"}}]
-    r = conn.execute("select iie.fn_consultar_iie(%s)", (pedido["uf"],)).fetchone()[0]
+    # Como as ferramentas do n8n real: a lista de UFs vem do pedido (do site), nunca do modelo.
+    r = conn.execute("select iie.fn_consultar_iie(%s, 'EM', %s)", (pedido["uf"], pedido["ufs_permitidas"])).fetchone()[0]
     nome, serie, brasil, pos = r["territorio"]["nome"], r["serie"], r["brasil"][-1], r["posicao"]
     ultimo = serie[-1]
     evolucao = " → ".join(f"{_num(p['valor'])} ({p['ano']})" for p in serie)
@@ -79,6 +80,9 @@ class _Webhook(BaseHTTPRequestHandler):
         except json.JSONDecodeError:
             return self._recusar(400, "JSON inválido")
         faltando = [c for c in CAMPOS if not pedido.get(c)]
+        if not faltando and not (isinstance(pedido["ufs_permitidas"], list)
+                                 and all(isinstance(u, str) for u in pedido["ufs_permitidas"])):
+            faltando = ["ufs_permitidas (lista de siglas)"]
         if faltando:
             return self._recusar(400, f"campos obrigatórios: {', '.join(faltando)}")
 

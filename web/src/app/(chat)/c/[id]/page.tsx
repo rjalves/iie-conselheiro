@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Chat } from "@/components/chat/Chat";
-import { carregarConversa, limiteDiario, perguntasRestantes } from "@/lib/conversa";
+import { carregarConversa, limiteDiario, perguntasRestantes, usuarioDoChat } from "@/lib/conversa";
 import { obterUsuario } from "@/lib/usuario";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -22,9 +22,10 @@ export default async function PaginaConversa({ params }: PageProps<"/c/[id]">) {
       key={id}
       conversa={dados.conversa}
       mensagensIniciais={dados.mensagens}
-      usuario={{ id: usuario.id, nome: usuario.nome, uf: usuario.uf, municipio: usuario.municipio_nome }}
+      usuario={usuarioDoChat(usuario)}
       restantes={await perguntasRestantes()}
       limite={limiteDiario()}
     />
   );
 }
+

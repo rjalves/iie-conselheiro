@@ -1,8 +1,8 @@
-// As 27 UFs, na ordem alfabética, com o código IBGE (2 primeiros dígitos do código do município).
+// As 27 UFs, em ordem alfabética do português (Pará, Paraíba, Paraná), com o código IBGE (2 primeiros dígitos do código do município).
 // Gerado de agente/dados/seeds/territorios.csv. O artigo serve para escrever "o Ceará", "a Bahia", "São Paulo".
 export type UF = { sigla: string; nome: string; codigo: string; artigo: "o" | "a" | "" };
 
-export const UFS: UF[] = [
+const LISTA: UF[] = [
   { sigla: "AC", nome: "Acre", codigo: "12", artigo: "o" },
   { sigla: "AL", nome: "Alagoas", codigo: "27", artigo: "" },
   { sigla: "AP", nome: "Amapá", codigo: "16", artigo: "o" },
@@ -31,6 +31,8 @@ export const UFS: UF[] = [
   { sigla: "SP", nome: "São Paulo", codigo: "35", artigo: "" },
   { sigla: "TO", nome: "Tocantins", codigo: "17", artigo: "o" },
 ];
+
+export const UFS: UF[] = [...LISTA].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
 
 export function buscarUf(sigla: string): UF | undefined {
   return UFS.find((uf) => uf.sigla === sigla);

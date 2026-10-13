@@ -2894,3 +2894,33 @@ psql "$SUPABASE_DB_URL" -c "update app.usuario set status = 'ativo', papel = 'ad
 - [ ] **Passo 7: Conferir os avisos de segurança**
 
 No painel, abra *Advisors → Security*. Esperado: nenhum aviso de "RLS disabled" nas tabelas de `iie` e `app`. Avisos de *search_path* em funções do esquema `iie`, que não é exposto, são aceitos. Registre o resultado na descrição do PR.
+
+---
+
+### Tarefa 9: Acesso por UF (2026-10-13)
+
+Mudança aprovada em 2026-10-13: a decisão W5 da proposta 03 foi revista. O código está no repositório e não é copiado aqui.
+
+**Arquivos:**
+- Criar: `agente/supabase/migrations/0006_acesso_por_uf.sql`
+- Teste: `agente/tests/sql/test_acesso.py`
+- Modificar: os testes de `fn_*` passam a enviar `p_ufs => iie.ufs_todas()`
+
+**Interfaces:**
+- **Coluna `app.usuario.ufs_acesso text[]`:**
+  - não pode ser nula;
+  - o cadastro grava a UF informada;
+  - o gatilho `app.validar_ufs_acesso` normaliza (maiúsculas, sem repetição, em ordem) e recusa lista vazia ou sigla inválida, com erro `22023`;
+  - só administradores mudam a coluna (RLS da 0004).
+- **`iie.ufs_todas() -> text[]`:** as 27 siglas.
+- **`iie.fn_checar_acesso(territorio, p_ufs)`:**
+  - lista nula: erro `42501 acesso_nao_informado`;
+  - UF fora da lista: erro `42501 territorio_sem_acesso: <nome>`, com os estados liberados no `hint`;
+  - Brasil: sempre liberado.
+- **Novas assinaturas,** com `p_ufs text[]` no fim (as versões antigas foram removidas):
+  - `fn_consultar_iie(p_territorio, p_etapa default 'EM', p_ufs)`;
+  - `fn_decompor(p_territorio, p_ano, p_ufs)`;
+  - `fn_comparar(p_territorios, p_indicador, p_ano, p_ufs)`;
+  - `fn_ranking(p_indicador, p_ano, p_regiao, p_limite, p_ufs)`. No ranking, a posição continua sendo a nacional (ou da região); só as UFs liberadas aparecem, e o retorno traz `de` e `apenas_ufs_liberadas`.
+
+**Resultado:** 84 testes passando no Postgres 15 e no 17. A migração foi aplicada no Supabase local; **no Supabase de desenvolvimento, ainda não**.

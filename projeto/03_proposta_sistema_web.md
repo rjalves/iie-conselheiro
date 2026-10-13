@@ -34,7 +34,7 @@ Um site onde gestores da educação se cadastram, informam estado e município e
 | W2 | Acesso | **Cadastro livre**. O chat só fica disponível depois que a equipe aprova o cadastro |
 | W3 | Login | **E-mail e senha** no Supabase Auth, com confirmação de e-mail e recuperação de senha |
 | W4 | Região | O cadastro pede **UF e município**. Hoje o agente responde com os dados da **UF** e informa que o dado municipal ainda não está disponível. O município fica guardado para quando houver dados |
-| W5 | Outras regiões | A UF do cadastro é o padrão. O usuário **pode perguntar sobre outras UFs** e pedir comparações |
+| W5 | Acesso por UF (revista em 2026-10-13) | Cada usuário vê os dados **só das UFs liberadas**, uma lista que começa com a UF do cadastro. O administrador libera ou retira UFs, inclusive "todas". **Administradores veem todas.** O Brasil, a posição nacional da própria UF e as práticas de gestão ficam sempre liberados. A regra é aplicada no banco (migração 0006). Antes, qualquer usuário via qualquer UF |
 | W6 | Agente | **n8n auto-hospedado, versão 2.37 ou mais nova** (que traz o cache do nó Anthropic) |
 | W7 | Modelo | `claude-opus-5-5`, com raciocínio adaptativo e esforço `medium`, que são os padrões do modelo |
 | W8 | Workflows | O JSON dos workflows é **gerado pelo Claude**, versionado no git e publicado no n8n **via MCP** |
@@ -60,7 +60,7 @@ Um site onde gestores da educação se cadastram, informam estado e município e
 | RW01 | **Cadastro** com nome, e-mail, senha, perfil, instituição, UF, município e aceite do termo de uso. A lista de municípios é filtrada pela UF escolhida |
 | RW02 | Confirmação de e-mail, login, "esqueci minha senha" e sair |
 | RW03 | Depois do login, o que aparece depende do status: **pendente** vê a tela "cadastro em análise"; **recusado** e **bloqueado** veem um aviso; **ativo** vê o chat |
-| RW04 | **Administração** (só equipe): lista de cadastros, com filtro de pendentes, e ações de aprovar, recusar e bloquear |
+| RW04 | **Administração** (só equipe): lista de cadastros, com filtro de pendentes, e ações de aprovar, recusar e bloquear; edição dos estados liberados de cada usuário (RW12) |
 | RW05 | **Chat:** barra lateral com as conversas, das mais recentes para as mais antigas; "nova conversa"; apagar conversa. O título é o começo da primeira pergunta |
 | RW06 | A resposta aparece aos poucos (*streaming*) e com formatação (negrito, listas e tabelas pequenas) |
 | RW07 | Uma conversa nova mostra 3 sugestões de pergunta já com a UF do usuário. Ex.: "Como está o Ceará no IIE?", "Onde o Ceará deveria agir primeiro?", "O que é o IIE?" |
@@ -68,6 +68,7 @@ Um site onde gestores da educação se cadastram, informam estado e município e
 | RW09 | Limite diário por usuário, padrão de 40 perguntas, com aviso de quando o limite renova |
 | RW10 | **Meus dados:** página com os dados do cadastro e o botão "excluir minha conta", que apaga conversas, mensagens, memória do agente e a conta |
 | RW11 | Cada resposta registra ferramentas usadas, latência, números e práticas sem origem, modelo e versão da base de conhecimento |
+| RW12 | **Acesso por UF** (W5): o agente só mostra números das UFs liberadas para o usuário. No ranking, aparecem só as UFs liberadas, com a posição nacional; numa comparação com UF não liberada, o agente explica que não tem acesso e oferece os estados liberados. O chat e "Minha conta" mostram os estados liberados |
 
 ### Não funcionais
 
@@ -148,7 +149,7 @@ Nenhuma outra biblioteca de interface no MVP.
 | `/` | ativo | Barra lateral com as conversas e uma conversa vazia com sugestões (RW07) |
 | `/c/[id]` | ativo e dono da conversa | Conversa: mensagens, campo de pergunta, 👍/👎 |
 | `/conta` | logado | Meus dados e excluir conta (RW10) |
-| `/admin` | `papel = admin` | Cadastros: aprovar, recusar, bloquear (RW04) |
+| `/admin` | `papel = admin` | Cadastros: aprovar, recusar, bloquear e editar os estados liberados, numa janela com as 27 UFs (RW04, RW12) |
 | `POST /api/chat` | ativo | Valida, cria a conversa, chama o n8n e transmite a resposta |
 
 O *middleware* do Next.js renova a sessão e redireciona:
@@ -179,9 +180,13 @@ O *middleware* do Next.js renova a sessão e redireciona:
   "perfil": "secretaria_estadual",
   "uf": "CE",
   "municipio": "Sobral",
-  "data_referencia": "2026-10-13"
+  "data_referencia": "2026-10-13",
+  "ufs_permitidas": ["CE", "PE"]
 }
 ```
+
+- `uf` é a UF padrão: a do cadastro, se estiver liberada; senão, a primeira liberada.
+- `ufs_permitidas` é calculada pelo site no servidor: a lista do usuário, ou as 27 UFs para administradores. O n8n **recusa** pedidos sem essa lista.
 
 **Resposta:** *stream* NDJSON no formato do n8n, com eventos `begin`, `item` (trecho de texto) e `end`.
 
@@ -212,6 +217,7 @@ Fontes sobre o cache do nó: [PR #34482](https://github.com/n8n-io/n8n/pull/3448
   - **Formato web:** markdown, com negrito, listas e no máximo uma tabela pequena; até cerca de 2.500 caracteres por resposta.
   - **Município:** "o usuário informa o município; os dados do IIE existem só por UF. Responda com a UF e diga, uma vez por conversa, que o dado municipal ainda não está disponível".
   - **Contexto:** "o bloco `<contexto>` no começo da mensagem do usuário traz perfil, UF, município e data. Use a UF como padrão quando a pergunta não disser o território".
+  - **Acesso por UF:** "se uma ferramenta devolver `territorio_sem_acesso`, diga que os dados desse estado não estão liberados para a pessoa, cite os estados liberados (estão na dica do erro) e diga que ela pode pedir acesso à equipe do IIE. Nunca estime números de um estado sem acesso".
 - **Bytes estáveis:** a mensagem de sistema não muda entre usuários nem entre pedidos. Não pode conter data, nome ou UF.
 - **Mensagem do usuário:**
 
@@ -228,8 +234,10 @@ O contexto fica na mensagem do usuário porque o nó do n8n não oferece o canal
 São as 5 da proposta 01 (seção 6.3) e mais 2 que usam a base de práticas. Cada uma vira um nó de ferramenta Postgres, com os parâmetros preenchidos pelo modelo via `$fromAI()`. Exemplo de consulta:
 
 ```sql
-select iie.fn_ranking($1, $2::int, nullif($3, 'todas'), $4::int)
+select iie.fn_ranking($1, $2::int, nullif($3, 'todas'), $4::int, $5::text[])
 ```
+
+Nas 4 ferramentas de dados (`consultar_iie`, `decompor_iie`, `comparar_territorios` e `ranking`), o último parâmetro, `p_ufs`, vem do corpo do webhook (`{{ $('Webhook').item.json.body.ufs_permitidas }}`), **nunca de `$fromAI()`**. Assim, o modelo não consegue pedir uma UF fora da lista. Sem a lista, as funções recusam tudo (`acesso_nao_informado`).
 
 | Ferramenta | Parâmetros | Devolve | Função SQL |
 |---|---|---|---|
@@ -289,7 +297,7 @@ O inventário das 541 práticas feito em 2026-09-11 não foi salvo: só as cerca
 
 | Tabela | Campos principais | Quem grava |
 |---|---|---|
-| `usuario` | `id` (= `auth.users.id`), `email` (cópia do Auth, para a tela de administração), `nome`, `perfil` (escola, secretaria_municipal, secretaria_estadual, equipe_interna, outro), `instituicao`, `uf` (sigla), `municipio_ibge` (7 dígitos), `municipio_nome`, `status` (pendente, ativo, recusado, bloqueado), `papel` (usuario, admin), `aceite_termo_em`, `decidido_por`, `decidido_em`, `criado_em`, `telefone_e164` (nulo até a fase WhatsApp) | gatilho de cadastro; administrador (status e papel) |
+| `usuario` | `id` (= `auth.users.id`), `email` (cópia do Auth, para a tela de administração), `nome`, `perfil` (escola, secretaria_municipal, secretaria_estadual, equipe_interna, outro), `instituicao`, `uf` (sigla), `municipio_ibge` (7 dígitos), `municipio_nome`, `status` (pendente, ativo, recusado, bloqueado), `papel` (usuario, admin), `aceite_termo_em`, `ufs_acesso` (siglas liberadas; começa com a UF do cadastro; nunca vazia), `decidido_por`, `decidido_em`, `criado_em`, `telefone_e164` (nulo até a fase WhatsApp) | gatilho de cadastro; administrador (status, papel e `ufs_acesso`) |
 | `conversa` | `id`, `usuario_id`, `titulo`, `canal` (web), `criada_em`, `atualizada_em` | usuário (via RLS) |
 | `mensagem` | `id`, `conversa_id`, `papel` (usuario, agente), `texto`, `ferramentas` jsonb, `numeros_sem_origem` jsonb, `praticas_sem_origem` jsonb, `latencia_ms`, `modelo`, `kb_versao`, `erro`, `criado_em` | n8n |
 | `feedback` | `mensagem_id`, `usuario_id`, `nota` (+1 ou −1), `motivo`, `criado_em` | usuário (via RLS) |
@@ -311,7 +319,7 @@ O inventário das 541 práticas feito em 2026-09-11 não foi salvo: só as cerca
 
 | Tabela | Ler | Criar | Mudar | Apagar |
 |---|---|---|---|---|
-| `usuario` | o próprio; admin vê todos | — (gatilho) | só admin | — (exclusão de conta pelo servidor) |
+| `usuario` | o próprio; admin vê todos | — (gatilho) | só admin (status, papel, `ufs_acesso` e dados do cadastro) | — (exclusão de conta pelo servidor) |
 | `conversa` | as próprias | se o status for ativo | o título das próprias | as próprias |
 | `mensagem` | as das próprias conversas | — | — | — |
 | `feedback` | o próprio | nas mensagens das próprias conversas | — | — |

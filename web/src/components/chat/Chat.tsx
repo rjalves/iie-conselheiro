@@ -13,7 +13,15 @@ import { PerguntaUsuario, TextoResposta } from "./Mensagem";
 type Props = {
   conversa: { id: string; titulo: string } | null;
   mensagensIniciais: MensagemTela[];
-  usuario: { id: string; nome: string; uf: string; municipio: string };
+  usuario: {
+    id: string;
+    nome: string;
+    uf: string;
+    municipio: string;
+    estados: string;
+    todosEstados: boolean;
+    variosEstados: boolean;
+  };
   restantes: number;
   limite: number;
 };
@@ -121,8 +129,11 @@ export function Chat({ conversa, mensagensIniciais, usuario, restantes, limite }
             <section className="flex flex-col gap-5 pt-6 sm:pt-14">
               <h1 className="text-3xl font-bold">Olá, {primeiroNome(usuario.nome)}.</h1>
               <p className="max-w-[60ch] text-lg text-grafite-suave">
-                Pergunte sobre o IIE {uf ? comDe(uf) : "do seu estado"} ou de qualquer outro estado: resultados,
-                comparações e o que fazer para melhorar.
+                {usuario.todosEstados
+                  ? "Pergunte sobre o IIE de qualquer estado: resultados, comparações e o que fazer para melhorar."
+                  : usuario.variosEstados
+                    ? `Pergunte sobre o IIE dos estados liberados para você (${usuario.estados}): resultados, comparações e o que fazer para melhorar.`
+                    : `Pergunte sobre o IIE ${uf ? comDe(uf) : "do seu estado"}: resultados, comparação com o Brasil e o que fazer para melhorar.`}
               </p>
               <ul className="flex flex-col gap-2" aria-label="Sugestões de pergunta">
                 {sugestoes.map((s) => (
@@ -221,7 +232,7 @@ export function Chat({ conversa, mensagensIniciais, usuario, restantes, limite }
           <p className="numeros text-xs text-grafite-suave">
             {semPerguntas
               ? `Você usou as ${limite} perguntas de hoje. O limite renova à meia-noite (horário de Brasília).`
-              : `Dados oficiais do IIE por estado; ainda não há dados de ${usuario.municipio}. O Conselheiro pode errar: confira as fontes citadas. ${restantes} de ${limite} perguntas restantes hoje.`}
+              : `Estados liberados: ${usuario.estados}. Dados oficiais do IIE por estado; ainda não há dados de ${usuario.municipio}. O Conselheiro pode errar: confira as fontes citadas. ${restantes} de ${limite} perguntas restantes hoje.`}
           </p>
         </div>
       </form>
