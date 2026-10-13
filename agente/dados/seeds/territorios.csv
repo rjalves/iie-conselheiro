@@ -1,0 +1,29 @@
+id,tipo,codigo_ibge,sigla,nome,regiao,sinonimos
+BR,BR,0,BR,Brasil,Brasil,brasil|pais|nacional
+UF-11,UF,11,RO,Rondônia,Norte,rondonia|rondoniense
+UF-12,UF,12,AC,Acre,Norte,acre|acreano|acriano
+UF-13,UF,13,AM,Amazonas,Norte,amazonas|amazonense
+UF-14,UF,14,RR,Roraima,Norte,roraima|roraimense
+UF-15,UF,15,PA,Pará,Norte,para|paraense
+UF-16,UF,16,AP,Amapá,Norte,amapa|amapaense
+UF-17,UF,17,TO,Tocantins,Norte,tocantins|tocantinense
+UF-21,UF,21,MA,Maranhão,Nordeste,maranhao|maranhense
+UF-22,UF,22,PI,Piauí,Nordeste,piaui|piauiense
+UF-23,UF,23,CE,Ceará,Nordeste,ceara|cearense
+UF-24,UF,24,RN,Rio Grande do Norte,Nordeste,rio grande do norte|potiguar|norte-rio-grandense
+UF-25,UF,25,PB,Paraíba,Nordeste,paraiba|paraibano
+UF-26,UF,26,PE,Pernambuco,Nordeste,pernambuco|pernambucano
+UF-27,UF,27,AL,Alagoas,Nordeste,alagoas|alagoano
+UF-28,UF,28,SE,Sergipe,Nordeste,sergipe|sergipano
+UF-29,UF,29,BA,Bahia,Nordeste,bahia|baiano
+UF-31,UF,31,MG,Minas Gerais,Sudeste,minas gerais|minas|mineiro
+UF-32,UF,32,ES,Espírito Santo,Sudeste,espirito santo|capixaba
+UF-33,UF,33,RJ,Rio de Janeiro,Sudeste,rio de janeiro|fluminense
+UF-35,UF,35,SP,São Paulo,Sudeste,sao paulo|paulista
+UF-41,UF,41,PR,Paraná,Sul,parana|paranaense
+UF-42,UF,42,SC,Santa Catarina,Sul,santa catarina|catarinense
+UF-43,UF,43,RS,Rio Grande do Sul,Sul,rio grande do sul|gaucho
+UF-50,UF,50,MS,Mato Grosso do Sul,Centro-Oeste,mato grosso do sul|sul-mato-grossense
+UF-51,UF,51,MT,Mato Grosso,Centro-Oeste,mato grosso|mato-grossense
+UF-52,UF,52,GO,Goiás,Centro-Oeste,goias|goiano
+UF-53,UF,53,DF,Distrito Federal,Centro-Oeste,distrito federal|brasilia|candango

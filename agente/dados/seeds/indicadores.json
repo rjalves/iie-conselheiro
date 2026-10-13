@@ -1,0 +1,238 @@
+[
+  {
+    "id": "P1",
+    "nome": "Evasão aos 17 anos",
+    "grupo": "Permanência",
+    "pergunta": "Quantos jovens da geração saíram da escola sem concluir o EM?",
+    "metrica": "% da coorte fora da escola sem EM (PNADc) — pct_fora_escola",
+    "sentido": "alto_ruim",
+    "gatilho_atencao": "> 6,4%",
+    "gatilho_critico": "> 9,8%",
+    "significado": "A geração está perdendo jovens para fora do sistema. Cada ponto de evasão sai direto do numerador potencial do IIE e não tem volta pela aprendizagem.",
+    "diagnostico": [
+      "Em que série e idade os jovens deixam a escola (taxa de abandono por série no Censo)? A saída se concentra na passagem do 9º ano para a 1ª série do EM?",
+      "Quem sai: há concentração por raça/cor, sexo, renda, zona rural ou território?",
+      "Por que sai: trabalho, gravidez, desengajamento após reprovação, distância/transporte, violência? Aplique os 5 Porquês (PE-17) antes de escolher a ação.",
+      "A escola sabe, hoje, quem está infrequente? Existe fluxo de busca ativa com Saúde e Assistência Social?"
+    ],
+    "monitorar": [
+      "Frequência por estudante (semanal/mensal) e número de alertas de infrequência abertos.",
+      "Casos da Busca Ativa Escolar abertos × encerrados com retorno à escola.",
+      "Taxa de abandono por série e escola (Censo Escolar, anual).",
+      "% de jovens de 15–17 anos fora da escola (PNADc, anual)."
+    ],
+    "horizonte": "Ações no EM aparecem nas 1–2 edições seguintes do IIE (0–3 anos)."
+  },
+  {
+    "id": "F2",
+    "nome": "Retenção prolongada (atraso 2+)",
+    "grupo": "Fluxo",
+    "pergunta": "Quantos seguem matriculados aos 18 anos sem ter concluído o EM?",
+    "metrica": "% da coorte ainda na escola sem concluir em t+1 — pct_atrasado2",
+    "sentido": "alto_ruim",
+    "gatilho_atencao": "> 31,0%",
+    "gatilho_critico": "> 37,9%",
+    "significado": "A geração está presa em reprovação e distorção idade-série acumuladas. São jovens que ainda estão na escola, e portanto recuperáveis, mas que já não contam para o IIE.",
+    "diagnostico": [
+      "Onde a distorção nasce? Veja a taxa de reprovação por série desde os Anos Iniciais e a distorção idade-série por etapa.",
+      "A retenção recupera a aprendizagem? Cruze com o indicador A2.",
+      "A reprovação se concentra em quais escolas, turmas e componentes (GE-SEC-70)?",
+      "A recuperação é contínua ao longo do ano ou só no fim do semestre?"
+    ],
+    "monitorar": [
+      "Taxa de reprovação por série e escola (Censo, anual; prévia por conselho de classe bimestral).",
+      "Distorção idade-série por etapa (INEP, anual).",
+      "% de estudantes em recuperação que sobem de nível na diagnóstica seguinte.",
+      "Nº de estudantes com 2+ anos de atraso com plano individual de acompanhamento."
+    ],
+    "horizonte": "É cumulativo. Reprovação nos Anos Finais aparece no IIE 4–7 anos depois; no EM, em 0–3 anos."
+  },
+  {
+    "id": "F1",
+    "nome": "Conclusão no tempo (até 18 anos)",
+    "grupo": "Fluxo",
+    "pergunta": "Quantos concluem o EM até os 18 anos?",
+    "metrica": "% da coorte que concluiu o EM em t−1, t ou t+1 — pct_concluiu_ate18",
+    "sentido": "baixo_ruim",
+    "gatilho_atencao": "< 62,6%",
+    "gatilho_critico": "< 53,3%",
+    "significado": "É o indicador-síntese do fluxo. Pela identidade do cálculo, F1 = 100 − F2 − P1, então F1 baixo é sempre retenção prolongada, evasão ou ambos. Siga para o componente dominante.",
+    "diagnostico": [
+      "Compare F2 e P1 com o Brasil: qual dos dois explica a maior parte da distância?",
+      "Olhe a composição dos que concluem: muitos 'atrasados 1 ano' sinalizam fluxo frágil, ainda que dentro do IIE."
+    ],
+    "monitorar": [
+      "Os mesmos de F2 e P1."
+    ],
+    "horizonte": "O mesmo de F2 e P1."
+  },
+  {
+    "id": "A1",
+    "nome": "Aprendizagem dos concluintes",
+    "grupo": "Aprendizagem",
+    "pergunta": "Dos que concluem no tempo, quantos têm o básico em LP e MT (≥ 300)?",
+    "metrica": "% com básico entre concluintes até 18 — pct_basico_entre_concluintes",
+    "sentido": "baixo_ruim",
+    "gatilho_atencao": "< 29,8%",
+    "gatilho_critico": "< 20,3%",
+    "significado": "A escola forma no tempo, mas sem garantir a aprendizagem essencial. É o maior gargalo do país: mesmo nas melhores UFs, 6 a 7 de cada 10 concluintes não atingem o básico nas duas disciplinas.",
+    "diagnostico": [
+      "O problema é LP, MT ou ambos? Veja o indicador A3.",
+      "Está em todas as escolas ou concentrado (GE-SEC-70)?",
+      "Quanto do baixo desempenho já vem dos Anos Finais? Veja o indicador E2.",
+      "Há coordenador pedagógico e rotina de observação de aula com devolutiva?",
+      "As avaliações diagnósticas são usadas para replanejar ou só aplicadas?"
+    ],
+    "monitorar": [
+      "Avaliações diagnósticas e formativas por habilidade (bimestral).",
+      "% de escolas com observação de aula e devolutiva no mês.",
+      "Cobertura das visitas do núcleo de apoio (referência do MEC: cerca de 10 escolas por técnico, visitas quinzenais).",
+      "SAEB da 3ª série do EM (bienal)."
+    ],
+    "horizonte": "0–3 anos para as turmas atuais do EM; o teto depende da base trazida do EF (E1, E2)."
+  },
+  {
+    "id": "A2",
+    "nome": "Aprendizagem de quem atrasou",
+    "grupo": "Aprendizagem × Fluxo",
+    "pergunta": "Quem conclui com 1 ano de atraso recuperou a aprendizagem?",
+    "metrica": "p(básico) dos atrasados 1 ano — p_basico_atrasado1 — e a distância para os em linha",
+    "sentido": "baixo_ruim",
+    "gatilho_atencao": "< 22,6%",
+    "gatilho_critico": "< 13,8% ou distância > 16,8 p.p.",
+    "significado": "A reprovação não está gerando aprendizagem: o estudante repete, conclui mais tarde e ainda sem o básico. Combinado com F2 alto, indica uma política de retenção sem recomposição.",
+    "diagnostico": [
+      "A distância entre em linha e atrasados é maior que a do Brasil (13,1 p.p.)?",
+      "Os retidos recebem apoio diferenciado ou apenas repetem o mesmo percurso?",
+      "A recuperação segue o desenho recomendado (SM-91) ou é uma prova no fim do ano?"
+    ],
+    "monitorar": [
+      "Avanço na diagnóstica dos estudantes retidos ou em recuperação.",
+      "% de retidos com plano individual e acompanhamento."
+    ],
+    "horizonte": "0–3 anos."
+  },
+  {
+    "id": "A3",
+    "nome": "Componente limitante (LP × MT)",
+    "grupo": "Aprendizagem",
+    "pergunta": "Qual disciplina impede o jovem de atingir o básico?",
+    "metrica": "% ≥ 300 em LP e em MT separadamente (painel Looker, recorte por disciplina)",
+    "sentido": "baixo_ruim",
+    "gatilho_atencao": "a menor das duas",
+    "gatilho_critico": "—",
+    "significado": "O IIE exige LP e MT ≥ 300. A disciplina mais fraca limita o índice, e o esforço deve se concentrar nela.",
+    "diagnostico": [
+      "No painel, compare o % ≥ 300 em LP e em MT. A diferença é grande?",
+      "O componente crítico é o mesmo em todas as escolas?"
+    ],
+    "monitorar": [
+      "Resultados por componente nas diagnósticas; SAEB LP e MT."
+    ],
+    "horizonte": "0–3 anos."
+  },
+  {
+    "id": "E1",
+    "nome": "Base nos Anos Iniciais (IIE-AI)",
+    "grupo": "Trajetória anterior",
+    "pergunta": "A exclusão já começa na alfabetização?",
+    "metrica": "IIE dos Anos Iniciais: conclusão do 5º ano no tempo com LP e MT ≥ 250",
+    "sentido": "baixo_ruim",
+    "gatilho_atencao": "< 52,4",
+    "gatilho_critico": "< 38,0",
+    "significado": "A geração chega ao EF II sem a base. Nenhuma ação no EM compensa integralmente uma alfabetização frágil.",
+    "diagnostico": [
+      "As crianças estão alfabetizadas ao fim do 2º ano?",
+      "Quais as causas? O exemplo do TPE aponta apoio pedagógico às alfabetizadoras, qualidade do material e uso de avaliações (PE-08).",
+      "Há acesso e qualidade na Educação Infantil?"
+    ],
+    "monitorar": [
+      "Avaliação de alfabetização do 2º ano (rede ou estado) e diagnósticas de leitura e escrita.",
+      "IIE-AI (bienal)."
+    ],
+    "horizonte": "IIE-AI em 2–4 anos; IIE-EM em 8–11 anos."
+  },
+  {
+    "id": "E2",
+    "nome": "Anos Finais (IIE-AF e perda AI→AF)",
+    "grupo": "Trajetória anterior",
+    "pergunta": "A geração se perde na passagem para os Anos Finais?",
+    "metrica": "IIE-AF (LP e MT ≥ 275) e razão IIE-AF ÷ IIE-AI",
+    "sentido": "baixo_ruim",
+    "gatilho_atencao": "AF < 24,7 ou razão < 0,47",
+    "gatilho_critico": "AF < 16,5 ou razão < 0,42",
+    "significado": "A exclusão cresce entre o 6º e o 9º ano, com reprovação, distorção e queda de aprendizagem. É ali que nasce boa parte do 'atraso 2+' que o IIE-EM mede.",
+    "diagnostico": [
+      "A queda acontece na transição do 5º para o 6º ano?",
+      "A reprovação sobe no 6º e no 7º ano?",
+      "A aprendizagem de LP e MT cai entre AI e AF mais que no Brasil?"
+    ],
+    "monitorar": [
+      "Reprovação e abandono no 6º e no 7º ano; diagnósticas de AF; IIE-AF (bienal)."
+    ],
+    "horizonte": "IIE-AF em 2–4 anos; IIE-EM em 4–7 anos."
+  },
+  {
+    "id": "E3",
+    "nome": "Passagem para o EM (perda AF→EM)",
+    "grupo": "Trajetória anterior",
+    "pergunta": "A geração se perde na transição para o EM e no próprio EM?",
+    "metrica": "Razão IIE-EM ÷ IIE-AF",
+    "sentido": "baixo_ruim",
+    "gatilho_atencao": "< 0,77",
+    "gatilho_critico": "< 0,64",
+    "significado": "Jovens que terminaram o EF em boas condições não concluem o EM no tempo ou com aprendizagem. O problema está na transição entre redes (municipal → estadual) e no EM.",
+    "diagnostico": [
+      "Há evasão ou reprovação alta na 1ª série do EM?",
+      "Existe articulação entre as escolas de 9º ano e as de EM do território (matrícula, informação sobre os estudantes, acolhimento)?"
+    ],
+    "monitorar": [
+      "Taxa de transição do 9º ano para a 1ª série; abandono e reprovação na 1ª série.",
+      "Razão IIE-EM ÷ IIE-AF (bienal)."
+    ],
+    "horizonte": "0–3 anos."
+  },
+  {
+    "id": "Q1",
+    "nome": "Equidade",
+    "grupo": "Equidade",
+    "pergunta": "O IIE e seus componentes são desiguais entre grupos e territórios?",
+    "metrica": "IIE por raça/cor e sexo (painel Looker); IIEM de municípios e escolas frente à UF",
+    "sentido": "alto_ruim",
+    "gatilho_atencao": "distância entre grupos maior que a do Brasil",
+    "gatilho_critico": "distância crescente entre edições",
+    "significado": "A média esconde grupos excluídos. Sem metas explícitas de redução de desigualdade, a melhora tende a se concentrar nos grupos já favorecidos.",
+    "diagnostico": [
+      "Qual grupo tem o menor IIE, e em qual componente (P1, F2, A1) ele fica para trás?",
+      "Quais municípios ou escolas puxam a UF para baixo?"
+    ],
+    "monitorar": [
+      "Indicadores do painel por raça/cor e sexo.",
+      "Nº de escolas prioritárias com visita quinzenal do núcleo.",
+      "Metas de redução da distância pactuadas e acompanhadas."
+    ],
+    "horizonte": "Acompanha o componente que gera a desigualdade."
+  },
+  {
+    "id": "D1",
+    "nome": "Qualidade do dado",
+    "grupo": "Dados",
+    "pergunta": "Os números refletem a realidade?",
+    "metrica": "Consistência dos componentes do Censo entre coortes (aprovados, matrículas, rendimento informado)",
+    "sentido": "nenhum",
+    "gatilho_atencao": "variação > 30% sem causa conhecida (sugestão)",
+    "gatilho_critico": "quebra que inverte a leitura do território",
+    "significado": "Erros ou lacunas no registro (Educacenso, Situação do Aluno) distorcem o IIE. Exemplo: na BA, os aprovados no 3º EM em 2020 caíram 77% e o índice passou a indicar retenção extrema.",
+    "diagnostico": [
+      "Há quebras bruscas entre coortes em algum componente?",
+      "O rendimento (aprovado, reprovado, abandono) foi informado para todas as matrículas?",
+      "Há matrícula duplicada?"
+    ],
+    "monitorar": [
+      "% de matrículas com rendimento informado.",
+      "Divergências entre o sistema da rede e o Educacenso.",
+      "Variação dos componentes entre coortes."
+    ],
+    "horizonte": "Imediato: corrige a leitura antes de qualquer ação."
+  }
+]
