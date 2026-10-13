@@ -276,26 +276,29 @@ begin
         and (p_papel is null or iie.norm(ip.papel) = iie.norm(p_papel))), '[]'::jsonb));
 end $$;
 
--- Painel de uso (preços de claude-opus-5 por milhão de tokens: entrada 5; leitura de cache 0,5; escrita 1 h 10; saída 25).
+-- Painel de uso por dia (fuso de Brasília). O custo vem do relatório de uso da Anthropic: o nó do n8n não separa
+-- os tokens de cache (proposta 03, seção 5.5).
 create or replace view app.vw_uso_diario with (security_invoker = true) as
-with uso as (
-  select m.criado_em::date as dia,
-         count(*) filter (where m.papel = 'agente') as respostas,
-         sum((m.uso ->> 'input')::bigint) as tokens_entrada,
-         sum((m.uso ->> 'cache_read')::bigint) as tokens_cache_leitura,
-         sum((m.uso ->> 'cache_write')::bigint) as tokens_cache_escrita,
-         sum((m.uso ->> 'output')::bigint) as tokens_saida,
-         round(sum(coalesce((m.uso ->> 'input')::numeric, 0) * 5 + coalesce((m.uso ->> 'cache_read')::numeric, 0) * 0.5
-                 + coalesce((m.uso ->> 'cache_write')::numeric, 0) * 10 + coalesce((m.uso ->> 'output')::numeric, 0) * 25) / 1e6, 4) as custo_usd,
+with msg as (
+  select (m.criado_em at time zone 'America/Sao_Paulo')::date as dia,
+         count(*) filter (where m.papel = 'usuario') as perguntas,
+         count(*) filter (where m.papel = 'agente' and m.erro is null) as respostas,
+         count(*) filter (where m.erro is not null) as erros,
+         count(*) filter (where jsonb_array_length(coalesce(m.numeros_sem_origem, '[]')) > 0) as com_numero_sem_origem,
+         count(*) filter (where jsonb_array_length(coalesce(m.praticas_sem_origem, '[]')) > 0) as com_pratica_sem_origem,
+         count(distinct c.usuario_id) as usuarios,
          percentile_cont(0.5) within group (order by m.latencia_ms) filter (where m.papel = 'agente') as latencia_p50_ms,
          percentile_cont(0.95) within group (order by m.latencia_ms) filter (where m.papel = 'agente') as latencia_p95_ms
   from app.mensagem m
-  group by m.criado_em::date
+  join app.conversa c on c.id = m.conversa_id
+  group by 1
 ), avaliacao as (
-  select f.criado_em::date as dia, count(*) filter (where f.nota = -1)::numeric / count(*) as taxa_negativa
+  select (f.criado_em at time zone 'America/Sao_Paulo')::date as dia, count(*) as avaliacoes,
+         round(count(*) filter (where f.nota = -1)::numeric / count(*), 3) as taxa_negativa
   from app.feedback f
-  group by f.criado_em::date
+  group by 1
 )
-select uso.*, avaliacao.taxa_negativa
-from uso
+select msg.*, avaliacao.avaliacoes, avaliacao.taxa_negativa,
+       (select count(*) from app.usuario u where u.status = 'pendente') as cadastros_pendentes
+from msg
 left join avaliacao using (dia);

@@ -29,7 +29,9 @@ SERIES = {  # série: (fonte, documento, nível, total esperado)
 }
 RE_ID = re.compile(r"^(GE-SEC|GE|SM|PE)-(\d{2,3})$")
 RE_LINHAS = re.compile(r"^L(\d+)(?:–(\d+))?$")
-RE_ANCORA_DOC09 = re.compile(r"\b((?:GE-SEC|GE|SM|PE)-\d+) \((?:MEC|Itaú|TPE) (L\d+(?:–\d+)?)\)")
+# Citações do doc 09: "SM-05 (Itaú L380–412)", "SM-35 a 49 (Itaú L790–1133)", "GE-SEC-04/07 (MEC L2187–2216, L2274–2316)".
+RE_ANCORA_DOC09 = re.compile(r"\b(GE-SEC|GE|SM|PE)-(\d+)(?: a (\d+)|((?:/\d+)+))? \((?:MEC|Itaú|TPE) "
+                             r"(L\d+(?:–\d+)?(?:, L\d+(?:–\d+)?)*)\)")
 
 
 def serie(pratica_id: str) -> str:
@@ -58,7 +60,18 @@ def ler_ancoras(matriz: Path = MATRIZ, doc09: Path = DOC09) -> dict[str, tuple[i
             if r["pratica_id"] != "—":
                 ancoras[r["pratica_id"]] = intervalo(r["linhas"])
     for m in RE_ANCORA_DOC09.finditer(doc09.read_text(encoding="utf-8")):
-        ancoras.setdefault(m.group(1), intervalo(m.group(2)))
+        s, primeiro, ate, barras, trechos = m.groups()
+        intervalos = [intervalo(x) for x in trechos.split(", ")]
+        envelope = (min(i for i, _ in intervalos), max(f for _, f in intervalos))
+        if ate:  # "SM-35 a 49": todas dentro do mesmo trecho
+            pares = [(n, envelope) for n in range(int(primeiro), int(ate) + 1)]
+        elif barras:  # "GE-SEC-04/07": um trecho para cada, ou o mesmo trecho para todas
+            numeros = [int(primeiro)] + [int(x) for x in barras.split("/")[1:]]
+            pares = list(zip(numeros, intervalos)) if len(intervalos) == len(numeros) else [(n, envelope) for n in numeros]
+        else:
+            pares = [(int(primeiro), envelope)]
+        for n, faixa in pares:
+            ancoras.setdefault(f"{s}-{n:02d}", faixa)
     return ancoras
 
 

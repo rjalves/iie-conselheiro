@@ -10,3 +10,9 @@ def test_carga_completa(sql):
 
 def test_sinonimos_sem_acento(sql):
     assert sql("select sinonimos from iie.territorio where sigla = 'CE'") == ["ceara", "cearense"]
+
+
+def test_tabelas_do_app_para_o_site(sql):
+    tabelas = sql("""select array_agg(table_name::text order by table_name) from information_schema.tables
+                     where table_schema = 'app' and table_type = 'BASE TABLE'""")
+    assert tabelas == ["agente_memoria", "conversa", "cota_diaria", "feedback", "kb_versao", "mensagem", "usuario"]

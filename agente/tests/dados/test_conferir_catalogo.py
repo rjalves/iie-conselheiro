@@ -44,5 +44,12 @@ def test_campos_e_alavancas():
 
 def test_ancoras_reais():
     ancoras = ler_ancoras()
-    assert len(ancoras) == 119
+    assert len(ancoras) == 147
     assert ancoras["SM-79"][0] > 0 and ancoras["PE-02"] == (29, 52)
+
+
+def test_ancoras_de_intervalos_e_pares_do_doc09():
+    ancoras = ler_ancoras()
+    assert ancoras["SM-40"] == (790, 1133)                       # "SM-35 a 49 (Itaú L790–1133)"
+    assert ancoras["GE-SEC-04"] == (2187, 2216) and ancoras["GE-SEC-07"] == (2274, 2316)
+    assert ancoras["SM-115"] == ancoras["SM-116"] == (2560, 2590)

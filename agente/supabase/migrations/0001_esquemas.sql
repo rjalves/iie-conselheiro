@@ -100,56 +100,70 @@ create table iie.carga (
 );
 
 -- ---------------------------------------------------------------- app
+-- Usuários do site: um por conta do Supabase Auth (auth.users), criado pelo gatilho da migração 0004.
 create table app.usuario (
-  id              uuid primary key default gen_random_uuid(),
-  telefone_e164   text unique check (telefone_e164 ~ '^\+[1-9][0-9]{7,14}$'),
-  nome            text not null,
-  perfil          text not null check (perfil in ('escola', 'secretaria_municipal', 'secretaria_estadual', 'equipe_interna')),
-  instituicao     text,
-  uf_padrao       text references iie.territorio (sigla),
-  status          text not null default 'pendente' check (status in ('pendente', 'ativo', 'bloqueado', 'removido')),
-  aceite_termo_em timestamptz,
+  id              uuid primary key references auth.users (id) on delete cascade,
+  email           text not null,
+  nome            text not null check (length(trim(nome)) between 2 and 120),
+  perfil          text not null check (perfil in ('escola', 'secretaria_municipal', 'secretaria_estadual',
+                                                  'equipe_interna', 'outro')),
+  instituicao     text not null check (length(trim(instituicao)) between 2 and 200),
+  uf              text not null references iie.territorio (sigla),
+  municipio_ibge  text not null check (municipio_ibge ~ '^[0-9]{7}$'),
+  municipio_nome  text not null,
+  status          text not null default 'pendente' check (status in ('pendente', 'ativo', 'recusado', 'bloqueado')),
+  papel           text not null default 'usuario' check (papel in ('usuario', 'admin')),
+  aceite_termo_em timestamptz not null,
+  decidido_por    uuid references app.usuario (id) on delete set null,
+  decidido_em     timestamptz,
+  telefone_e164   text unique check (telefone_e164 ~ '^\+[1-9][0-9]{7,14}$'),  -- fase WhatsApp
   criado_em       timestamptz not null default now()
 );
 
-create table app.solicitacao_acesso (
-  id            bigserial primary key,
-  telefone_e164 text not null,
-  mensagem      text,
-  status        text not null default 'aberta' check (status in ('aberta', 'aprovada', 'recusada')),
-  criado_em     timestamptz not null default now()
-);
-
 create table app.conversa (
-  id                 uuid primary key default gen_random_uuid(),
-  usuario_id         uuid not null references app.usuario (id) on delete cascade,
-  iniciada_em        timestamptz not null default now(),
-  ultima_mensagem_em timestamptz not null default now()
+  id            uuid primary key default gen_random_uuid(),
+  usuario_id    uuid not null references app.usuario (id) on delete cascade,
+  titulo        text not null check (length(trim(titulo)) between 1 and 120),
+  canal         text not null default 'web' check (canal in ('web', 'whatsapp')),
+  criada_em     timestamptz not null default now(),
+  atualizada_em timestamptz not null default now()
 );
+create index conversa_usuario_atualizada on app.conversa (usuario_id, atualizada_em desc);
 
+-- Escrita só pelo n8n (papel n8n_operacao).
 create table app.mensagem (
-  id                 uuid primary key default gen_random_uuid(),
-  conversa_id        uuid not null references app.conversa (id) on delete cascade,
-  wamid              text unique,
-  papel              text not null check (papel in ('usuario', 'agente')),
-  texto              text not null,
-  ferramentas        jsonb,
-  uso                jsonb,
-  numeros_sem_origem jsonb,
-  latencia_ms        int,
-  modelo             text,
-  kb_versao          text,
-  erro               text,
-  criado_em          timestamptz not null default now()
+  id                  uuid primary key default gen_random_uuid(),
+  conversa_id         uuid not null references app.conversa (id) on delete cascade,
+  papel               text not null check (papel in ('usuario', 'agente')),
+  texto               text not null,
+  ferramentas         jsonb,
+  numeros_sem_origem  jsonb,
+  praticas_sem_origem jsonb,
+  latencia_ms         int,
+  modelo              text,
+  kb_versao           text,
+  erro                text,
+  wamid               text unique,                     -- fase WhatsApp
+  criado_em           timestamptz not null default now()
 );
 create index mensagem_conversa_criado on app.mensagem (conversa_id, criado_em);
 
 create table app.feedback (
-  id          bigserial primary key,
   mensagem_id uuid not null references app.mensagem (id) on delete cascade,
+  usuario_id  uuid not null references app.usuario (id) on delete cascade,
   nota        smallint not null check (nota in (-1, 1)),
-  motivo      text,
-  criado_em   timestamptz not null default now()
+  motivo      text check (length(motivo) <= 500),
+  criado_em   timestamptz not null default now(),
+  primary key (mensagem_id, usuario_id)
+);
+
+-- Perguntas por usuário e dia (fuso de Brasília). Separada de app.mensagem para que apagar uma
+-- conversa não zere o limite diário.
+create table app.cota_diaria (
+  usuario_id uuid not null references app.usuario (id) on delete cascade,
+  dia        date not null,
+  perguntas  int  not null default 0,
+  primary key (usuario_id, dia)
 );
 
 create table app.kb_versao (
@@ -162,3 +176,11 @@ create table app.kb_versao (
   criado_em timestamptz not null default now()
 );
 create unique index kb_versao_uma_ativa on app.kb_versao (ativa) where ativa;
+
+-- Memória do agente no n8n (nó Postgres Chat Memory; formato do LangChain). session_id = id da conversa.
+create table app.agente_memoria (
+  id         serial primary key,
+  session_id varchar(255) not null,
+  message    jsonb not null
+);
+create index agente_memoria_sessao on app.agente_memoria (session_id, id);
