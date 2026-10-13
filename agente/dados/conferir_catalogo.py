@@ -52,14 +52,10 @@ def intervalo(linhas: str) -> tuple[int, int]:
     return ini, fim
 
 
-def ler_ancoras(matriz: Path = MATRIZ, doc09: Path = DOC09) -> dict[str, tuple[int, int]]:
-    """IDs já usados na matriz e no doc 09, com o intervalo de linhas em que precisam cair."""
-    ancoras: dict[str, tuple[int, int]] = {}
-    with open(matriz, newline="", encoding="utf-8") as f:
-        for r in csv.DictReader(f):
-            if r["pratica_id"] != "—":
-                ancoras[r["pratica_id"]] = intervalo(r["linhas"])
-    for m in RE_ANCORA_DOC09.finditer(doc09.read_text(encoding="utf-8")):
+def citacoes(texto: str) -> list[tuple[str, tuple[int, int]]]:
+    """IDs citados com linhas, na ordem do texto. Expande "SM-35 a 49" e "GE-SEC-04/07"."""
+    achados: list[tuple[str, tuple[int, int]]] = []
+    for m in RE_ANCORA_DOC09.finditer(texto):
         s, primeiro, ate, barras, trechos = m.groups()
         intervalos = [intervalo(x) for x in trechos.split(", ")]
         envelope = (min(i for i, _ in intervalos), max(f for _, f in intervalos))
@@ -70,8 +66,19 @@ def ler_ancoras(matriz: Path = MATRIZ, doc09: Path = DOC09) -> dict[str, tuple[i
             pares = list(zip(numeros, intervalos)) if len(intervalos) == len(numeros) else [(n, envelope) for n in numeros]
         else:
             pares = [(int(primeiro), envelope)]
-        for n, faixa in pares:
-            ancoras.setdefault(f"{s}-{n:02d}", faixa)
+        achados.extend((f"{s}-{n:02d}", faixa) for n, faixa in pares)
+    return achados
+
+
+def ler_ancoras(matriz: Path = MATRIZ, doc09: Path = DOC09) -> dict[str, tuple[int, int]]:
+    """IDs já usados na matriz e no doc 09, com o intervalo de linhas em que precisam cair."""
+    ancoras: dict[str, tuple[int, int]] = {}
+    with open(matriz, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            if r["pratica_id"] != "—":
+                ancoras[r["pratica_id"]] = intervalo(r["linhas"])
+    for pid, faixa in citacoes(doc09.read_text(encoding="utf-8")):
+        ancoras.setdefault(pid, faixa)
     return ancoras
 
 

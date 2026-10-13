@@ -8,7 +8,7 @@ Este documento cruza os componentes do IIE com três referenciais de boas práti
 | **Gestão da Secretaria** | *Secretaria Municipal de Educação: Práticas para uma boa gestão* (`031_Secretaria…md`) | Fundação Itaú / Itaú Social, 2021 | secretaria municipal no início da gestão (4 eixos: equipe, funcionamento, ano letivo, plano estratégico) | 117 (SM-) |
 | **Gestão Estratégica** | *Planejamento Estratégico de uma Secretaria de Educação* (`planejamento-estrategico-…md`) | Todos Pela Educação | ciclo de planejamento em 7 etapas (diagnóstico → metas → visão sistêmica → prioridades → plano → formalização → monitoramento) | 52 (PE-) |
 
-Os IDs (GE-, GE-SEC-, SM-, PE-) seguem a ordem de aparição em cada documento. A coluna **Fonte** indica as linhas do arquivo `.md` correspondente. A matriz completa, legível por máquina, está em [anexos/matriz_indicador_pratica.csv](anexos/matriz_indicador_pratica.csv).
+Os IDs (GE-, GE-SEC-, SM-, PE-) seguem a ordem de aparição em cada documento. A coluna **Fonte** indica as linhas do arquivo `.md` correspondente. A matriz completa, legível por máquina, está em [anexos/matriz_indicador_pratica.csv](anexos/matriz_indicador_pratica.csv). O catálogo com todas as 541 práticas, inclusive as que não estão ligadas a indicadores, está em [anexos/catalogo_praticas.csv](anexos/catalogo_praticas.csv).
 
 > **Quem executa.** O IIE mede o fim do Ensino Médio, oferta majoritária das **redes estaduais**. Os documentos do Itaú Social e do TPE foram escritos para **secretarias municipais**, e o do MEC vale para qualquer escola pública.
 > - As práticas de secretaria valem, por analogia, para as redes estaduais nos indicadores do EM (P1, F2, A1, A2, E3).

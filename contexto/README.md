@@ -23,7 +23,7 @@ Esta pasta guarda o conhecimento consolidado sobre o IIE: o que mede, como é ca
 | 08 | [Glossário](08_glossario.md) | termos e siglas |
 | 09 | [Indicadores do IIE e práticas de gestão](09_indicadores_iie_e_praticas_de_gestao.md) | árvore de indicadores, semáforo e prioridade por UF, e o que fazer quando cada indicador está baixo (escola, secretaria, estratégico), a partir dos três referenciais de `boas-praticas/` |
 | — | [../projeto/](../projeto/) | proposta de arquitetura e plano de desenvolvimento do agente IIE Conselheiro (WhatsApp) |
-| — | [anexos/](anexos/) | script de reprodução, CSV reproduzido por UF, CSV oficial 2013–2019, matriz indicador × prática (`matriz_indicador_pratica.csv`) |
+| — | [anexos/](anexos/) | script de reprodução, CSV reproduzido por UF, CSV oficial 2013–2019, matriz indicador × prática (`matriz_indicador_pratica.csv`), catálogo completo das 541 práticas (`catalogo_praticas.csv`, com método e revisão em `catalogo_praticas_revisao.md`) |
 
 ## Fatos essenciais
 
