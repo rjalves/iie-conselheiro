@@ -289,17 +289,18 @@ O inventário das 541 práticas feito em 2026-09-11 não foi salvo: só as cerca
 
 | Tabela | Campos principais | Quem grava |
 |---|---|---|
-| `usuario` | `id` (= `auth.users.id`), `nome`, `perfil` (escola, secretaria_municipal, secretaria_estadual, equipe_interna, outro), `instituicao`, `uf` (sigla), `municipio_ibge` (7 dígitos), `municipio_nome`, `status` (pendente, ativo, recusado, bloqueado), `papel` (usuario, admin), `aceite_termo_em`, `decidido_por`, `decidido_em`, `criado_em`, `telefone_e164` (nulo até a fase WhatsApp) | gatilho de cadastro; administrador (status e papel) |
+| `usuario` | `id` (= `auth.users.id`), `email` (cópia do Auth, para a tela de administração), `nome`, `perfil` (escola, secretaria_municipal, secretaria_estadual, equipe_interna, outro), `instituicao`, `uf` (sigla), `municipio_ibge` (7 dígitos), `municipio_nome`, `status` (pendente, ativo, recusado, bloqueado), `papel` (usuario, admin), `aceite_termo_em`, `decidido_por`, `decidido_em`, `criado_em`, `telefone_e164` (nulo até a fase WhatsApp) | gatilho de cadastro; administrador (status e papel) |
 | `conversa` | `id`, `usuario_id`, `titulo`, `canal` (web), `criada_em`, `atualizada_em` | usuário (via RLS) |
 | `mensagem` | `id`, `conversa_id`, `papel` (usuario, agente), `texto`, `ferramentas` jsonb, `numeros_sem_origem` jsonb, `praticas_sem_origem` jsonb, `latencia_ms`, `modelo`, `kb_versao`, `erro`, `criado_em` | n8n |
 | `feedback` | `mensagem_id`, `usuario_id`, `nota` (+1 ou −1), `motivo`, `criado_em` | usuário (via RLS) |
+| `cota_diaria` | `usuario_id`, `dia`, `perguntas` | gatilho de mensagem nova. Fica separada de `mensagem` para que apagar conversas não zere o limite diário |
 | `kb_versao` | igual à P1 | equipe (compilação) |
 | `agente_memoria` | `id`, `session_id`, `message` jsonb: o formato do *Postgres Chat Memory* do n8n | n8n |
 
 **Funções e gatilhos:**
 - **`app.ao_criar_usuario()`:** gatilho em `auth.users`, `security definer`. Cria `app.usuario` com status `pendente` a partir dos metadados do cadastro. Valida a UF e se o município pertence a ela: os 2 primeiros dígitos do código IBGE são o código da UF.
 - **`app.eh_admin()`:** `security definer`, usada nas políticas.
-- **`app.fn_perguntas_hoje()`:** conta as mensagens do usuário no dia, no fuso de Brasília.
+- **`app.fn_perguntas_hoje()`:** perguntas do usuário no dia, no fuso de Brasília, lidas de `app.cota_diaria`.
 - **Exclusão de conversa:** um gatilho apaga as linhas de `app.agente_memoria` com `session_id` igual à conversa. As mensagens saem por `on delete cascade`.
 - **`app.vw_uso_diario`:** mensagens, latência p50/p95, taxa de 👎, erros, números sem origem e cadastros pendentes.
 
@@ -314,7 +315,7 @@ O inventário das 541 práticas feito em 2026-09-11 não foi salvo: só as cerca
 | `conversa` | as próprias | se o status for ativo | o título das próprias | as próprias |
 | `mensagem` | as das próprias conversas | — | — | — |
 | `feedback` | o próprio | nas mensagens das próprias conversas | — | — |
-| `kb_versao`, `agente_memoria` | — | — | — | — |
+| `kb_versao`, `agente_memoria`, `cota_diaria` | — | — | — | — |
 
 - **Credenciais do n8n:**
   - `iie-leitura`: usuário `agente_app`, papel `agente_leitura`; usada só pelas ferramentas;

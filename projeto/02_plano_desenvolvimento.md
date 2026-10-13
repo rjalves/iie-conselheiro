@@ -10,7 +10,7 @@ São **6 subplanos**, numerados na ordem de execução. Cada um entrega algo tes
 
 | Subplano | Conteúdo | De onde vem | Situação |
 |---|---|---|---|
-| [P1: camada de dados](planos/P1_camada_de_dados.md) | Esquemas `iie` e `app` no Supabase, carga, funções SQL, papéis e RLS, mais o catálogo completo de práticas e toda a relação do doc 09 | P1 anterior, **revisada** | Validada localmente. Falta revisar `app` para o site e acrescentar a base de práticas (seção 5) |
+| [P1: camada de dados](planos/P1_camada_de_dados.md) | Esquemas `iie` e `app` no Supabase, carga, funções SQL, papéis e RLS, mais o catálogo completo de práticas e toda a relação do doc 09 | P1 anterior, **revisada** | **Tarefas 1 a 7 executadas** em 2026-10-13 (68 testes, *branch* `feat/p1-camada-de-dados`). Falta a Tarefa 8 (Supabase) |
 | P2: agente no n8n | Workflow `iie-agente-web`: modelo, 7 ferramentas, memória, *streaming*, rastreabilidade, erros | **Substitui** a [P2 em Python](planos/P2_servico_do_agente.md), que fica só como referência | Tarefas e critérios na seção 6. Plano passo a passo a escrever |
 | P3: site | Next.js: cadastro, login, administração, chat com várias conversas, *streaming*, conta | **Novo** | Tarefas e critérios na seção 7. Plano passo a passo a escrever |
 | P4: base de conhecimento e avaliação | Compilação da base, 85 perguntas, corretores, critérios de liberação | Antiga P3 | Tarefas e critérios na seção 8 |

@@ -7,7 +7,7 @@ O IIE Conselheiro é um agente de IA para gestores da educação. Ele explica os
 | [03_proposta_sistema_web.md](03_proposta_sistema_web.md) | **Proposta atual (rascunho para revisão):** site em Next.js, Supabase e agente no n8n |
 | [02_plano_desenvolvimento.md](02_plano_desenvolvimento.md) | Plano-mestre v2: fases F0–F6 (site primeiro, WhatsApp por último), tarefas, cronograma, orçamento e decisões |
 | [01_proposta_arquitetura.md](01_proposta_arquitetura.md) | Proposta original (WhatsApp + serviço Python). Ainda vale para princípios, ferramentas, base de conhecimento, avaliação e LGPD |
-| [planos/P1_camada_de_dados.md](planos/P1_camada_de_dados.md) | Plano executável da camada de dados. O esquema `app` será revisado para o site |
+| [planos/P1_camada_de_dados.md](planos/P1_camada_de_dados.md) | Plano executável da camada de dados, v2 (site e base de práticas). Tarefas 1 a 7 executadas |
 | [planos/P2_servico_do_agente.md](planos/P2_servico_do_agente.md) | Serviço do agente em Python. **Substituído** pelo agente no n8n; fica como referência e plano B |
 | [planos/anexos/seeds/](planos/anexos/seeds/) | Sementes usadas pela P1: territórios, indicadores, alertas de dado |
 
@@ -27,6 +27,11 @@ Gestor ⇄ Site (Next.js) ⇄ n8n: AI Agent + Claude (claude-opus-5-5)
 
 ## Situação em 2026-10-13
 
-- A nova proposta (03) e o plano v2 estão escritos e aguardam revisão.
-- Nada foi executado ainda: não existe a pasta `agente/` nem a `web/`.
-- Próximo passo: a Fase 0, com a prova técnica do agente no n8n, que decide se o caminho do n8n segue.
+- A proposta 03 foi aprovada, com a base de práticas completa no Supabase.
+- **P1 (camada de dados), Tarefas 1 a 7: executadas e testadas** na *branch* `feat/p1-camada-de-dados`.
+  - O que existe: migrações 0001 a 0005, carga, catálogo das 541 práticas e 68 testes num Postgres 17 local.
+  - O que falta: a Tarefa 8, que aplica tudo no Supabase de desenvolvimento.
+- Próximos passos:
+  - a Tarefa 8;
+  - a prova técnica do agente no n8n (Fase 0);
+  - os planos da P2 (agente no n8n) e da P3 (site).
