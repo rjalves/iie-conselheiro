@@ -66,7 +66,8 @@ export function Botao({
   ...props
 }: ComponentProps<"button"> & { variante?: "principal" | "secundario" | "perigo" | "discreto" }) {
   const estilos = {
-    principal: "bg-tinta text-white hover:bg-tinta-escura",
+    principal:
+      "bg-tinta text-white shadow-[0_10px_22px_-12px_rgb(29_58_138/0.75)] hover:bg-tinta-escura disabled:shadow-none",
     secundario: "border border-tinta text-tinta hover:bg-tinta-clara",
     perigo: "bg-erro text-white hover:bg-[#8f1c13]",
     discreto: "text-tinta hover:bg-tinta-clara",

@@ -40,20 +40,21 @@ export function FormEntrar({ proxima }: { proxima: string }) {
       <Campo rotulo="Senha" id="senha">
         <EntradaSenha id="senha" name="senha" autoComplete="current-password" required />
       </Campo>
+      <Link
+        href="/recuperar-senha"
+        className="-mt-2 self-end text-sm text-tinta underline underline-offset-2 hover:text-tinta-escura"
+      >
+        Esqueci minha senha
+      </Link>
       <Botao type="submit" disabled={enviando}>
         {enviando ? "Entrando…" : "Entrar"}
       </Botao>
-      <div className="flex flex-wrap justify-between gap-3 text-sm">
-        <Link href="/recuperar-senha" className="text-tinta underline underline-offset-2">
-          Esqueci minha senha
+      <p className="mt-2 text-center text-sm">
+        Ainda não tem conta?{" "}
+        <Link href="/cadastro" className="font-semibold text-tinta underline underline-offset-2 hover:text-tinta-escura">
+          Criar conta
         </Link>
-        <p>
-          Ainda não tem conta?{" "}
-          <Link href="/cadastro" className="font-semibold text-tinta underline underline-offset-2">
-            Criar conta
-          </Link>
-        </p>
-      </div>
+      </p>
     </form>
   );
 }

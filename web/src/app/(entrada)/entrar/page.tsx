@@ -20,7 +20,12 @@ export default async function PaginaEntrar({ searchParams }: PageProps<"/entrar"
   const proxima = caminhoSeguro(typeof parametros.proxima === "string" ? parametros.proxima : null);
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-bold">Entrar</h1>
+      <div>
+        <h1 className="text-3xl font-bold">Entrar</h1>
+        <p className="mt-2 text-grafite-suave">
+          Converse sobre o Índice de Inclusão Educacional do seu estado e receba sugestões de práticas de gestão.
+        </p>
+      </div>
       {recado && <Aviso tipo={recado.tipo}>{recado.texto}</Aviso>}
       <FormEntrar proxima={proxima} />
     </div>

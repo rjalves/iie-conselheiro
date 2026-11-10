@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Rodape } from "@/components/Rodape";
 import { TopoSimples } from "@/components/TopoSimples";
 import { acessoDoUsuario, descreverAcesso } from "@/lib/acesso";
 import { PERFIS, STATUS, type Perfil, type Status } from "@/lib/rotulos";
@@ -25,7 +26,7 @@ export default async function PaginaConta() {
   return (
     <>
       <TopoSimples voltar={usuario.status === "ativo"} />
-      <main className="mx-auto flex max-w-2xl flex-col gap-8 px-4 py-10 sm:px-6">
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-10 sm:px-6">
         <h1 className="text-3xl font-bold">Minha conta</h1>
         <section aria-labelledby="dados" className="flex flex-col gap-3">
           <h2 id="dados" className="text-xl font-bold">
@@ -62,6 +63,7 @@ export default async function PaginaConta() {
           <ExcluirConta />
         </section>
       </main>
+      <Rodape />
     </>
   );
 }

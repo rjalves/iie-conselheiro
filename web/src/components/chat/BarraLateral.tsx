@@ -4,6 +4,7 @@ import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import { agruparPorDia } from "@/lib/grupos";
 import { Marca } from "../Marca";
+import { Rodape } from "../Rodape";
 
 type ConversaResumo = { id: string; titulo: string; atualizada_em: string };
 
@@ -91,6 +92,7 @@ export function BarraLateral({
             </button>
           </form>
         </div>
+        <Rodape claro className="mt-4 border-t border-white/15 pt-3" />
       </div>
     </div>
   );

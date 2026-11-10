@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Rodape } from "@/components/Rodape";
 import { TopoSimples } from "@/components/TopoSimples";
 
 export const metadata: Metadata = { title: "Página não encontrada" };
@@ -9,7 +10,7 @@ export default function NaoEncontrada() {
   return (
     <>
       <TopoSimples voltar={false} />
-      <main className="mx-auto flex max-w-xl flex-col items-start gap-5 px-4 py-16 sm:px-6">
+      <main className="mx-auto flex w-full max-w-xl flex-col items-start gap-5 px-4 py-16 sm:px-6">
         <h1 className="text-3xl font-bold">Não encontramos esta página</h1>
         <p className="text-lg">Confira o endereço. Se ele veio de um link, a página pode ter mudado de lugar.</p>
         <Link
@@ -19,6 +20,7 @@ export default function NaoEncontrada() {
           Voltar às conversas
         </Link>
       </main>
+      <Rodape />
     </>
   );
 }

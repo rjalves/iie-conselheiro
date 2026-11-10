@@ -88,7 +88,7 @@ export function montarEmail({ user, email_data: dados }: PedidoHook): Email | nu
   const nome = user.user_metadata?.nome?.trim().split(/\s+/)[0] ?? "";
   const ola = nome ? `Olá, ${nome}.` : "Olá.";
   const ignorar = "Se você não fez este pedido, ignore esta mensagem.";
-  const texto = `${ola}\n\n${modelo.texto}\n\n${modelo.botao}: ${link}\n\n${ignorar}\n\nIIE Conselheiro · Lupa Social e Instituto Natura`;
+  const texto = `${ola}\n\n${modelo.texto}\n\n${modelo.botao}: ${link}\n\n${ignorar}\n\nIIE Conselheiro · Educacional.ia - Roberto Alves`;
   const html = `<!doctype html><html lang="pt-BR"><body style="margin:0;background:#f6f7f9;font-family:Arial,sans-serif;color:#1e2228">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border:1px solid #dde1e8;border-radius:8px">
@@ -101,7 +101,7 @@ export function montarEmail({ user, email_data: dados }: PedidoHook): Email | nu
 <p style="margin:0 0 8px;font-size:13px;color:#5a6170;line-height:1.5">Se o botão não funcionar, copie e cole este endereço no navegador:<br><a href="${escapar(link)}" style="color:#1d3a8a;word-break:break-all">${escapar(link)}</a></p>
 <p style="margin:16px 0 0;font-size:13px;color:#5a6170">${escapar(ignorar)}</p>
 </td></tr></table>
-<p style="margin:16px 0 0;font-size:12px;color:#5a6170">IIE Conselheiro · Lupa Social e Instituto Natura</p>
+<p style="margin:16px 0 0;font-size:12px;color:#5a6170">IIE Conselheiro · Educacional.ia - Roberto Alves</p>
 </td></tr></table></body></html>`;
   return { para: user.email, assunto: modelo.assunto, html, texto };
 }

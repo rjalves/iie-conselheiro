@@ -20,7 +20,7 @@ export const viewport: Viewport = { themeColor: "#152b66" };
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className={`${atkinson.variable} h-full`}>
-      <body className="min-h-full">{children}</body>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }

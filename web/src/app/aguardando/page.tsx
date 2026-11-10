@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Rodape } from "@/components/Rodape";
 import { TopoSimples } from "@/components/TopoSimples";
 import { obterUsuario, primeiroNome } from "@/lib/usuario";
 
@@ -30,7 +31,7 @@ export default async function PaginaAguardando() {
   return (
     <>
       <TopoSimples voltar={false} />
-      <main className="mx-auto flex max-w-xl flex-col gap-5 px-4 py-12 sm:px-6">
+      <main className="mx-auto flex w-full max-w-xl flex-col gap-5 px-4 py-12 sm:px-6">
         <p className="text-grafite-suave">Olá, {primeiroNome(usuario.nome)}.</p>
         <h1 className="text-3xl font-bold">{titulo}</h1>
         <p className="text-lg">{texto}</p>
@@ -53,6 +54,7 @@ export default async function PaginaAguardando() {
           .
         </p>
       </main>
+      <Rodape />
     </>
   );
 }

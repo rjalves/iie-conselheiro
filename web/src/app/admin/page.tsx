@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Rodape } from "@/components/Rodape";
 import { TopoSimples } from "@/components/TopoSimples";
 import { acessoDoUsuario, resumirAcesso } from "@/lib/acesso";
 import { PERFIS, STATUS, type Perfil, type Status } from "@/lib/rotulos";
@@ -39,7 +40,7 @@ export default async function PaginaAdmin({ searchParams }: PageProps<"/admin">)
   return (
     <>
       <TopoSimples />
-      <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6">
+      <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6">
         <h1 className="text-3xl font-bold">Cadastros</h1>
         <nav aria-label="Filtrar por situação" className="flex flex-wrap gap-2">
           {ABAS.map((s) => (
@@ -121,6 +122,7 @@ export default async function PaginaAdmin({ searchParams }: PageProps<"/admin">)
           </div>
         )}
       </main>
+      <Rodape />
     </>
   );
 }
