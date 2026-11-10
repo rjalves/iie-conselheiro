@@ -19,7 +19,7 @@ export default function LayoutEntrada({ children }: { children: ReactNode }) {
               <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-5 gap-y-3 sm:gap-x-8 sm:gap-y-5 lg:flex lg:flex-col lg:items-start lg:gap-7">
                 <GradeGeracao />
                 <p className="text-lg leading-snug font-bold sm:text-2xl sm:leading-tight lg:max-w-md lg:text-[1.75rem]">
-                  De cada 100 jovens brasileiros, 19 concluem o Ensino Médio até os 18 anos com o básico em Português e
+                  De cada 100 jovens brasileiros, 15 concluem o Ensino Médio até os 18 anos com o básico em Português e
                   Matemática.
                 </p>
                 <p className="col-span-2 text-white/85 max-sm:text-[0.9375rem] lg:max-w-md">
@@ -28,7 +28,7 @@ export default function LayoutEntrada({ children }: { children: ReactNode }) {
                 </p>
               </div>
               <p className="text-xs text-white/70 sm:text-sm">
-                Brasil, IIE 2019 (nascidos em 2002). Fonte: Fernandes, Felicio e Saad (2024).
+                Brasil, IIE 2023 (nascidos em 2006), dado preliminar. Fonte: painel do IIE, Lupa Social.
               </p>
             </div>
           </div>

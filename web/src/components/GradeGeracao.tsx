@@ -1,11 +1,11 @@
 /**
  * "De cada 100 jovens…": a geração em 100 pontos, com os que concluíram o Ensino Médio até os 18 anos com o básico.
- * Valor padrão: Brasil, IIE 2019 = 19,0 (Fernandes, Felicio e Saad, 2024, Tabela 7).
+ * Valor padrão: Brasil, IIE 2023 = 15,5, preliminar (painel do IIE, Lupa Social; contexto/anexos/iie_uf_painel_2015_2023.csv).
  * Compacta no celular, para o formulário caber na primeira tela.
  */
 export function GradeGeracao({
-  preenchidos = 19,
-  descricao = "De cada 100 jovens nascidos em 2002, 19 concluíram o Ensino Médio até os 18 anos com o básico em Língua Portuguesa e Matemática.",
+  preenchidos = 15,
+  descricao = "De cada 100 jovens nascidos em 2006, 15 concluíram o Ensino Médio até os 18 anos com o básico em Língua Portuguesa e Matemática.",
 }: {
   preenchidos?: number;
   descricao?: string;
