@@ -220,3 +220,18 @@ def test_sql_de_gravacao_como_n8n(banco):
                          "where conversa_id = %s and papel = 'agente'", (conversa,)).fetchone() == (
         ferramentas, "claude-opus-5-5", 1200, None)
     assert _como_n8n(banco, montar.SQL_GRAVA_FALHA, ("1", montar.NOME_AGENTE, "grava-pergunta", "falhou"))[0]
+
+
+def test_conferencia_do_publicado_acusa_diferencas_e_credenciais_nao_encontradas():
+    """publicar.sh termina com erro se o n8n guardou algo diferente do git ou não achou uma credencial (revisão final)."""
+    local = montar.workflow_agente()
+    remoto = json.loads(json.dumps(local))
+    for n in remoto["nodes"]:  # como o n8n devolve: credenciais resolvidas, com o id real
+        for c in n.get("credentials", {}).values():
+            c["id"] = "id-" + c["name"]
+    assert montar.diferencas_publicadas(local, remoto) == []
+    _no(remoto, "consultar_iie")["credentials"]["postgres"]["id"] = "iie-leitura"  # não resolvida: id == nome
+    _no(remoto, "base-ativa")["parameters"]["query"] = "select 1"
+    remoto["connections"].pop("erro-agente")
+    assert montar.diferencas_publicadas(local, remoto) == [
+        "nó diferente: base-ativa", "conexões diferentes", "credencial não encontrada: consultar_iie (iie-leitura)"]

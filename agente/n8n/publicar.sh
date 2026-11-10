@@ -35,18 +35,12 @@ else
 fi
 
 curl -sf -m 30 "$N8N_URL/api/v1/workflows/$ID" -H "X-N8N-API-KEY: $N8N_API_KEY" > "$PUBLICADO"
-python3 -I - "$ENVIO" "$PUBLICADO" <<'EOF'
+python3 -I - "$PWD" "$ENVIO" "$PUBLICADO" <<'EOF'
 import json, sys
-local, remoto = json.load(open(sys.argv[1])), json.load(open(sys.argv[2]))
-resumo = lambda w: ({n["name"]: (n["type"], n["typeVersion"], n["parameters"],
-                                 {t: c["name"] for t, c in n.get("credentials", {}).items()}) for n in w["nodes"]},
-                    w["connections"])
-(nos_l, con_l), (nos_r, con_r) = resumo(local), resumo(remoto)
-diferencas = [nome for nome in sorted(set(nos_l) | set(nos_r)) if nos_l.get(nome) != nos_r.get(nome)]
-if con_l != con_r:
-    diferencas.append("(conexões)")
-if diferencas:
-    sys.exit("DIFERENTE do git: " + ", ".join(diferencas))
-sem_credencial = [n["name"] for n in remoto["nodes"] for c in n.get("credentials", {}).values() if c.get("id") == c.get("name")]
-print("conferido: igual ao git" + (f" | credenciais não encontradas: {', '.join(sem_credencial)}" if sem_credencial else ""))
+sys.path.insert(0, sys.argv[1])  # agente/: montar.py só usa a biblioteca padrão
+from n8n.montar import diferencas_publicadas
+problemas = diferencas_publicadas(json.load(open(sys.argv[2])), json.load(open(sys.argv[3])))
+if problemas:
+    sys.exit("PROBLEMA na publicação: " + "; ".join(problemas))
+print("conferido: igual ao git, com todas as credenciais associadas")
 EOF

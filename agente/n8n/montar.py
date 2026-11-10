@@ -264,6 +264,21 @@ def workflow_erros() -> dict:
             "settings": {"executionOrder": "v1"}}
 
 
+def diferencas_publicadas(local: dict, remoto: dict) -> list[str]:
+    """O que o n8n guardou de diferente do git (nós, parâmetros, conexões) e as credenciais que ele não achou pelo
+    nome (ficam com id == nome). Lista vazia = publicado igual ao git. Usada pelo publicar.sh."""
+    def resumo(w: dict) -> dict:
+        return {n["name"]: (n["type"], n["typeVersion"], n["parameters"],
+                            {t: c["name"] for t, c in n.get("credentials", {}).items()}) for n in w["nodes"]}
+    nos_l, nos_r = resumo(local), resumo(remoto)
+    problemas = [f"nó diferente: {nome}" for nome in sorted(set(nos_l) | set(nos_r)) if nos_l.get(nome) != nos_r.get(nome)]
+    if local["connections"] != remoto["connections"]:
+        problemas.append("conexões diferentes")
+    problemas += [f"credencial não encontrada: {n['name']} ({c['name']})" for n in remoto["nodes"]
+                  for c in n.get("credentials", {}).values() if c.get("id") == c.get("name")]
+    return problemas
+
+
 def _gravar(caminho: Path, workflow: dict) -> None:
     caminho.write_text(json.dumps(workflow, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"gravado: {caminho}")
