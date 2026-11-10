@@ -6,6 +6,18 @@ export const CAPTURAS = process.env.E2E_CAPTURAS ?? "e2e/capturas";
 export const sufixo = `${Date.now()}-${randomBytes(3).toString("hex")}`;
 export const senha = `Teste-${randomBytes(8).toString("hex")}`; // gerada a cada execução; as contas são apagadas no fim
 
+/** SQL pela rota /pg/query do Supabase (E2E_SUPABASE_URL), porque o Postgres da homologação não fica exposto. */
+export async function sql<T = Record<string, unknown>>(consulta: string): Promise<T[]> {
+  const chave = process.env.E2E_SERVICE_ROLE_KEY ?? "";
+  const r = await fetch(`${process.env.E2E_SUPABASE_URL}/pg/query`, {
+    method: "POST",
+    headers: { apikey: chave, Authorization: `Bearer ${chave}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ query: consulta }),
+  });
+  if (!r.ok) throw new Error(`SQL falhou (${r.status}): ${await r.text()}`);
+  return r.json();
+}
+
 export async function cadastrar(page: Page, pessoa: { nome: string; email: string }) {
   await preencherCadastro(page, pessoa);
   await expect(page.getByRole("heading", { name: "Seu cadastro está em análise" })).toBeVisible();

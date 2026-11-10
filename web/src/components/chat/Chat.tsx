@@ -41,11 +41,13 @@ export function Chat({ conversa, mensagensIniciais, usuario, restantes, limite }
   const ancorar = useRef(true);
   const uf = buscarUf(usuario.uf);
 
-  // Quando o servidor manda a versão gravada (com ids para a avaliação), ela substitui a local.
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (!enviando) setMensagens(mensagensIniciais);
-  }, [mensagensIniciais, enviando]);
+  // Quando o servidor manda a versão gravada (com ids para a avaliação), ela substitui a local. Só quando chega uma
+  // versão nova: reaplicar a antiga ao fim do streaming apagava a resposta até o refresh trazê-la de volta.
+  const [versao, setVersao] = useState(mensagensIniciais);
+  if (versao !== mensagensIniciais && !enviando) {
+    setVersao(mensagensIniciais);
+    setMensagens(mensagensIniciais);
+  }
 
   useLayoutEffect(() => {
     const caixa = rolagem.current;

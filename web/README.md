@@ -42,6 +42,8 @@ npm run build
 npm run e2e       # ponta a ponta (Playwright). Precisa dos passos 1 a 4 rodando; cria e apaga as contas de teste
 ```
 
+O `e2e/chat-estavel.spec.ts` confere que a pergunta e a resposta não somem da tela quando a resposta termina. Ele não gasta tokens e roda contra qualquer Supabase com SQL pela API: `E2E_URL=… E2E_SUPABASE_URL=… E2E_SERVICE_ROLE_KEY=… npx playwright test e2e/chat-estavel.spec.ts`.
+
 ## Publicar (homologação, Easypanel)
 
 O site roda como um serviço *App* do Easypanel, no mesmo servidor do n8n, construído a partir do `web/Dockerfile`.

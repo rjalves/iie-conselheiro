@@ -4,26 +4,13 @@
 //     npx playwright test e2e/homologacao.spec.ts
 import { mkdirSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
-import { CAPTURAS, preencherCadastro, senha, sufixo } from "./comum";
+import { CAPTURAS, preencherCadastro, senha, sql, sufixo } from "./comum";
 
-const SUPABASE = process.env.E2E_SUPABASE_URL ?? "";
-const CHAVE = process.env.E2E_SERVICE_ROLE_KEY ?? "";
-test.skip(!CHAVE, "só contra a homologação (E2E_SERVICE_ROLE_KEY)");
+test.skip(!process.env.E2E_SERVICE_ROLE_KEY, "só contra a homologação (E2E_SERVICE_ROLE_KEY)");
 
 // Endereços de teste do Resend: aceitam o envio sem entregar a ninguém e sem prejudicar a reputação do domínio.
 const gestora = { nome: "Gestora de Homologação", email: `delivered+gestora-${sufixo}@resend.dev` };
 const admin = { nome: "Administração de Homologação", email: `delivered+admin-${sufixo}@resend.dev` };
-
-/** SQL na homologação pela rota /pg/query, porque o Postgres não fica exposto. */
-async function sql<T = Record<string, unknown>>(consulta: string): Promise<T[]> {
-  const r = await fetch(`${SUPABASE}/pg/query`, {
-    method: "POST",
-    headers: { apikey: CHAVE, Authorization: `Bearer ${CHAVE}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ query: consulta }),
-  });
-  if (!r.ok) throw new Error(`SQL falhou (${r.status}): ${await r.text()}`);
-  return r.json();
-}
 
 type Resposta = { texto: string | null; erro: string | null; ferramentas: unknown; latencia_ms: number | null };
 const respostas = () =>
