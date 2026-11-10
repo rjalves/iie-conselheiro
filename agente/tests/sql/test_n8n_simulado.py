@@ -49,7 +49,7 @@ def test_responde_em_ndjson_e_grava_pergunta_e_resposta(banco, sql, webhook):
     eventos = _post(webhook, _pedido(uid, conversa))
     assert eventos[0]["type"] == "begin" and eventos[-1]["type"] == "end"
     texto = "".join(e["content"] for e in eventos if e["type"] == "item")
-    assert "Ceará" in texto and "21,2" in texto and "Sobral" in texto
+    assert "Ceará" in texto and "18,1" in texto and "Sobral" in texto  # IIE 2023 do CE, o ano mais recente
     assert sql("select array_agg(papel order by criado_em) from app.mensagem where conversa_id = %s",
                conversa) == ["usuario", "agente"]
     assert sql("select texto from app.mensagem where conversa_id = %s and papel = 'agente'", conversa) == texto

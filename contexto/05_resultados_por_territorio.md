@@ -68,6 +68,48 @@ Fonte: Fernandes, Felicio e Saad (2024), Tabela 7, p. 30. A transcrição foi co
 - **2015 é um vale.** Todas as UFs, exceto o AM, caem em relação a 2013. O estudo aponta possível efeito teto ou falha na amostra da rede privada do SAEB 2015.
 - **2019 é um salto.** Reflete a alta do SAEB 2019, que o próprio estudo relaciona a uma possível "inflação de notas" após a universalização do SAEB no EM público em 2017. Além disso, o valor de 2019 depende da imputação por trajetória ([02_metodologia.md](02_metodologia.md#7-tratamento-especial-de-2019)).
 
+## 3a. Série publicada no painel do IIE — 2015 a 2023
+
+Fonte: painel do IIE da Lupa Social (Looker Studio), consultado em 10/11/2026. Arquivo: [anexos/iie_uf_painel_2015_2023.csv](anexos/iie_uf_painel_2015_2023.csv), com o IIE e os três componentes publicados por UF e ano. **O IIE 2023 é preliminar:** o painel avisa que ele pode mudar um pouco quando sair o Censo Escolar — Situação do Aluno de 2024. De 2015 a 2019, a diferença para a Tabela 7 é de até 0,3 ponto. É esta a série que a base do Conselheiro usa no EM de 2015 em diante.
+
+| UF | 2015 | 2017 | 2019 | 2021 | 2023 | Δ 2019→23 | Posição 2023 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| **Brasil** | **9,5** | **13,5** | **18,9** | **17,0** | **15,5** | **−3,4** | — |
+| PR | 12,0 | 16,3 | 24,6 | 25,3 | 20,4 | −4,2 | 1 |
+| ES | 12,7 | 18,3 | 24,5 | 21,9 | 19,5 | −5,0 | 2 |
+| GO | 9,5 | 17,1 | 25,7 | 19,6 | 19,0 | −6,7 | 3 |
+| SP | 13,1 | 17,5 | 27,0 | 23,5 | 18,6 | −8,4 | 4 |
+| CE | 7,6 | 13,3 | 21,0 | 21,4 | 18,1 | −2,9 | 5 |
+| SC | 13,9 | 15,8 | 17,2 | 20,9 | 17,4 | +0,2 | 6 |
+| DF | 15,1 | 19,2 | 26,0 | 22,7 | 17,4 | −8,6 | 7 |
+| RS | 10,9 | 14,8 | 17,4 | 18,1 | 16,7 | −0,8 | 8 |
+| MG | 10,5 | 16,1 | 22,0 | 19,4 | 16,6 | −5,4 | 9 |
+| PE | 9,7 | 12,9 | 19,2 | 19,4 | 16,2 | −3,0 | 10 |
+| RN | 5,7 | 8,2 | 15,5 | 14,0 | 12,5 | −3,0 | 11 |
+| PI | 6,1 | 10,6 | 15,2 | 13,7 | 12,4 | −2,8 | 12 |
+| RJ | 10,8 | 15,3 | 18,1 | 15,5 | 11,8 | −6,2 | 13 |
+| MS | 9,3 | 12,4 | 16,7 | 13,5 | 11,2 | −5,5 | 14 |
+| RO | 6,2 | 9,8 | 12,0 | 11,7 | 11,1 | −1,0 | 15 |
+| PB | 6,2 | 9,6 | 15,8 | 11,9 | 11,0 | −4,8 | 16 |
+| TO | 4,8 | 9,9 | 11,7 | 11,7 | 10,7 | −1,0 | 17 |
+| MT | 7,1 | 9,4 | 13,4 | 11,5 | 10,3 | −3,1 | 18 |
+| SE | 6,3 | 10,9 | 13,1 | 11,9 | 9,8 | −3,3 | 19 |
+| AL | 3,4 | 6,9 | 11,9 | 9,3 | 8,4 | −3,5 | 20 |
+| BA | 4,7 | 6,9 | 8,0 | 7,8 | 8,1 | +0,2 | 21 |
+| AC | 4,4 | 7,4 | 9,2 | 10,2 | 7,9 | −1,2 | 22 |
+| PA | 4,5 | 5,9 | 8,4 | 6,3 | 6,9 | −1,5 | 23 |
+| RR | 4,8 | 5,7 | 8,2 | 7,6 | 6,6 | −1,6 | 24 |
+| AM | 6,3 | 6,1 | 7,7 | 6,8 | 6,6 | −1,1 | 25 |
+| MA | 2,5 | 5,7 | 8,9 | 7,7 | 6,6 | −2,3 | 26 |
+| AP | 2,7 | 4,9 | 6,5 | 6,4 | 5,6 | −0,9 | 27 |
+
+**Leituras principais**
+- **O avanço de 2019 se desfez em parte.** O Brasil caiu de 18,9 (2019) para 17,0 (2021) e 15,5 (2023). De 2019 para 2021, 21 UFs caíram; de 2021 para 2023, 25.
+- **As maiores quedas de 2019 a 2023 são de UFs que lideravam:** DF (−8,6), SP (−8,4), GO (−6,7), RJ (−6,2), MS (−5,5) e MG (−5,4). Só BA e SC ficaram estáveis (+0,2).
+- **Em 2023, o PR lidera (20,4)**, seguido de ES (19,5), GO (19,0), SP (18,6) e CE (18,1). O maior IIE é 3,6 vezes o menor (AP, 5,6).
+- **CE e PE continuam sendo as únicas UFs do Nordeste acima do Brasil** (18,1 e 16,2, contra 15,5).
+- **2021 reflete os anos da pandemia.** O fora da escola do Brasil caiu de 6,4% (2019) para 3,8% (2021) e voltou a 5,7% (2023); compare 2019 → 2021 → 2023 com cautela.
+
 ## 4. Onde cada UF perde a coorte: decomposição fluxo × aprendizagem
 
 O IIE pode ser escrito como:

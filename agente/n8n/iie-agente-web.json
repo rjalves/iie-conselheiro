@@ -198,7 +198,7 @@
         "operation": "executeQuery",
         "query": "select iie.fn_comparar(array(select trim(x) from unnest(string_to_array($1, ',')) as x), $2, $3::int, $4::text[]) as resultado",
         "options": {
-          "queryReplacement": "={{ [ $fromAI('territorios', 'De 2 a 6 territórios separados por vírgula (siglas, nomes ou gentílicos das UFs, ou Brasil), ex.: CE, PE', 'string'), $fromAI('indicador', 'Um de: IIE, P1, F1, F2, A1, A2, E1, E2, E2R, E3', 'string'), $fromAI('ano', '2013, 2015, 2017 ou 2019', 'number'), $('Webhook').first().json.body.ufs_permitidas ] }}"
+          "queryReplacement": "={{ [ $fromAI('territorios', 'De 2 a 6 territórios separados por vírgula (siglas, nomes ou gentílicos das UFs, ou Brasil), ex.: CE, PE', 'string'), $fromAI('indicador', 'Um de: IIE, P1, F1, F2, A1, A2, E1, E2, E2R, E3', 'string'), $fromAI('ano', '2013 a 2023, de dois em dois anos (E1, E2, E2R e E3 só até 2019; P1, F1, F2, A1 e A2 a partir de 2015); use 2023 se a pessoa não disser', 'number'), $('Webhook').first().json.body.ufs_permitidas ] }}"
         }
       },
       "credentials": {
@@ -219,7 +219,7 @@
       ],
       "parameters": {
         "descriptionType": "manual",
-        "toolDescription": "Série oficial do IIE de um território (2013 a 2019), posição entre as UFs e valor do Brasil. Use para qualquer valor oficial do IIE.",
+        "toolDescription": "Série oficial do IIE de um território (Ensino Médio de 2013 a 2023; anos iniciais e finais até 2019), posição entre as UFs no ano mais recente e valor do Brasil. Use para qualquer valor oficial do IIE.",
         "resource": "database",
         "operation": "executeQuery",
         "query": "select iie.fn_consultar_iie($1, $2, $3::text[]) as resultado",
@@ -250,7 +250,7 @@
         "operation": "executeQuery",
         "query": "select iie.fn_decompor($1, $2::int, $3::text[]) as resultado",
         "options": {
-          "queryReplacement": "={{ [ $fromAI('territorio', 'Sigla, nome ou gentílico da UF, ou Brasil', 'string'), $fromAI('ano', '2015, 2017 ou 2019; use 2019 se a pessoa não disser', 'number'), $('Webhook').first().json.body.ufs_permitidas ] }}"
+          "queryReplacement": "={{ [ $fromAI('territorio', 'Sigla, nome ou gentílico da UF, ou Brasil', 'string'), $fromAI('ano', '2015, 2017, 2019, 2021 ou 2023; use 2023 se a pessoa não disser', 'number'), $('Webhook').first().json.body.ufs_permitidas ] }}"
         }
       },
       "credentials": {
@@ -328,7 +328,7 @@
         "operation": "executeQuery",
         "query": "select iie.fn_ranking($1, $2::int, nullif($3, 'todas'), $4::int, $5::text[]) as resultado",
         "options": {
-          "queryReplacement": "={{ [ $fromAI('indicador', 'Um de: IIE, P1, F1, F2, A1, A2, E1, E2, E2R, E3', 'string'), $fromAI('ano', '2013, 2015, 2017 ou 2019', 'number'), $fromAI('regiao', 'todas, Norte, Nordeste, Sudeste, Sul ou Centro-Oeste', 'string'), $fromAI('limite', 'Quantas posições devolver, de 1 a 27', 'number'), $('Webhook').first().json.body.ufs_permitidas ] }}"
+          "queryReplacement": "={{ [ $fromAI('indicador', 'Um de: IIE, P1, F1, F2, A1, A2, E1, E2, E2R, E3', 'string'), $fromAI('ano', '2013 a 2023, de dois em dois anos (E1, E2, E2R e E3 só até 2019; P1, F1, F2, A1 e A2 a partir de 2015); use 2023 se a pessoa não disser', 'number'), $fromAI('regiao', 'todas, Norte, Nordeste, Sudeste, Sul ou Centro-Oeste', 'string'), $fromAI('limite', 'Quantas posições devolver, de 1 a 27', 'number'), $('Webhook').first().json.body.ufs_permitidas ] }}"
         }
       },
       "credentials": {

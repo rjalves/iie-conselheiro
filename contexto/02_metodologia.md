@@ -24,11 +24,13 @@ Alinhamento temporal: o **ano de referência** do IIE é o ano de nascimento + 1
 | 2000 | 2017 | 2016, 2017, 2018 | 2017 | 2017 |
 | 2002 | 2019 | 2018, 2019, 2020 | 2019 (sem idade) | 2019 |
 | 2004 | 2021 | 2020, 2021, 2022 | 2021 | 2021 |
-| 2006 | 2023 | 2022, 2023, **2024** | 2023 | — (ainda não integrado) |
+| 2006 | 2023 | 2022, 2023, **2024** | 2023 | 2023 |
 
-A série de 2023 depende do Censo 2024 completo; por isso não foi integrada. A série é **bienal** porque o SAEB do 3º EM é bienal.
+A série é **bienal** porque o SAEB do 3º EM é bienal.
 
-A série oficial da Metas Sociais/Instituto Natura vai de **2007 a 2019** (coortes 1990 a 2002). Este repositório cobre **2015–2021**. O relatório de junho de 2024 afirma que o IIE 2021 era inviável com dados públicos: a partir de 2021, o SAEB passou a ser divulgado com "máscaras" e o Censo Escolar agregado por escola. O pipeline deste repositório contorna isso com os microdados identificados da Sala Segura. Ver [06_estudos.md](06_estudos.md).
+**Série publicada (painel do IIE, Lupa Social):** 2015, 2017, 2019, 2021 e 2023, por UF e Brasil. O painel avisa que o **IIE 2023 é preliminar**: pode mudar um pouco quando sair o Censo Escolar — Situação do Aluno de 2024. Brasil: 9,5 (2015), 13,5 (2017), 18,9 (2019), 17,0 (2021) e 15,5 (2023). Os números estão em [anexos/iie_uf_painel_2015_2023.csv](anexos/iie_uf_painel_2015_2023.csv).
+
+A série oficial da Metas Sociais/Instituto Natura vai de **2007 a 2019** (coortes 1990 a 2002); no ensino médio, o painel a continua até 2023, com diferença de até 0,3 ponto em relação à Tabela 7 de Fernandes, Felicio e Saad (2024) nos anos em comum. As `.rds` deste repositório só permitem reproduzir **2015–2019**: falta a coorte do Censo de 2021 e de 2023. O relatório de junho de 2024 afirma que o IIE 2021 era inviável com dados públicos: a partir de 2021, o SAEB passou a ser divulgado com "máscaras" e o Censo Escolar agregado por escola. O pipeline deste repositório contorna isso com os microdados identificados da Sala Segura. Ver [06_estudos.md](06_estudos.md).
 
 ## 2. Por que o IIE é diferente dos indicadores tradicionais
 
@@ -171,6 +173,18 @@ $$
 O fluxo (Censo + PNADc) de 2019 não precisa de tratamento especial, pois não depende da idade no SAEB.
 
 **Reprodução.** O procedimento foi reimplementado em [anexos/reproducao_iie.py](anexos/reproducao_iie.py) como `2019_B_procedimento_publicado`. Aplicado às `.rds` do repositório, dá **Brasil 2019 = 18,6** (oficial: 19,0), com erro médio de 0,3 ponto nas UFs. Uma alternativa testada, a razão relativa $p_{g,2019} = p_{total,2019}\cdot p_{g,2017}/p_{total,2017}$, dá 19,0 no Brasil, mas erra mais por UF (0,4).
+
+**Valor adotado.** O painel do IIE publica 2019 com o procedimento da equipe (Brasil 18,9). Ele difere da reprodução B em até 1,5 ponto (GO), sempre na parte da aprendizagem: o fluxo (Censo e PNADc) coincide. A base do Conselheiro usa o valor publicado e deriva dele a aprendizagem entre os concluintes (A1); como o SAEB 2019 não traz a idade, o básico por trajetória (A2) de 2019 fica sem valor.
+
+## 7a. 2021 e 2023: o que o painel publica
+
+O painel publica, por UF e ano, o IIE e três componentes: alunos com 2 anos ou mais de atraso (entre os que estão na escola, Censo), alunos abaixo do básico (SAEB) e jovens fora da escola sem o EM (PNADc). Com a identidade $IIE = (100 - F2 - P1) \times A1 / 100$:
+
+- **P1** é o fora da escola publicado;
+- **F2** é o atraso publicado convertido para a geração toda: $F2 = \text{atraso} \times (100 - P1) / 100$;
+- **F1** $= 100 - F2 - P1$ e **A1** $= 100 \times IIE / F1$.
+
+Em 2015 e 2017, essas contas reproduzem a decomposição feita a partir das `.rds` (diferença ≤ 0,02 ponto). Em 2021 e 2023 não há a coorte do Censo, então a trajetória da geração (adiantados, em linha, 1 ano de atraso) não é conhecida. O básico por trajetória, e com ele o **A2**, vem do SAEB 2021 e 2023 por trajetória (regra regular), como reprodução. Em todas as UFs, o A1 derivado do painel fica dentro da faixa do básico por trajetória do SAEB.
 
 **Validação geral.** Para 2015 e 2017, a fórmula do script 04 aplicada às `.rds` reproduz a série oficial por UF com **erro médio de 0,1 ponto** (máximo 0,31; correlação 0,9998). Detalhes em [05_resultados_por_territorio.md](05_resultados_por_territorio.md).
 

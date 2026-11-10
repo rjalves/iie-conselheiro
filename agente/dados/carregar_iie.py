@@ -22,6 +22,9 @@ SEEDS = Path(__file__).resolve().parent / "seeds"
 
 FONTE_OFICIAL = "Fernandes, Felicio e Saad (2024), Tabela 7"
 FONTE_REPRODUCAO = "Reprodução a partir das bases do IIE (contexto/anexos/iie_uf_reproducao.csv)"
+FONTE_PAINEL = "Painel do IIE (Lupa Social), consultado em 10/11/2026"
+FONTE_PAINEL_COMPONENTES = (FONTE_PAINEL + "; P1, F2, F1 e A1 derivados do que o painel publica; "
+                            "A2 e básico por trajetória: reprodução a partir do SAEB")
 ETAPAS = ("AI", "AF", "EM")
 
 
@@ -57,16 +60,27 @@ def ler_oficial(caminho: Path, id_por_sigla: dict[str, str]) -> list[tuple]:
     return linhas
 
 
+def ler_painel(caminho: Path, id_por_sigla: dict[str, str]) -> list[tuple]:
+    """IIE do Ensino Médio publicado no painel do IIE (contexto/anexos/iie_uf_painel_2015_2023.csv)."""
+    return [(id_por_sigla[r["uf_sigla"]], int(r["ano"]), "EM", float(r["iie"]), FONTE_PAINEL)
+            for r in _ler_csv(caminho)]
+
+
 def ler_componentes(caminho: Path, id_por_sigla: dict[str, str]) -> list[tuple]:
+    """Decomposição por método. No método "painel", o que não é publicado nem calculável vem vazio (None)."""
+    def num(valor: str) -> float | None:
+        return float(valor) if valor != "" else None
+
     linhas = []
     for r in _ler_csv(caminho):
+        painel = r["metodo"] == "painel"
         linhas.append((
-            id_por_sigla[r["uf_sigla"]], int(r["ano"]), r["metodo"], False, float(r["IIE"]),
-            float(r["pct_adiantado"]), float(r["pct_em_linha"]), float(r["pct_atrasado1"]),
+            id_por_sigla[r["uf_sigla"]], int(r["ano"]), r["metodo"], painel, float(r["IIE"]),
+            num(r["pct_adiantado"]), num(r["pct_em_linha"]), num(r["pct_atrasado1"]),
             float(r["pct_atrasado2"]), float(r["pct_fora_escola"]), float(r["pct_concluiu_ate18"]),
-            float(r["pct_basico_entre_concluintes"]), float(r["p_basico_adiantado"]),
-            float(r["p_basico_em_linha"]), float(r["p_basico_atrasado1"]), float(r["coorte_ajustada"]),
-            FONTE_REPRODUCAO,
+            float(r["pct_basico_entre_concluintes"]), num(r["p_basico_adiantado"]),
+            num(r["p_basico_em_linha"]), num(r["p_basico_atrasado1"]), num(r["coorte_ajustada"]),
+            FONTE_PAINEL_COMPONENTES if painel else FONTE_REPRODUCAO,
         ))
     return linhas
 
@@ -156,6 +170,7 @@ def carregar(conn: psycopg.Connection, responsavel: str, anexos: Path = ANEXOS, 
         "indicadores": seeds / "indicadores.json",
         "alertas": seeds / "alertas.csv",
         "oficial": anexos / "iie_uf_oficial_2013_2019.csv",
+        "painel": anexos / "iie_uf_painel_2015_2023.csv",
         "componentes": anexos / "iie_uf_reproducao.csv",
         "matriz": anexos / "matriz_indicador_pratica.csv",
         "catalogo": anexos / "catalogo_praticas.csv",
@@ -164,7 +179,9 @@ def carregar(conn: psycopg.Connection, responsavel: str, anexos: Path = ANEXOS, 
     }
     territorios = ler_territorios(arquivos["territorios"])
     id_por_sigla = {t[3]: t[0] for t in territorios}
-    oficial = ler_oficial(arquivos["oficial"], id_por_sigla)
+    # O painel substitui a Tabela 7 no EM dos anos que publica; a Tabela 7 fica para 2013 e para AI e AF.
+    oficial = list({r[:3]: r for r in ler_oficial(arquivos["oficial"], id_por_sigla)
+                    + ler_painel(arquivos["painel"], id_por_sigla)}.values())
     componentes = ler_componentes(arquivos["componentes"], id_por_sigla)
     _, vinculos = ler_matriz(arquivos["matriz"])
     praticas = ler_catalogo(arquivos["catalogo"])

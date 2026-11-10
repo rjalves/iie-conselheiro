@@ -81,6 +81,7 @@ flowchart TD
 - **Semáforo:** 🔴 crítico · 🟡 atenção · 🟢 igual ou melhor que o Brasil.
 - **Ganho:** pontos de IIE que a UF somaria se o componente chegasse ao nível do Brasil, mantidos os demais.
 - A UF é ordenada pelo IIE oficial. Os componentes vêm da reprodução (procedimento publicado para 2019).
+- **Retrato de 2019, feito antes da série do painel.** A base do Conselheiro agora vai até 2023 e, de 2019 em diante, deriva A1 do IIE publicado (ver [02 §7](02_metodologia.md)). Com isso, alguns semáforos de A1 de 2019 mudam; por exemplo, o de MT passa de 🔴 para 🟡. Para o diagnóstico de hoje, use a ferramenta `decompor_iie` com 2023.
 
 | UF | IIE 2019 | P1 | F2 | A1 | A2 | E1 | E2 | E3 | Ganho se A1→BR | Ganho se F2→BR | Ganho se P1→BR | Onde agir primeiro |
 |---|---:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|---:|---:|---:|---|

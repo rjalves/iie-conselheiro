@@ -42,7 +42,8 @@ class Ferramenta:
 
 _TERRITORIO = Parametro("territorio", "Sigla, nome ou gentílico da UF, ou Brasil", "string")
 _INDICADOR = Parametro("indicador", "Um de: IIE, P1, F1, F2, A1, A2, E1, E2, E2R, E3", "string")
-_ANO = Parametro("ano", "2013, 2015, 2017 ou 2019", "number")
+_ANO = Parametro("ano", "2013 a 2023, de dois em dois anos (E1, E2, E2R e E3 só até 2019; P1, F1, F2, A1 e A2 "
+                        "a partir de 2015); use 2023 se a pessoa não disser", "number")
 _NIVEL = Parametro("nivel", "todos, Escola, Secretaria ou Estrategico", "string")
 
 FERRAMENTAS: tuple[Ferramenta, ...] = (
@@ -71,8 +72,8 @@ FERRAMENTAS: tuple[Ferramenta, ...] = (
     ),
     Ferramenta(
         "consultar_iie",
-        "Série oficial do IIE de um território (2013 a 2019), posição entre as UFs e valor do Brasil. "
-        "Use para qualquer valor oficial do IIE.",
+        "Série oficial do IIE de um território (Ensino Médio de 2013 a 2023; anos iniciais e finais até 2019), "
+        "posição entre as UFs no ano mais recente e valor do Brasil. Use para qualquer valor oficial do IIE.",
         "select iie.fn_consultar_iie($1, $2, $3::text[]) as resultado",
         (_TERRITORIO,
          Parametro("etapa", "EM (Ensino Médio), AF ou AI; use EM se a pessoa não disser", "string")),
@@ -84,7 +85,7 @@ FERRAMENTAS: tuple[Ferramenta, ...] = (
         "aprendizagem (A1, A2), com semáforo, ganho potencial, prioridade e alertas de dado.",
         "select iie.fn_decompor($1, $2::int, $3::text[]) as resultado",
         (_TERRITORIO,
-         Parametro("ano", "2015, 2017 ou 2019; use 2019 se a pessoa não disser", "number")),
+         Parametro("ano", "2015, 2017, 2019, 2021 ou 2023; use 2023 se a pessoa não disser", "number")),
         True,
     ),
     Ferramenta(

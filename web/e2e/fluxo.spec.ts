@@ -45,7 +45,7 @@ test("cadastro com acesso imediato, conversa, avaliação e exclusão da convers
   await expect(page.getByText("Estados liberados: Ceará e Pernambuco.", { exact: false })).toBeVisible();
   await page.getByRole("button", { name: "Como está o Ceará no IIE?" }).click();
   const resposta = page.locator("article").last();
-  await expect(resposta).toContainText("21,2", { timeout: 30_000 });
+  await expect(resposta).toContainText("18,1", { timeout: 30_000 });
   await page.waitForURL(/\/c\/[0-9a-f-]{36}$/);
   await expect(page.getByRole("navigation", { name: "Conversas anteriores" })).toContainText(
     "Como está o Ceará no IIE?",
@@ -67,7 +67,7 @@ test("cadastro com acesso imediato, conversa, avaliação e exclusão da convers
   await paginaAdmin.screenshot({ path: `${CAPTURAS}/admin-computador.png`, fullPage: true });
   const celular = await entrarComo(browser, gestora.email, devices["Pixel 7"]);
   await celular.goto(page.url());
-  await expect(celular.locator("article").last()).toContainText("21,2");
+  await expect(celular.locator("article").last()).toContainText("18,1");
   await celular.screenshot({ path: `${CAPTURAS}/chat-celular.png` });
 
   await page.getByRole("button", { name: "Apagar conversa" }).click();

@@ -52,7 +52,7 @@ EXEMPLOS = {
                              "select iie.fn_comparar(array['CE', 'PE'], 'IIE', 2019, array['CE', 'PE'])",
                              lambda r: "Pernambuco" in json.dumps(r, ensure_ascii=False)),
     "consultar_iie": (["CE", "EM"], ["CE"], "select iie.fn_consultar_iie('CE', 'EM', array['CE'])",
-                      lambda r: r["serie"][-1]["valor"] == 21.2),
+                      lambda r: r["serie"][-1] == {"ano": 2023, "valor": 18.14}),
     "decompor_iie": (["Cearense", 2019], ["CE"], "select iie.fn_decompor('Cearense', 2019, array['CE'])",
                      lambda r: r["ano"] == 2019),
     "pacote_por_perfil": (["evasao"], None, "select iie.fn_pacote('evasao')", lambda r: '"SM-79"' in json.dumps(r)),

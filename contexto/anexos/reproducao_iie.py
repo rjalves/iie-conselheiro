@@ -12,7 +12,8 @@ Gera contexto/anexos/iie_uf_reproducao.csv com o IIE e a decomposição da coort
     A_alternativa: p_g,2019 = p_total,2019 * p_g,2017 / p_total,2017
     B_procedimento_publicado: totais de básico e abaixo de 2019 repartidos entre grupos pela
       distribuição de 2017 e linhas renormalizadas (Fernandes, Felicio e Saad, 2024, p. 22)
-- 2021: não calculável; a base do Censo não tem a coorte 2004.
+- 2019, 2021 e 2023, método "painel": componentes coerentes com o IIE publicado no painel do IIE (Lupa Social),
+  transcrito em iie_uf_painel_2015_2023.csv. Ver painel().
 """
 from pathlib import Path
 
@@ -23,6 +24,7 @@ import pyreadr
 RAIZ = Path(__file__).resolve().parents[2]
 DADOS = RAIZ / "dados"
 SAIDA = Path(__file__).resolve().parent / "iie_uf_reproducao.csv"
+PAINEL = Path(__file__).resolve().parent / "iie_uf_painel_2015_2023.csv"
 
 UF_SIGLA = dict(zip(
     [0, 11, 12, 13, 14, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 28, 29,
@@ -92,6 +94,30 @@ def calcula(cont, p, perc_fora):
     })
 
 
+def painel(trajetoria_2019, p_regular):
+    """IIE do painel (2019 em diante) e componentes coerentes com ele, pela identidade IIE = (100 − F2 − P1) × A1 / 100.
+
+    - P1 é o fora da escola do painel. O painel publica o atraso de 2+ anos entre quem está na escola; F2 é esse
+      percentual sobre a geração toda. F1 = 100 − F2 − P1 e A1 = 100 × IIE / F1. Em 2015 e 2017 isso reproduz o
+      método "regular" (diferença ≤ 0,02 ponto).
+    - 2019: adiantados, em linha e 1 ano de atraso vêm do Censo (não dependem do SAEB). O SAEB 2019 não traz a idade
+      do aluno, então o básico por trajetória fica vazio.
+    - 2021 e 2023: sem a coorte do Censo, a trajetória fica vazia; o básico por trajetória vem do SAEB (regra regular).
+    """
+    p = pd.read_csv(PAINEL).query("ano >= 2019")
+    p["uf"] = p.uf_sigla.map({s: c for c, s in UF_SIGLA.items()})
+    p = p.set_index(["ano", "uf"])
+    f2 = p.pct_atraso2_na_escola * (100 - p.pct_fora_escola) / 100
+    f1 = 100 - f2 - p.pct_fora_escola
+    basico = (100 * p_regular[[A, L, T]]).rename(
+        columns={A: "p_basico_adiantado", L: "p_basico_em_linha", T: "p_basico_atrasado1"})
+    return (pd.DataFrame({"IIE": p.iie, "pct_atrasado2": f2, "pct_fora_escola": p.pct_fora_escola,
+                          "pct_concluiu_ate18": f1, "pct_basico_entre_concluintes": 100 * p.iie / f1})
+            .join(trajetoria_2019[["pct_adiantado", "pct_em_linha", "pct_atrasado1", "coorte_ajustada"]])
+            .join(basico)
+            .assign(metodo="painel"))
+
+
 def main():
     censo, saeb, pnad = ler("censo_escolar_iie_geral"), ler("saeb_iie_geral"), ler("pnadc_iie_geral")
     cont = contagens_censo(censo)
@@ -104,6 +130,7 @@ def main():
     for h in ("A_alternativa", "B_procedimento_publicado"):
         p = pd.concat({2019: p_basico_2019(saeb, h)}, names=["ano", "uf"])
         partes.append(calcula(c19, p, perc_fora).assign(metodo=f"2019_{h}"))
+    partes.append(painel(partes[-1], p_basico_regular(saeb)))  # a trajetória de 2019 é a mesma nos dois métodos
 
     out = pd.concat(partes).reset_index()
     out.insert(2, "uf_sigla", out.uf.map(UF_SIGLA))

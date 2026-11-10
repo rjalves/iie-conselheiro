@@ -1,7 +1,7 @@
 def test_carga_completa(sql):
     contagens = {
-        "iie.territorio": 28, "iie.resultado_oficial": 336, "iie.componente": 112, "iie.indicador": 11,
-        "iie.pratica": 541, "iie.indicador_pratica": 133, "iie.alerta_dado": 10, "iie.precondicao": 6,
+        "iie.territorio": 28, "iie.resultado_oficial": 392, "iie.componente": 196, "iie.indicador": 11,
+        "iie.pratica": 541, "iie.indicador_pratica": 133, "iie.alerta_dado": 12, "iie.precondicao": 6,
         "iie.precondicao_pratica": 50, "iie.perfil_territorio": 6, "iie.perfil_pratica": 26, "iie.lacuna": 8,
     }
     for tabela, esperado in contagens.items():

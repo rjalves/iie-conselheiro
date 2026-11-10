@@ -132,5 +132,6 @@ Soma dos pesos (Brasil): 2,01 mi (2015), 2,02 mi (2017), 2,12 mi (2019), 2,25 mi
 | Arquivo | Conteúdo |
 |---|---|
 | `reproducao_iie.py` | transcrição do cálculo do script 04 em Python (pandas + pyreadr), com duas reconstruções para 2019 (`2019_A_alternativa` e `2019_B_procedimento_publicado`) |
-| `iie_uf_reproducao.csv` | 112 linhas (28 territórios × 4 conjuntos: 2015, 2017, 2019-A, 2019-B), com IIE, % por trajetória, % fora da escola, % concluiu até 18, % básico entre concluintes, p(básico) por trajetória e coorte ajustada |
+| `iie_uf_reproducao.csv` | 196 linhas (28 territórios × 7 conjuntos: 2015, 2017, 2019-A, 2019-B e o método `painel` em 2019, 2021 e 2023), com IIE, % por trajetória, % fora da escola, % concluiu até 18, % básico entre concluintes, p(básico) por trajetória e coorte ajustada. No método `painel`, o que não é publicado nem calculável fica vazio: a trajetória em 2021 e 2023 e o p(básico) por trajetória em 2019 (ver [02 §7a](02_metodologia.md)) |
+| `iie_uf_painel_2015_2023.csv` | 140 linhas (28 territórios × 2015 a 2023), transcritas do painel do IIE (Lupa Social) em 10/11/2026 com os valores exatos que o painel consulta: `iie`, `pct_atraso2_na_escola` (alunos com 2+ anos de atraso entre os que estão na escola, Censo), `pct_abaixo_basico` (SAEB) e `pct_fora_escola` (PNADc). O IIE 2023 é preliminar |
 | `iie_uf_oficial_2013_2019.csv` | série **oficial** por UF, transcrita da Tabela 7 de Fernandes, Felicio e Saad (2024, p. 30): IIE para Anos Iniciais (AI), Anos Finais (AF) e EM, de 2013 a 2019 |

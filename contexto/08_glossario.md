@@ -4,6 +4,7 @@
 |---|---|
 | **IIE** | Índice de Inclusão Educacional: % de uma coorte de nascimento que concluiu o EM até os 18 anos com LP ≥ 300 **e** MT ≥ 300 no SAEB (0–100) |
 | **IIE Geral** | nome usado neste repositório para o IIE total, sem recortes (saída `IIE_Geral`) |
+| **Painel do IIE** | painel da Lupa Social no Looker Studio (Data Studio) com o IIE por UF e Brasil de 2015 a 2023 e três componentes: atraso de 2+ anos (Censo), abaixo do básico (SAEB) e fora da escola (PNADc). Também traz capitais, equidade, disciplina e as variantes IPIE, ISE e idade correta. O IIE 2023 é preliminar |
 | **IIE Legado** | citado só no painel Looker; não há definição nos materiais do repositório (hipótese: série original da Metas Sociais) |
 | **IPIE / Pré-Inclusão** | Índice de Pré-Inclusão Educacional: mesma construção, com corte 250 |
 | **ISE / Sucesso Educacional** | Índice de Sucesso Educacional: corte 375, equivalente ao nível "Adequado" do IIEM |

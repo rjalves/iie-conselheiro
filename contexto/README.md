@@ -23,7 +23,7 @@ Esta pasta guarda o conhecimento consolidado sobre o IIE: o que mede, como é ca
 | 08 | [Glossário](08_glossario.md) | termos e siglas |
 | 09 | [Indicadores do IIE e práticas de gestão](09_indicadores_iie_e_praticas_de_gestao.md) | árvore de indicadores, semáforo e prioridade por UF, e o que fazer quando cada indicador está baixo (escola, secretaria, estratégico), a partir dos três referenciais de `boas-praticas/` |
 | — | [../projeto/](../projeto/) | proposta de arquitetura e plano de desenvolvimento do agente IIE Conselheiro (WhatsApp) |
-| — | [anexos/](anexos/) | script de reprodução, CSV reproduzido por UF, CSV oficial 2013–2019, matriz indicador × prática (`matriz_indicador_pratica.csv`), catálogo completo das 541 práticas (`catalogo_praticas.csv`, com método e revisão em `catalogo_praticas_revisao.md`) |
+| — | [anexos/](anexos/) | script de reprodução, CSV reproduzido por UF, CSV oficial 2013–2019, série publicada no painel 2015–2023 (`iie_uf_painel_2015_2023.csv`), matriz indicador × prática (`matriz_indicador_pratica.csv`), catálogo completo das 541 práticas (`catalogo_praticas.csv`, com método e revisão em `catalogo_praticas_revisao.md`) |
 
 ## Fatos essenciais
 
@@ -58,5 +58,6 @@ Esta pasta guarda o conhecimento consolidado sobre o IIE: o que mede, como é ca
 ## Como manter esta pasta
 
 - Quando o código mudar, atualize [03](03_arquitetura_tecnica.md), [04](04_dicionario_de_dados.md) e [07](07_lacunas_riscos_e_proximos_passos.md).
-- Quando novas bases forem versionadas (2021, 2023), rode `python contexto/anexos/reproducao_iie.py` e atualize [05](05_resultados_por_territorio.md).
+- Quando o painel do IIE mudar (por exemplo, o IIE 2023 revisto com o Censo 2024), transcreva de novo `anexos/iie_uf_painel_2015_2023.csv`, rode `python contexto/anexos/reproducao_iie.py`, atualize [05](05_resultados_por_territorio.md) §3a e rode a carga (`agente/dados/carregar_iie.py`).
+- Quando novas bases forem versionadas (Censo das coortes de 2021 e 2023), a decomposição completa desses anos passa a ser calculável pela reprodução.
 - Novos estudos em `estudos/` devem ganhar uma seção em [06](06_estudos.md).

@@ -41,10 +41,10 @@ Inventário feito em 2026-09-10 (commit `60e7bfb`). Neste levantamento o R não 
 ## 4. Próximos passos sugeridos (por prioridade)
 
 1. **Tornar o script 04 executável:** implementar `calc_iie_2019_geral()`, criar `Resultados/` e padronizar caminhos (B1, B3, D3).
-2. **Fechar 2021:** versionar a base do Censo da coorte 2004 e rodar a série 2015–2021 (B2).
+2. **Fechar 2021 e 2023 na reprodução:** versionar a base do Censo das coortes 2004 e 2006 e rodar a série completa (B2). Enquanto isso, o IIE 2021 e 2023 e três componentes vêm do painel do IIE (`anexos/iie_uf_painel_2015_2023.csv`, ver [02 §7a](02_metodologia.md)); falta a trajetória da geração nesses anos.
 3. **Corrigir `if_error()`** e o filtro de 2021 do SAEB, e sincronizar os scripts com a versão que gerou as `.rds`, incluindo o SAEB 2023 (D1, D2, D4).
 4. **Teste de regressão** contra a Tabela 7 oficial: tolerância de 0,3 ponto para 2015/2017 e de 1,0 para 2019 (D7).
 5. **Tratar anomalias territoriais** (BA 2019, SC) antes de publicar comparações entre UFs (R1, R2).
-6. **Integrar 2023** quando o Censo 2024 estiver completo (coorte 2006).
+6. **Revisar o IIE 2023** quando o painel for atualizado com o Censo Escolar 2024: transcrever de novo o CSV do painel e rodar a carga.
 7. **Expandir a família IIE no código:** Pré-Inclusão (250), Sucesso/Adequado (375), recortes por LP e MT, sexo e raça/cor, e capitais, alinhando o repositório ao painel Looker.
 8. **Atualizar o README:** nomes de arquivos, anos realmente disponíveis e referência a esta pasta `contexto/`.

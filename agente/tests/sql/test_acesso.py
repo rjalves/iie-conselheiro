@@ -49,8 +49,8 @@ def test_dados_de_uf_nao_liberada_sao_recusados(banco):
 def test_brasil_e_a_propria_uf_sempre_respondem(sql):
     assert sql("select iie.fn_consultar_iie('Brasil', p_ufs => array['PE'])")["territorio"]["sigla"] == "BR"
     pe = sql("select iie.fn_consultar_iie('PE', p_ufs => array['PE'])")
-    assert pe["posicao"] == {"ano": 2019, "posicao": 8, "de": 27}  # posição nacional continua visível
-    assert sql("select iie.fn_decompor('Brasil', 2019, array['PE'])")["iie_oficial"] == 19.0
+    assert pe["posicao"] == {"ano": 2023, "posicao": 10, "de": 27}  # posição nacional continua visível
+    assert sql("select iie.fn_decompor('Brasil', 2019, array['PE'])")["iie_oficial"] == 18.88
 
 
 def test_sem_lista_de_acesso_nada_responde(banco):

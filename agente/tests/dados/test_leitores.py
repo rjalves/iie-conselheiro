@@ -1,5 +1,5 @@
-from dados.carregar_iie import (ANEXOS, SEEDS, ler_alertas, ler_componentes, ler_indicadores, ler_matriz,
-                                ler_oficial, ler_territorios, normalizar)
+from dados.carregar_iie import (ANEXOS, FONTE_PAINEL, SEEDS, ler_alertas, ler_componentes, ler_indicadores,
+                                ler_matriz, ler_oficial, ler_painel, ler_territorios, normalizar)
 
 
 def _ids():
@@ -22,11 +22,25 @@ def test_oficial_vira_formato_longo():
     assert ("UF-23", 2019, "EM", 21.2, "Fernandes, Felicio e Saad (2024), Tabela 7") in linhas
 
 
-def test_componentes_mantem_metodos_de_2019():
+def test_painel_traz_o_iie_do_em_de_2015_a_2023():
+    linhas = ler_painel(ANEXOS / "iie_uf_painel_2015_2023.csv", _ids())
+    assert len(linhas) == 28 * 5
+    assert ("UF-23", 2023, "EM", 18.135, FONTE_PAINEL) in linhas
+    assert ("BR", 2015, "EM", 9.468, FONTE_PAINEL) in linhas
+
+
+def test_componentes_mantem_metodos_de_2019_e_trazem_o_painel():
     linhas = ler_componentes(ANEXOS / "iie_uf_reproducao.csv", _ids())
     metodos = {(l[1], l[2]) for l in linhas}
     assert metodos == {(2015, "regular"), (2017, "regular"), (2019, "2019_A_alternativa"),
-                       (2019, "2019_B_procedimento_publicado")}
+                       (2019, "2019_B_procedimento_publicado"), (2019, "painel"), (2021, "painel"), (2023, "painel")}
+    painel = {(l[0], l[1]): l for l in linhas if l[2] == "painel"}
+    assert all(l[3] for l in painel.values())  # oficial
+    br19, br23 = painel[("BR", 2019)], painel[("BR", 2023)]
+    assert br19[4] == 18.878 and br19[5] is not None and br19[14] is None  # trajetória do Censo; sem A2 em 2019
+    assert br23[4] == 15.485 and br23[5] is None and br23[14] is not None  # sem trajetória; A2 do SAEB
+    # A identidade IIE = F1 × A1 / 100 vale para o que o painel publica.
+    assert abs(br23[10] * br23[11] / 100 - br23[4]) < 0.01
 
 
 def test_matriz_ignora_base_e_pratica_tem_fonte_unica():

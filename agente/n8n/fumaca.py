@@ -30,6 +30,7 @@ AGENTE = Path(__file__).resolve().parents[1]
 JS = (AGENTE / "n8n" / "codigo" / "rastreabilidade.js").read_text(encoding="utf-8")
 TEXTO_INSTABILIDADE = re.search(r'const TEXTO_INSTABILIDADE = "([^"]+)"', JS).group(1)
 EMAIL_TESTE = "fumaca-{}@teste.invalid"
+BASE_ATIVA = "provisoria-1"  # metodologia e glossário de contexto/, com o IIE até 2023
 
 
 def _ambiente() -> dict[str, str]:
@@ -233,7 +234,7 @@ def execucao_nova(workflow: str, anterior: list[str | None], espera_s: int = 30)
 def completo(conferir: Conferencias) -> None:
     import hashlib
     base = sql("select versao from app.kb_versao where ativa")
-    conferir(base and base[0]["versao"] == "provisoria-0", "a base ativa é a provisoria-0", base)
+    conferir(base and base[0]["versao"] == BASE_ATIVA, f"a base ativa é a {BASE_ATIVA}", base)
     workflow = id_do_workflow(montar.NOME_AGENTE)
     anterior = [(n8n("GET", f"/executions?workflowId={workflow}&limit=1")["data"] or [{}])[0].get("id")]
     ce, conversa_ce = criar_usuario("CE", "2312908", "Sobral")
@@ -258,7 +259,7 @@ def completo(conferir: Conferencias) -> None:
         print(f"> {(resposta.get('texto') or '')[:500]!r}")
         conferir(not r.falhou, "stream completo", r.eventos[-3:])
         conferir(resposta.get("erro") is None and resposta.get("modelo") == montar.MODELO
-                 and resposta.get("kb_versao") == "provisoria-0" and (resposta.get("latencia_ms") or 0) > 0,
+                 and resposta.get("kb_versao") == BASE_ATIVA and (resposta.get("latencia_ms") or 0) > 0,
                  "registro da resposta: sem erro, com modelo, base e latência", resposta)
         resposta["nomes"] = [f["nome"] for f in resposta.get("ferramentas") or []]
         print(f"  ferramentas: {resposta['nomes']} | sem origem: {resposta.get('numeros_sem_origem')} "
@@ -266,7 +267,8 @@ def completo(conferir: Conferencias) -> None:
         return resposta
 
     r = rodar("1. Ceará", ce, conversa_ce, "CE", "Sobral", ["CE"], "Como está o Ceará no IIE?")
-    conferir("21,2" in r["texto"] and re.search(r"7\s*(º|°|ª|\.º)|sétim", r["texto"], re.I), "cita 21,2 e a 7ª posição")
+    conferir("18,1" in r["texto"] and re.search(r"5\s*(º|°|ª|\.º)|quint", r["texto"], re.I),
+             "cita 18,1 (IIE 2023) e a 5ª posição")
     conferir("consultar_iie" in r["nomes"], "usou consultar_iie", r["nomes"])
     conferir(r["numeros_sem_origem"] == [], "nenhum número sem origem", r["numeros_sem_origem"])
 
@@ -289,7 +291,7 @@ def completo(conferir: Conferencias) -> None:
               "Pode explicar esse número de um jeito mais simples?")
     conferir(r["numeros_sem_origem"] == [], "números lembrados da conversa têm origem", r["numeros_sem_origem"])
     r = rodar("5c. Sem acesso", pe, conversa_pe, "PE", "Recife", ["PE"], "E como está o Ceará?")
-    conferir("Pernambuco" in r["texto"] and "liberad" in r["texto"].lower() and "21,2" not in r["texto"],
+    conferir("Pernambuco" in r["texto"] and "liberad" in r["texto"].lower() and "18,1" not in r["texto"],
              "recusa o CE, cita Pernambuco como liberado e não mostra números do CE")
 
     print("\n### Geral")
