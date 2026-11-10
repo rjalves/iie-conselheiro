@@ -201,7 +201,7 @@ A mensagem final, com metadados, fica gravada em `app.mensagem`. O site não dep
 | 3 | **Postgres** `base-ativa` | `select versao, conteudo from app.kb_versao where ativa` |
 | 4 | **AI Agent** (Tools Agent) | *System Message* = regras (seção 5.3) + `{{ conteudo }}` da base ativa; *Prompt* = bloco de contexto + pergunta; *Max Iterations* = 6; *Enable Streaming* ligado; *Return Intermediate Steps* ligado |
 | 4a | ↳ **Anthropic Chat Model** (versão 1.6) | Modelo `claude-opus-5-5`; *Maximum Number of Tokens* = 16000; **Enable Prompt Caching** ligado; **Cache TTL** = 5 minutos (seção 11); raciocínio sem configuração, para que o modelo use o adaptativo padrão |
-| 4b | ↳ **Postgres Chat Memory** | Tabela `app.agente_memoria`; chave da sessão = `conversa_id`; janela de 20 mensagens |
+| 4b | ↳ **Postgres Chat Memory** (v1.4) | Tabela `agente.memoria` (esquema próprio, fora da API: o nó roda `CREATE TABLE IF NOT EXISTS` a cada uso e precisa de CREATE no esquema — migração 0007); chave da sessão = `conversa_id` (`sessionIdType: customKey`); janela de 10 (a janela conta mensagens, e chamadas de ferramenta também gravam mensagens) |
 | 4c | ↳ **7 ferramentas Postgres** | Uma por função `iie.fn_*` (seção 5.4). Credencial `iie-leitura`, somente leitura |
 | 5 | **Code** `rastreabilidade` | Extrai os números e os códigos de prática da resposta e confere se cada um aparece nas saídas das ferramentas (passos intermediários) ou na lista de constantes. Monta `ferramentas`, `numeros_sem_origem` e `praticas_sem_origem`. Resposta vazia (recusa) vira o texto fixo de fora de escopo |
 | 6 | **Postgres** `grava-resposta` | `insert into app.mensagem (… 'agente', texto, ferramentas, numeros_sem_origem, latencia_ms, modelo, kb_versao)` |
@@ -303,7 +303,7 @@ O inventário das 541 práticas feito em 2026-09-11 não foi salvo: só as cerca
 | `feedback` | `mensagem_id`, `usuario_id`, `nota` (+1 ou −1), `motivo`, `criado_em` | usuário (via RLS) |
 | `cota_diaria` | `usuario_id`, `dia`, `perguntas` | gatilho de mensagem nova. Fica separada de `mensagem` para que apagar conversas não zere o limite diário |
 | `kb_versao` | igual à P1 | equipe (compilação) |
-| `agente_memoria` | `id`, `session_id`, `message` jsonb: o formato do *Postgres Chat Memory* do n8n | n8n |
+| `agente.memoria` (esquema `agente`, migração 0007) | `id`, `session_id`, `message` jsonb: o formato do *Postgres Chat Memory* do n8n | n8n |
 
 **Funções e gatilhos:**
 - **`app.ao_criar_usuario()`:** gatilho em `auth.users`, `security definer`. Cria `app.usuario` com status `pendente` a partir dos metadados do cadastro. Valida a UF e se o município pertence a ela: os 2 primeiros dígitos do código IBGE são o código da UF.

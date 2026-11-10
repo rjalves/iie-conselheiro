@@ -49,6 +49,29 @@ describe("ndjsonParaTexto", () => {
     );
   });
 
+  it("erro de ferramenta seguido da resposta não é falha (o agente continua)", async () => {
+    // n8n 2.46: a ferramenta que falha (ex.: territorio_sem_acesso) emite "error", e o agente segue respondendo.
+    const texto = await converter([
+      linha({ type: "begin" }),
+      linha({ type: "end" }),
+      linha({ type: "error", content: "territorio_sem_acesso: Ceará" }),
+      linha({ type: "begin" }),
+      linha({ type: "item", content: "Os dados do Ceará não estão liberados para você." }),
+      linha({ type: "end" }),
+    ]);
+    expect(texto).toBe("Os dados do Ceará não estão liberados para você.");
+  });
+
+  it("ignora keepalive e itens vazios", async () => {
+    const texto = await converter([
+      linha({ type: "keepalive" }),
+      linha({ type: "item", content: "" }),
+      linha({ type: "item", content: "Pronto" }),
+      linha({ type: "end" }),
+    ]);
+    expect(texto).toBe("Pronto");
+  });
+
   it("aceita a resposta do n8n sem streaming (um JSON com output)", async () => {
     expect(await converter([JSON.stringify({ output: "Resposta inteira" })])).toBe("Resposta inteira");
   });

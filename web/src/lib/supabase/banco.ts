@@ -9,24 +9,6 @@ export type Json =
 export type Database = {
   app: {
     Tables: {
-      agente_memoria: {
-        Row: {
-          id: number
-          message: Json
-          session_id: string
-        }
-        Insert: {
-          id?: number
-          message: Json
-          session_id: string
-        }
-        Update: {
-          id?: number
-          message?: Json
-          session_id?: string
-        }
-        Relationships: []
-      }
       conversa: {
         Row: {
           atualizada_em: string

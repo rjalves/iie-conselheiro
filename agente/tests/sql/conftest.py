@@ -20,7 +20,7 @@ def banco():
     if not url:
         pytest.skip("DATABASE_URL_TEST não definido")
     with psycopg.connect(url, autocommit=True) as conn:
-        conn.execute("drop schema if exists iie cascade; drop schema if exists app cascade")
+        conn.execute("drop schema if exists iie cascade; drop schema if exists app cascade; drop schema if exists agente cascade")
         conn.execute(SIMULADO.read_text(encoding="utf-8"))
         conn.execute("truncate auth.users")
         for arquivo in MIGRACOES:

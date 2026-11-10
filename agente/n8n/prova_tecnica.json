@@ -1,0 +1,179 @@
+{
+  "name": "IIE Conselheiro — prova técnica",
+  "nodes": [
+    {
+      "id": "b6a3c1e0-1111-4a00-8000-000000000001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "iie-prova",
+        "authentication": "headerAuth",
+        "responseMode": "streaming",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iie-chave-site",
+          "name": "iie-chave-site"
+        }
+      },
+      "webhookId": "b6a3c1e0-1111-4a00-8000-0000000000aa"
+    },
+    {
+      "id": "b6a3c1e0-1111-4a00-8000-000000000002",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        320,
+        0
+      ],
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ '<contexto>perfil: ' + $json.body.perfil + '; UF padrão: ' + $json.body.uf + '; município: ' + $json.body.municipio + '; data: ' + $json.body.data_referencia + '</contexto>\\n\\n' + $json.body.mensagem }}",
+        "hasOutputParser": false,
+        "needsFallback": false,
+        "options": {
+          "systemMessage": "Você é o IIE Conselheiro, assistente da Lupa Social e do Instituto Natura para gestores da educação. Sua missão é explicar os resultados do Índice de Inclusão Educacional (IIE) e orientar práticas de gestão.\n\n# Regras de exatidão\n- Todo número sobre um território vem de uma ferramenta chamada nesta conversa. Nunca estime nem complete números de memória.\n- Se não houver ferramenta para o dado, diga que ele não está disponível.\n- Cite o ano e a fonte que a ferramenta devolver.\n\n# Acesso por estado\n- O bloco <contexto> no começo da mensagem do usuário traz perfil, UF padrão, município e data. Use a UF padrão quando a pergunta não disser o território.\n- Se uma ferramenta devolver territorio_sem_acesso, diga que os dados desse estado não estão liberados para a pessoa, cite os estados liberados (estão na dica do erro) e diga que ela pode pedir acesso à equipe do IIE.\n\n# Formato\n- Português do Brasil, frases curtas, markdown simples (negrito para o número principal, listas curtas).\n- Os dados do IIE são por estado: se a pessoa perguntar pelo município, responda com a UF e diga que o dado municipal ainda não existe.\n\n# Glossário do IIE (referência)\n# 08 — Glossário\n\n| Termo | Definição |\n|---|---|\n| **IIE** | Índice de Inclusão Educacional: % de uma coorte de nascimento que concluiu o EM até os 18 anos com LP ≥ 300 **e** MT ≥ 300 no SAEB (0–100) |\n| **IIE Geral** | nome usado neste repositório para o IIE total, sem recortes (saída `IIE_Geral`) |\n| **IIE Legado** | citado só no painel Looker; não há definição nos materiais do repositório (hipótese: série original da Metas Sociais) |\n| **IPIE / Pré-Inclusão** | Índice de Pré-Inclusão Educacional: mesma construção, com corte 250 |\n| **ISE / Sucesso Educacional** | Índice de Sucesso Educacional: corte 375, equivalente ao nível \"Adequado\" do IIEM |\n| **IIE-MT (adaptado)** | só Matemática, com fluxo pela PNAD; série 2003–2017 |\n| **IIE Anos Iniciais / Anos Finais (IIE_EF2)** | conclusão da etapa com até 1 ano de atraso; cortes 250 (AI) e 275 (AF), em LP e MT |\n| **IIEM** | IIE Municipal (Instituto Natura), coorte 2000 / 2017; evasão estimada por razão de matrículas |\n| **IJDS** | Índice de Jovens com Desempenho Suficiente (Salomão e Menezes-Filho, 2023): alunos do último ano do EM com ENEM ≥ 600 em Linguagens e em Matemática (e redação ≠ 0), divididos pelos ingressantes da mesma geração no EF; é municipal, mas não conta atrasados nem evadidos |\n| **Coorte / geração** | nascidos entre 1º de janeiro e 31 de dezembro de um ano |\n| **Ano de referência (t)** | ano de nascimento + 17, isto é, o ano da conclusão \"em linha\" |\n| **Adiantado** | concluiu o EM em t−1 (≤ 16 anos) |\n| **Em linha** | concluiu o EM em t (17 anos) |\n| **Atrasado (1 ano)** | concluiu o EM em t+1 (18 anos) |\n| **Atrasado 2+** | ainda matriculado em t+1 sem concluir o EM |\n| **Fora da escola sem EM** | jovem de 17 anos (PNADc) que não frequenta a escola e não concluiu o EM |\n| **Coorte ajustada** | total do Censo ÷ (1 − % fora da escola); é o denominador do IIE |\n| **Abaixo do básico** | LP < 300 **ou** MT < 300 |\n| **Básico (ou mais)** | LP ≥ 300 **e** MT ≥ 300 |\n| **Adequado** | LP ≥ 375 **e** MT ≥ 375 (definição do IIEM) |\n| **p(básico)** | proporção ponderada de alunos do 3º EM com básico, por trajetória |\n| **Efeito de composição** | mudança na média de uma série escolar causada pela mudança de quem chega a ela (fluxo), não pela aprendizagem |\n| **Sala Segura (SEDAP/INEP)** | ambiente controlado do INEP para acesso a microdados identificados |\n| **Situação do Aluno** | módulo do Censo Escolar com o rendimento ao fim do ano (aprovado, reprovado, abandono…) |\n| **`tp_etapa_ensino`** | etapa da matrícula no Censo; terminais do EM: 27, 28, 32, 33, 37 e 38 |\n| **`tp_situacao = 5`** | aprovado |\n| **PNADc 2º trimestre** | trimestre usado para medir a coorte de 17 anos |\n| **`V1028`** | peso amostral calibrado da PNADc |\n| **`peso_aluno_lp`** | peso amostral do SAEB usado na expansão |\n| **UF 0** | agregado Brasil (soma das UFs) |\n| **EF / EA** | efeitos fixos / efeitos aleatórios (modelos de painel dos estudos) |\n",
+          "maxIterations": 6,
+          "returnIntermediateSteps": true,
+          "enableStreaming": true
+        }
+      }
+    },
+    {
+      "id": "b6a3c1e0-1111-4a00-8000-000000000003",
+      "name": "Anthropic Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.6,
+      "position": [
+        160,
+        260
+      ],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "id",
+          "value": "claude-opus-5-5"
+        },
+        "options": {
+          "maxTokensToSample": 16000,
+          "thinkingMode": "adaptive",
+          "effort": "medium",
+          "promptCaching": "5m"
+        }
+      },
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-iie",
+          "name": "anthropic-iie"
+        }
+      }
+    },
+    {
+      "id": "b6a3c1e0-1111-4a00-8000-000000000004",
+      "name": "Postgres Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.4,
+      "position": [
+        320,
+        260
+      ],
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').first().json.body.conversa_id }}",
+        "tableName": "agente.memoria",
+        "contextWindowLength": 10
+      },
+      "credentials": {
+        "postgres": {
+          "id": "iie-operacao",
+          "name": "iie-operacao"
+        }
+      }
+    },
+    {
+      "id": "b6a3c1e0-1111-4a00-8000-000000000005",
+      "name": "consultar_iie",
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.8,
+      "position": [
+        480,
+        260
+      ],
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Consulta a série oficial do IIE do Ensino Médio (2013 a 2019) de um território: valor por ano, posição entre as 27 UFs, valor do Brasil e semáforo do último ano. Use sempre que precisar de qualquer número do IIE de um estado ou do Brasil. territorio: sigla, nome ou gentílico da UF, ou 'Brasil'.",
+        "resource": "database",
+        "operation": "executeQuery",
+        "query": "select iie.fn_consultar_iie($1, 'EM', $2::text[]) as resultado",
+        "options": {
+          "queryReplacement": "={{ [ $fromAI('territorio', 'Sigla, nome ou gentílico da UF, ou Brasil', 'string'), $('Webhook').first().json.body.ufs_permitidas ] }}"
+        }
+      },
+      "credentials": {
+        "postgres": {
+          "id": "iie-leitura",
+          "name": "iie-leitura"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar_iie": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  }
+}

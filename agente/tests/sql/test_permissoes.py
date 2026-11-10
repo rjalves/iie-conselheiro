@@ -31,3 +31,16 @@ def test_n8n_grava_mensagem_mas_nao_muda_usuario(banco):
         with pytest.raises(psycopg.errors.InsufficientPrivilege):
             with banco.transaction():
                 banco.execute("update app.usuario set status = 'ativo'")
+
+
+def test_memoria_do_agente_aceita_o_create_do_n8n(banco):
+    """O nó Postgres Chat Memory roda CREATE TABLE IF NOT EXISTS a cada uso (migração 0007)."""
+    ddl = 'CREATE TABLE IF NOT EXISTS "{}"."{}" (id SERIAL PRIMARY KEY, session_id VARCHAR(255) NOT NULL, message JSONB NOT NULL)'
+    with banco.transaction():
+        banco.execute("set local role n8n_operacao")
+        banco.execute(ddl.format("agente", "memoria"))
+        banco.execute("insert into agente.memoria (session_id, message) values ('s', '{}')")
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            with banco.transaction():
+                banco.execute(ddl.format("app", "memoria_indevida"))
+        banco.execute("delete from agente.memoria where session_id = 's'")

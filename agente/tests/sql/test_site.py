@@ -126,11 +126,11 @@ def test_apagar_conversa_limpa_mensagens_e_memoria(banco, sql):
     conversa = nova_conversa(banco, uid)
     mensagem(banco, conversa)
     with como_n8n(banco):
-        banco.execute("insert into app.agente_memoria (session_id, message) values (%s, '{}')", (str(conversa),))
+        banco.execute("insert into agente.memoria (session_id, message) values (%s, '{}')", (str(conversa),))
     with como(banco, uid):
         banco.execute("delete from app.conversa where id = %s", (conversa,))
     assert sql("select count(*) from app.mensagem where conversa_id = %s", conversa) == 0
-    assert sql("select count(*) from app.agente_memoria where session_id = %s", str(conversa)) == 0
+    assert sql("select count(*) from agente.memoria where session_id = %s", str(conversa)) == 0
 
 
 def test_limite_diario_conta_perguntas_e_nao_zera_ao_apagar_conversa(banco):
@@ -174,7 +174,7 @@ def test_excluir_conta_apaga_tudo(banco, sql):
     resposta = mensagem(banco, conversa, "agente", "Resposta")
     mensagem(banco, conversa)
     with como_n8n(banco):
-        banco.execute("insert into app.agente_memoria (session_id, message) values (%s, '{}')", (str(conversa),))
+        banco.execute("insert into agente.memoria (session_id, message) values (%s, '{}')", (str(conversa),))
     with como(banco, uid):
         banco.execute("insert into app.feedback (mensagem_id, usuario_id, nota) values (%s, %s, 1)", (resposta, uid))
     banco.execute("delete from auth.users where id = %s", (uid,))  # o que auth.admin.deleteUser faz
@@ -183,7 +183,7 @@ def test_excluir_conta_apaga_tudo(banco, sql):
                             ("select count(*) from app.mensagem where conversa_id = %s", conversa),
                             ("select count(*) from app.feedback where usuario_id = %s", uid),
                             ("select count(*) from app.cota_diaria where usuario_id = %s", uid),
-                            ("select count(*) from app.agente_memoria where session_id = %s", str(conversa))]:
+                            ("select count(*) from agente.memoria where session_id = %s", str(conversa))]:
         assert sql(consulta, param) == 0, consulta
 
 
@@ -194,7 +194,7 @@ def test_anonimo_nao_acessa_app(banco):
             banco.execute("select count(*) from app.usuario")
 
 
-@pytest.mark.parametrize("tabela", ["app.kb_versao", "app.agente_memoria", "app.cota_diaria", "iie.pratica"])
+@pytest.mark.parametrize("tabela", ["app.kb_versao", "agente.memoria", "app.cota_diaria", "iie.pratica"])
 def test_logado_nao_le_tabelas_internas(banco, tabela):
     uid = ativar(banco, cadastrar(banco))
     with pytest.raises(NEGADO):

@@ -2924,3 +2924,11 @@ Mudança aprovada em 2026-10-13: a decisão W5 da proposta 03 foi revista. O có
   - `fn_ranking(p_indicador, p_ano, p_regiao, p_limite, p_ufs)`. No ranking, a posição continua sendo a nacional (ou da região); só as UFs liberadas aparecem, e o retorno traz `de` e `apenas_ufs_liberadas`.
 
 **Resultado:** 84 testes passando no Postgres 15 e no 17. A migração foi aplicada no Supabase local; **no Supabase de desenvolvimento, ainda não**.
+
+### Tarefa 10: Memória do agente no esquema `agente` (2026-11-09)
+
+Descoberta ao levantar o n8n 2.46.7: o nó Postgres Chat Memory roda `CREATE TABLE IF NOT EXISTS` a cada uso, e o Postgres exige o privilégio CREATE no esquema mesmo quando a tabela já existe. Testado com o `n8n_app`, que recebeu `permission denied for schema app`.
+
+**Correção:** a migração `0007_memoria_do_agente.sql` cria o esquema `agente`, que não fica exposto na API, com a tabela `agente.memoria`. Só o papel `n8n_operacao` tem CREATE nesse esquema. A migração leva as linhas de `app.agente_memoria` para a tabela nova e apaga a antiga. O gatilho que apaga uma conversa passa a limpar `agente.memoria`.
+
+**Teste:** `test_memoria_do_agente_aceita_o_create_do_n8n`. Resultado: 85 testes passando no Postgres 15 e no 17. A 0007 foi aplicada no Supabase local; **no de desenvolvimento, ainda não**.

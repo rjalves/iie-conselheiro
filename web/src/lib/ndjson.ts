@@ -1,4 +1,5 @@
-// Converte a resposta do webhook do n8n (NDJSON: begin, item, end, error) no texto que o navegador mostra.
+// Converte a resposta do webhook do n8n (NDJSON: begin, item, end, error, keepalive) no texto que o navegador mostra.
+// Só é falha um error que não é seguido de end, ou um stream que acaba sem end.
 // Proposta 03, seção 5.1.
 
 export const TEXTO_INSTABILIDADE = "Estou com instabilidade agora. Tente de novo em alguns minutos.";
@@ -25,7 +26,9 @@ export function ndjsonParaTexto(): TransformStream<string, string> {
     if (evento.type === "item" && typeof evento.content === "string") {
       saida.enqueue(evento.content);
     } else if (evento.type === "end") {
+      // Um end depois de um error: o erro foi de uma ferramenta e o agente seguiu respondendo (n8n 2.46).
       terminou = true;
+      falhou = false;
     } else if (evento.type === "error") {
       falhou = true;
     } else if (evento.type === undefined && typeof evento.output === "string") {
