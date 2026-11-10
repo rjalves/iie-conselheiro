@@ -40,7 +40,11 @@ export default async function PaginaConta() {
             ))}
           </dl>
           <p className="text-sm text-grafite-suave">
-            Para corrigir algum dado, escreva para contato@lupasocial.com.br. Leia o{" "}
+            Para corrigir algum dado, escreva para{" "}
+            <a href="mailto:contato@educacional.ia.br" className="text-tinta underline underline-offset-2">
+              contato@educacional.ia.br
+            </a>
+            . Leia o{" "}
             <Link href="/termo" className="text-tinta underline underline-offset-2">
               termo de uso
             </Link>

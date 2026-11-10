@@ -61,9 +61,10 @@ export default async function PaginaAdmin({ searchParams }: PageProps<"/admin">)
             {aba === "pendente" ? "Nenhum cadastro esperando análise." : `Nenhum cadastro com a situação “${STATUS[aba]}”.`}
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-md border border-linha bg-white">
+          <div className="relative overflow-x-auto rounded-md border border-linha bg-white">
+            {/* relative: o rótulo sr-only da última coluna fica dentro da rolagem, sem alargar a página no celular. */}
             <table className="w-full min-w-[54rem] text-left">
-              <thead className="border-b border-linha text-sm text-grafite-suave">
+              <thead className="border-b border-linha text-sm whitespace-nowrap text-grafite-suave">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-semibold">Pessoa</th>
                   <th scope="col" className="px-4 py-3 font-semibold">Onde trabalha</th>
@@ -80,7 +81,7 @@ export default async function PaginaAdmin({ searchParams }: PageProps<"/admin">)
                   <tr key={u.id} className="border-b border-linha last:border-0">
                     <td className="px-4 py-3 align-top">
                       <p className="font-semibold">{u.nome}</p>
-                      <p className="text-sm text-grafite-suave">{u.email}</p>
+                      <p className="text-sm [overflow-wrap:anywhere] text-grafite-suave">{u.email}</p>
                     </td>
                     <td className="px-4 py-3 align-top">
                       <p>{u.instituicao}</p>
@@ -106,7 +107,7 @@ export default async function PaginaAdmin({ searchParams }: PageProps<"/admin">)
                       {u.id === admin.id ? (
                         <span className="text-sm text-grafite-suave">Você</span>
                       ) : (
-                        <div className="flex flex-wrap justify-end gap-2">
+                        <div className="flex justify-end gap-2 whitespace-nowrap">
                           {ACOES[aba].map((acao) => (
                             <BotaoDecisao key={acao} id={u.id} status={acao} nome={u.nome} />
                           ))}

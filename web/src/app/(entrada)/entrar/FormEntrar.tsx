@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { EntradaSenha } from "@/components/EntradaSenha";
 import { Aviso, Botao, Campo, Entrada } from "@/components/ui";
 import { traduzirErroAuth } from "@/lib/cadastro";
 import { criarClienteNavegador } from "@/lib/supabase/navegador";
@@ -15,12 +16,12 @@ export function FormEntrar({ proxima }: { proxima: string }) {
   async function entrar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
     const dados = new FormData(evento.currentTarget);
+    const email = String(dados.get("email") ?? "").trim();
+    const senha = String(dados.get("senha") ?? "");
+    if (!email || !senha) return setErro("Informe o e-mail e a senha.");
     setEnviando(true);
     setErro(null);
-    const { error } = await criarClienteNavegador().auth.signInWithPassword({
-      email: String(dados.get("email")).trim(),
-      password: String(dados.get("senha")),
-    });
+    const { error } = await criarClienteNavegador().auth.signInWithPassword({ email, password: senha });
     if (error) {
       setErro(traduzirErroAuth(error.message));
       setEnviando(false);
@@ -37,7 +38,7 @@ export function FormEntrar({ proxima }: { proxima: string }) {
         <Entrada id="email" name="email" type="email" autoComplete="email" required />
       </Campo>
       <Campo rotulo="Senha" id="senha">
-        <Entrada id="senha" name="senha" type="password" autoComplete="current-password" required />
+        <EntradaSenha id="senha" name="senha" autoComplete="current-password" required />
       </Campo>
       <Botao type="submit" disabled={enviando}>
         {enviando ? "Entrando…" : "Entrar"}

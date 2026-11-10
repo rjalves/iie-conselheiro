@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { Aviso, Botao, Campo, Entrada } from "@/components/ui";
+import { EntradaSenha } from "@/components/EntradaSenha";
+import { Aviso, Botao, Campo } from "@/components/ui";
 import { SENHA_MINIMA, traduzirErroAuth } from "@/lib/cadastro";
 import { criarClienteNavegador } from "@/lib/supabase/navegador";
 
@@ -42,10 +43,10 @@ export default function PaginaNovaSenha() {
       <form onSubmit={salvar} className="flex flex-col gap-5">
         {erro && <Aviso tipo="erro">{erro}</Aviso>}
         <Campo rotulo="Nova senha" id="senha" ajuda={`Pelo menos ${SENHA_MINIMA} caracteres.`}>
-          <Entrada id="senha" name="senha" type="password" autoComplete="new-password" required />
+          <EntradaSenha id="senha" name="senha" autoComplete="new-password" aria-describedby="senha-ajuda" required />
         </Campo>
         <Campo rotulo="Repita a nova senha" id="confirmacao">
-          <Entrada id="confirmacao" name="confirmacao" type="password" autoComplete="new-password" required />
+          <EntradaSenha id="confirmacao" name="confirmacao" autoComplete="new-password" required />
         </Campo>
         <Botao type="submit" disabled={enviando}>
           {enviando ? "Salvando…" : "Salvar nova senha"}

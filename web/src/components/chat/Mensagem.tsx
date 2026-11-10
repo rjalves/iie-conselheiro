@@ -28,7 +28,10 @@ export function TextoResposta({ texto }: { texto: string }) {
 
 export function PerguntaUsuario({ texto }: { texto: string }) {
   return (
-    <div className="ml-auto max-w-[85%] rounded-lg bg-tinta-clara px-4 py-3 whitespace-pre-wrap sm:max-w-[75%]">
+    <div
+      data-pergunta
+      className="relative ml-auto max-w-[85%] rounded-lg bg-tinta-clara px-4 py-3 whitespace-pre-wrap sm:max-w-[75%]"
+    >
       <span className="sr-only">Você: </span>
       {texto}
     </div>

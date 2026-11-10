@@ -83,7 +83,7 @@ test("jornada completa com o agente real", async ({ browser, page }) => {
   const resposta = page.locator("article").last();
   await expect(resposta).toContainText("Ceará");
   await expect(resposta.locator("[role=alert]")).toHaveCount(0);
-  await page.getByRole("button", { name: "👍 Útil" }).click();
+  await page.getByRole("button", { name: "Útil", exact: true }).click();
   await expect(page.getByText("Obrigado pela avaliação.")).toBeVisible();
   mkdirSync(CAPTURAS, { recursive: true });
   await page.screenshot({ path: `${CAPTURAS}/homologacao-chat.png`, fullPage: true });

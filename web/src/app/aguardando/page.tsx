@@ -45,7 +45,7 @@ export default async function PaginaAguardando() {
           </dd>
         </dl>
         <p className="text-sm text-grafite-suave">
-          Contato: <a href="mailto:contato@lupasocial.com.br" className="text-tinta underline">contato@lupasocial.com.br</a>.
+          Contato: <a href="mailto:contato@educacional.ia.br" className="text-tinta underline underline-offset-2">contato@educacional.ia.br</a>.
           Você pode ver ou excluir seus dados em{" "}
           <Link href="/conta" className="text-tinta underline underline-offset-2">
             Minha conta

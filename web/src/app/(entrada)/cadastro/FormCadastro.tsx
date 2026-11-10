@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
+import { EntradaSenha } from "@/components/EntradaSenha";
 import { Aviso, Botao, Campo, Entrada, Selecao } from "@/components/ui";
 import { SENHA_MINIMA, traduzirErroAuth, validarCadastro, type CamposCadastro, type ErrosCadastro } from "@/lib/cadastro";
 import { PERFIS } from "@/lib/rotulos";
@@ -10,6 +11,22 @@ import { criarClienteNavegador } from "@/lib/supabase/navegador";
 import { UFS } from "@/lib/ufs";
 
 type Municipio = { codigo: string; nome: string };
+
+/** "icó", "Ico " e "ICÓ" encontram Icó. */
+const normalizar = (texto: string) =>
+  texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").trim().toLowerCase();
+
+// Ordem dos campos na tela, para levar o foco ao primeiro erro.
+const CAMPOS: [keyof ErrosCadastro, string][] = [
+  ["nome", "nome"],
+  ["email", "email"],
+  ["senha", "senha"],
+  ["perfil", "perfil"],
+  ["instituicao", "instituicao"],
+  ["uf", "uf"],
+  ["municipio_ibge", "municipio"],
+  ["aceite", "aceite"],
+];
 
 export function FormCadastro() {
   const router = useRouter();
@@ -33,7 +50,7 @@ export function FormCadastro() {
     };
   }, [uf]);
 
-  const municipio = municipios.find((m) => m.nome.toLowerCase() === municipioNome.trim().toLowerCase());
+  const municipio = municipios.find((m) => normalizar(m.nome) === normalizar(municipioNome));
 
   async function criarConta(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
@@ -52,7 +69,8 @@ export function FormCadastro() {
     const encontrados = validarCadastro(campos);
     setErros(encontrados);
     setErroGeral(null);
-    if (Object.keys(encontrados).length) return;
+    const primeiro = CAMPOS.find(([chave]) => encontrados[chave]);
+    if (primeiro) return document.getElementById(primeiro[1])?.focus();
 
     setEnviando(true);
     const { data, error } = await criarClienteNavegador().auth.signUp({
@@ -103,10 +121,23 @@ export function FormCadastro() {
         <Entrada id="nome" name="nome" autoComplete="name" invalido={!!erros.nome} />
       </Campo>
       <Campo rotulo="E-mail" id="email" erro={erros.email} ajuda="De preferência, o e-mail da instituição.">
-        <Entrada id="email" name="email" type="email" autoComplete="email" invalido={!!erros.email} />
+        <Entrada
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          aria-describedby="email-ajuda"
+          invalido={!!erros.email}
+        />
       </Campo>
       <Campo rotulo="Senha" id="senha" erro={erros.senha} ajuda={`Pelo menos ${SENHA_MINIMA} caracteres.`}>
-        <Entrada id="senha" name="senha" type="password" autoComplete="new-password" invalido={!!erros.senha} />
+        <EntradaSenha
+          id="senha"
+          name="senha"
+          autoComplete="new-password"
+          aria-describedby="senha-ajuda"
+          invalido={!!erros.senha}
+        />
       </Campo>
       <Campo rotulo="Onde você trabalha" id="perfil" erro={erros.perfil}>
         <Selecao id="perfil" name="perfil" defaultValue="" invalido={!!erros.perfil}>
@@ -123,7 +154,13 @@ export function FormCadastro() {
         </Selecao>
       </Campo>
       <Campo rotulo="Instituição" id="instituicao" erro={erros.instituicao} ajuda="Ex.: Secretaria de Educação do Ceará">
-        <Entrada id="instituicao" name="instituicao" autoComplete="organization" invalido={!!erros.instituicao} />
+        <Entrada
+          id="instituicao"
+          name="instituicao"
+          autoComplete="organization"
+          aria-describedby="instituicao-ajuda"
+          invalido={!!erros.instituicao}
+        />
       </Campo>
       <div className="grid gap-5 sm:grid-cols-[8rem_1fr]">
         <Campo rotulo="Estado" id="uf" erro={erros.uf}>
@@ -160,6 +197,7 @@ export function FormCadastro() {
             onChange={(e) => setMunicipioNome(e.target.value)}
             disabled={!uf}
             autoComplete="off"
+            aria-describedby="municipio-ajuda"
             invalido={!!erros.municipio_ibge}
           />
           <datalist id="lista-municipios">
@@ -173,6 +211,7 @@ export function FormCadastro() {
         <label className="flex items-start gap-3">
           <input
             type="checkbox"
+            id="aceite"
             name="aceite"
             className="mt-1 size-5 accent-tinta"
             aria-invalid={!!erros.aceite || undefined}

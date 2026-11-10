@@ -28,6 +28,24 @@ body {
   font-size: 1.0625rem;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  scrollbar-color: var(--color-linha) transparent;
+}
+
+/* Superfícies do navegador na identidade: seleção é marca-texto, o cursor de texto é caneta azul. */
+::selection {
+  background: var(--color-marca);
+  color: var(--color-grafite);
+}
+input,
+textarea {
+  caret-color: var(--color-tinta);
+}
+h1,
+h2 {
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
 }
 
 /* Foco sempre visível, em tinta, com folga para não colar no contorno. */

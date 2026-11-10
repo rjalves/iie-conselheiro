@@ -17,7 +17,7 @@ function Enviar({ children, perigo }: { children: string; perigo: boolean }) {
       type="submit"
       disabled={pending}
       className={`rounded-md px-3 py-1.5 text-sm font-semibold disabled:opacity-60 ${
-        perigo ? "bg-erro text-white" : "bg-tinta text-white hover:bg-tinta-escura"
+        perigo ? "bg-erro text-white hover:bg-[#8f1c13]" : "bg-tinta text-white hover:bg-tinta-escura"
       }`}
     >
       {pending ? "Salvando…" : children}
@@ -47,7 +47,7 @@ export function BotaoDecisao({ id, status, nome }: { id: string; status: keyof t
       <input type="hidden" name="status" value={status} />
       <Enviar perigo={Boolean(confirmar)}>{confirmar ?? acao}</Enviar>
       {confirmando && (
-        <button type="button" onClick={() => setConfirmando(false)} className="text-sm underline">
+        <button type="button" onClick={() => setConfirmando(false)} className="text-sm underline underline-offset-2">
           Cancelar
         </button>
       )}

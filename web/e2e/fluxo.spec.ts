@@ -60,7 +60,7 @@ test("cadastro, aprovação, conversa, avaliação e exclusão da conversa", asy
   await page.reload(); // a resposta gravada pelo n8n aparece inteira
   await expect(page.locator("article").last()).toContainText("Ainda não há dados de Sobral");
   await expect(page.locator(".resposta strong").first()).toContainText("Ceará");
-  await page.getByRole("button", { name: "👍 Útil" }).click();
+  await page.getByRole("button", { name: "Útil", exact: true }).click();
   await expect(page.getByText("Obrigado pela avaliação.")).toBeVisible();
   expect(sql(`select nota from app.feedback f join app.usuario u on u.id = f.usuario_id
               where u.email = '${gestora.email}'`)).toBe("1");

@@ -10,7 +10,7 @@ export function TopoSimples({ voltar = true, children }: { voltar?: boolean; chi
         <Marca />
         <nav className="flex items-center gap-4 text-sm">
           {voltar && (
-            <Link href="/" className="font-semibold text-tinta underline underline-offset-2">
+            <Link href="/" className="font-semibold text-tinta underline underline-offset-2 hover:text-tinta-escura">
               Voltar às conversas
             </Link>
           )}

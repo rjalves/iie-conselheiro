@@ -38,7 +38,11 @@ export default function PaginaTermo() {
         <h2 className="text-xl font-bold">Seus direitos</h2>
         <p>
           Em “Minha conta” você vê os dados do seu cadastro e pode excluir a conta, o que apaga também todas as suas
-          conversas. Dúvidas: contato@lupasocial.com.br.
+          conversas. Dúvidas:{" "}
+          <a href="mailto:contato@educacional.ia.br" className="text-tinta underline underline-offset-2">
+            contato@educacional.ia.br
+          </a>
+          .
         </p>
       </section>
       <Link href="/cadastro" className="text-sm text-tinta underline underline-offset-2">
