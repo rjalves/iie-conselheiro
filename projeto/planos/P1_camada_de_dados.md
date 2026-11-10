@@ -2809,7 +2809,7 @@ Esta tarefa é operacional e não tem código novo. **Antes de começar, confirm
 >
 > | O que foi feito | Como |
 > |---|---|
-> | Migrações (passo 2) | `POST <url>/pg/query`, com a chave `service_role` e o corpo `{"query": "<conteúdo do arquivo>"}`. Um envio por arquivo, e cada envio roda numa transação só. Tudo foi ensaiado antes num banco limpo |
+> | Migrações (passo 2) | `agente/supabase/sql_dev.sh <arquivo.sql>`, que faz `POST <url>/pg/query` com a chave `service_role` de `agente/.env.dev` e o corpo `{"query": "<conteúdo do arquivo>"}`. Um envio por arquivo, e cada envio roda numa transação só. Tudo foi ensaiado antes num banco limpo |
 > | Usuários de login (passo 3) | A senha vai em hash SCRAM gerado localmente (`password 'SCRAM-SHA-256$…'`), para não trafegar nem ficar registrada em texto. As senhas ficam em `agente/.env.dev`, fora do git |
 > | Carga (passo 4) | Feita a partir do banco de teste validado: `pg_dump --data-only --column-inserts --schema=iie` gerado por um pg_dump 15, mantendo só as linhas `INSERT` e `setval`, enviado num único envio |
 > | Conferência (passo 5) | Feita com `has_table_privilege` e `has_function_privilege`, sem trocar de papel na conexão compartilhada. Resultado: o agente executa as funções e não grava; o n8n grava mensagens e não altera usuários; `anon` e `authenticated` não acessam `iie`; as 20 tabelas estão com RLS |
@@ -2923,7 +2923,7 @@ Mudança aprovada em 2026-10-13: a decisão W5 da proposta 03 foi revista. O có
   - `fn_comparar(p_territorios, p_indicador, p_ano, p_ufs)`;
   - `fn_ranking(p_indicador, p_ano, p_regiao, p_limite, p_ufs)`. No ranking, a posição continua sendo a nacional (ou da região); só as UFs liberadas aparecem, e o retorno traz `de` e `apenas_ufs_liberadas`.
 
-**Resultado:** 84 testes passando no Postgres 15 e no 17. A migração foi aplicada no Supabase local; **no Supabase de desenvolvimento, ainda não**.
+**Resultado:** 84 testes passando no Postgres 15 e no 17. A migração foi aplicada no Supabase local e, **em 2026-11-09, no de desenvolvimento**, com `agente/supabase/sql_dev.sh`.
 
 ### Tarefa 10: Memória do agente no esquema `agente` (2026-11-09)
 
@@ -2931,4 +2931,9 @@ Descoberta ao levantar o n8n 2.46.7: o nó Postgres Chat Memory roda `CREATE TAB
 
 **Correção:** a migração `0007_memoria_do_agente.sql` cria o esquema `agente`, que não fica exposto na API, com a tabela `agente.memoria`. Só o papel `n8n_operacao` tem CREATE nesse esquema. A migração leva as linhas de `app.agente_memoria` para a tabela nova e apaga a antiga. O gatilho que apaga uma conversa passa a limpar `agente.memoria`.
 
-**Teste:** `test_memoria_do_agente_aceita_o_create_do_n8n`. Resultado: 85 testes passando no Postgres 15 e no 17. A 0007 foi aplicada no Supabase local; **no de desenvolvimento, ainda não**.
+**Teste:** `test_memoria_do_agente_aceita_o_create_do_n8n`. Resultado: 85 testes passando no Postgres 15 e no 17. A 0007 foi aplicada no Supabase local e, **em 2026-11-09, no de desenvolvimento**. Conferências feitas lá:
+- assinaturas novas;
+- `agente.memoria` criada e `app.agente_memoria` removida;
+- `n8n_operacao` cria tabelas em `agente`, mas não em `app`;
+- nenhuma tabela sem RLS;
+- recusa sem a lista de UFs e recusa de UF não liberada.
