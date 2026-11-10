@@ -42,6 +42,22 @@ Rodada em 2026-11-10 com o workflow `prova_tecnica.json` (id `CwWKZufkyB3N3fWP`)
 2. **O hint do erro não chega ao agente.** A ferramenta devolve ao modelo só `{"error": "territorio_sem_acesso: Ceará"}`. O hint com os estados liberados vai para o stream, que o site ignora, e não para o modelo. Por isso, na P3 o agente disse que "o sistema não informou a lista". Correção: incluir as UFs liberadas no bloco `<contexto>` do texto do agente, assim: `UFs liberadas: ' + $json.body.ufs_permitidas.join(', ')`. A segurança não muda, porque o filtro continua no SQL.
 3. **Cada resposta com ferramenta começa com 7 itens vazios**, que são os pedaços da chamada da ferramenta. O site já ignora esses itens.
 
+## Versão do AI Agent (P2, Tarefa 1)
+
+Em 2026-11-10 rodei a mesma prova com o AI Agent **2.2** (`prova_tecnica.json`, mudando só o `typeVersion`). A pergunta foi "Como está o Ceará?", com acesso ao CE, e custou cerca de US$ 0,02.
+
+| | 3.1 (prova) | 2.2 |
+|---|---|---|
+| Execução | sem erro | sem erro |
+| `intermediateSteps` | `consultar_iie` | `consultar_iie` |
+| Itens com texto da resposta final | 105, de 9,81 a 9,93 s | 98, de 9,30 a 9,37 s |
+| Q3 − Q1 dos itens com texto | 0,00 s | 0,00 s |
+| Memória gravada | pergunta, chamada da ferramenta, resultado e resposta | só pergunta e resposta (2 linhas) |
+
+**Decisão:** fica o **AI Agent 3.1**. A 2.2 também entrega de uma vez a resposta que vem depois da ferramenta: a segunda chamada ao modelo levou 7,1 s, e o texto chegou em 0,07 s. Além disso, a 2.2 não grava o resultado da ferramenta na memória.
+
+Enquanto o primeiro texto não chega, o site mostra "Consultando os dados do IIE…".
+
 ## Pré-requisito de rede (homologação)
 
 O contêiner `supabase_iie-db-1` foi ligado à rede `easypanel` à mão, com o comando abaixo, para que o n8n alcance o banco pelo host `iie-supabase-db`:
