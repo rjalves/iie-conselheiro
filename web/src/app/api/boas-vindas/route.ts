@@ -13,7 +13,8 @@ export async function POST(request: Request) {
   if (!(Date.now() - Date.parse(user.created_at) <= PRAZO_MS)) {
     return Response.json({ erro: "as boas-vindas só saem logo depois do cadastro" }, { status: 409 });
   }
-  const site = request.headers.get("origin") ?? new URL(request.url).origin;
+  // O navegador manda o Origin no POST; request.url traria o endereço interno do contêiner.
+  const site = request.headers.get("origin") ?? `https://${request.headers.get("x-forwarded-host") ?? request.headers.get("host")}`;
   try {
     const email = montarBoasVindas({ para: user.email, nome: user.user_metadata?.nome, site });
     await enviarPorResend(email, `boas-vindas-${user.id}`);

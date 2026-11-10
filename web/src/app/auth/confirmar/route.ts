@@ -1,6 +1,6 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
-import { NextResponse, type NextRequest } from "next/server";
-import { caminhoSeguro } from "@/lib/caminho";
+import type { NextRequest } from "next/server";
+import { caminhoSeguro, redirecionarPara } from "@/lib/caminho";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
 /** Destino dos links enviados por e-mail (confirmação de cadastro e nova senha): troca o código por sessão. */
@@ -18,5 +18,5 @@ export async function GET(request: NextRequest) {
   } else if (tokenHash && tipo) {
     falhou = Boolean((await supabase.auth.verifyOtp({ type: tipo, token_hash: tokenHash })).error);
   }
-  return NextResponse.redirect(new URL(falhou ? "/entrar?link=invalido" : proxima, request.url));
+  return redirecionarPara(falhou ? "/entrar?link=invalido" : proxima);
 }
