@@ -4,6 +4,7 @@ O IIE Conselheiro é um agente de IA para gestores da educação. Ele explica os
 
 | Documento | Conteúdo |
 |---|---|
+| [visao_de_negocio.md](visao_de_negocio.md) | **Visão de negócio:** o problema (desigualdade digital e fluência em dados na gestão pública), o IIE e como o Conselheiro une dados, boas práticas e IA. Para parceiros e secretarias |
 | [03_proposta_sistema_web.md](03_proposta_sistema_web.md) | **Proposta atual (rascunho para revisão):** site em Next.js, Supabase e agente no n8n |
 | [02_plano_desenvolvimento.md](02_plano_desenvolvimento.md) | Plano-mestre v2: fases F0–F6 (site primeiro, WhatsApp por último), tarefas, cronograma, orçamento e decisões |
 | [01_proposta_arquitetura.md](01_proposta_arquitetura.md) | Proposta original (WhatsApp + serviço Python). Ainda vale para princípios, ferramentas, base de conhecimento, avaliação e LGPD |
