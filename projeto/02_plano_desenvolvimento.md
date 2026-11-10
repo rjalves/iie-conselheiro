@@ -177,6 +177,10 @@ As Tarefas 1 a 4 da P1 continuam valendo. O esquema `iie` de dados do IIE, as fu
 
 Antes de começar, escrever `planos/P2_agente_n8n.md` com os resultados da prova técnica.
 
+**Situação em 2026-11-10: P2.1 a P2.8 concluídas em homologação** ([`planos/P2_agente_n8n.md`](planos/P2_agente_n8n.md), que tem o resultado no cabeçalho). Ficaram dois pontos em aberto:
+- **Latência:** até o primeiro texto, levou de 14 a 17 s nas perguntas com ferramenta, acima da meta RNF02 (8 s).
+- **Cache:** falta conferir as leituras de cache no Console da Anthropic.
+
 | # | Tarefa | Entrega | Critério de aceite |
 |---|---|---|---|
 | P2.1 | Credenciais no n8n | `anthropic-iie`, `iie-leitura` (`agente_app`), `iie-operacao` (`n8n_app`), `iie-chave-site` (*Header Auth*) | Nenhum segredo em nó nem no JSON versionado |

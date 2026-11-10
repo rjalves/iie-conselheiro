@@ -150,8 +150,10 @@ SQL_GRAVA_PERGUNTA = "insert into app.mensagem (conversa_id, papel, texto) value
 SQL_BASE_ATIVA = ("select coalesce(max(versao), 'sem-base') as versao, coalesce(max(conteudo), '') as conteudo "
                   "from app.kb_versao where ativa")
 # Resultados de ferramentas de perguntas anteriores (a memória do agente 3.1 grava as mensagens de ferramenta).
-SQL_SAIDAS_DA_CONVERSA = ("select coalesce(jsonb_agg(message->'data'->>'content' order by id), '[]'::jsonb) as saidas "
-                          "from agente.memoria where session_id = $1 and message->>'type' = 'tool'")
+# O n8n grava a mensagem achatada ({type, content, ...}); o formato com "data" do LangChain fica como reserva.
+SQL_SAIDAS_DA_CONVERSA = ("select coalesce(jsonb_agg(c order by id), '[]'::jsonb) as saidas from ("
+                          "select id, coalesce(message->>'content', message->'data'->>'content') as c "
+                          "from agente.memoria where session_id = $1 and message->>'type' = 'tool') m where c is not null")
 SQL_GRAVA_RESPOSTA = ("insert into app.mensagem (conversa_id, papel, texto, ferramentas, numeros_sem_origem, "
                       "praticas_sem_origem, latencia_ms, modelo, kb_versao, erro) values ($1::uuid, 'agente', $2, "
                       "$3::jsonb, $4::jsonb, $5::jsonb, $6::int, $7, $8, $9) returning id")

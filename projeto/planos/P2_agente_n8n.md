@@ -4,6 +4,21 @@
 >
 > **Versão 1, 2026-11-10.** Substitui o plano B em Python (`P2_servico_do_agente.md`), do qual aproveita as descrições das ferramentas, as regras do prompt, o algoritmo de rastreabilidade e as perguntas de fumaça.
 >
+> **Executado em 2026-11-10** na *branch* `feat/p1-camada-de-dados`. Resultado:
+> - **Testes:** 105 no Postgres 15 e 105 no 17; 12 em `node --test`.
+> - **Homologação:**
+>   - `IIE Conselheiro — agente web` está **ativo** em `/webhook/iie-chat`;
+>   - `IIE Conselheiro — erros` está publicado;
+>   - a base ativa é a `provisoria-0`;
+>   - a migração 0008 foi aplicada.
+> - **Fumaça sem custo:** 8 de 8 conferências.
+> - **Fumaça completa** (7 perguntas, uma rodada): 26 de 28 conferências.
+>   - **Funcionou:** números certos (CE 21,2, 7º; PE 19,3, 8º), o alerta da BA (77%), SM-79, a recusa fora de escopo, a recusa do CE com acesso só a PE (citando Pernambuco) e a mesma mensagem de sistema para os dois usuários.
+>   - **As 2 falhas** eram falsos positivos da rastreabilidade, em números e práticas lembrados de perguntas anteriores. A causa: `saidas-da-conversa` lia `message->'data'->>'content'`, mas a memória do n8n grava a mensagem achatada (`message->>'content'`). Corrigi com um teste que reproduz o `[null]` visto na homologação. Simulei a rastreabilidade sobre as 7 execuções reais, com as saídas anteriores: zero "sem origem".
+>   - **A fumaça paga não foi repetida**, porque a aprovação era de uma rodada.
+> - **Latência** (tempo até o primeiro texto, nas perguntas com ferramenta): 13,9 a 17,1 s, acima da meta RNF02 (mediana ≤ 8 s). A resposta completa levou 16,8 a 19,0 s, dentro da meta de 20 s. A causa é a resposta depois da ferramenta, que chega de uma vez (Tarefa 1), somada a 2 ou 3 chamadas ao modelo por pergunta. Enquanto isso, o site mostra "Consultando os dados do IIE…".
+> - **Custo:** teto de **US$ 0,64** pelas estimativas de tokens do n8n, sem descontar o cache (140.624 tokens de entrada, 3.865 de saída, 14 chamadas). Na pergunta mais cara, a Bahia, foram US$ 0,20, com 3 chamadas. O custo real, com o cache, está no Console da Anthropic.
+>
 > **O que muda em relação ao plano 02, §6:**
 > - **P2.1 (credenciais):** já concluída em 2026-11-10. As 4 credenciais existem na homologação e foram testadas (`agente/n8n/prova_tecnica_resultado.md`).
 > - **P2.5:** a validação e a publicação são feitas **pela API REST**, porque o MCP do n8n conectado só busca, lê e executa.

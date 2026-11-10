@@ -216,9 +216,98 @@ def sem_custo(conferir: Conferencias) -> None:
         conferir(apagados == [wf["id"], credencial["id"]], "variante e credencial de teste apagadas do n8n", apagados)
 
 
+US_POR_TOKEN_ENTRADA, US_POR_TOKEN_SAIDA = 4 / 1e6, 20 / 1e6  # claude-opus-5-5 sem cache: o teto do custo
+
+
+def execucao_nova(workflow: str, anterior: list[str | None], espera_s: int = 30) -> dict:
+    """A execução que acabou de terminar (as perguntas são uma por vez). `anterior` guarda o id da última vista."""
+    for _ in range(espera_s):
+        lista = n8n("GET", f"/executions?workflowId={workflow}&includeData=true&limit=1")["data"]
+        if lista and lista[0]["id"] != anterior[0] and lista[0]["status"] in ("success", "error"):
+            anterior[0] = lista[0]["id"]
+            return lista[0]
+        time.sleep(1)
+    raise RuntimeError("a execução da pergunta não apareceu na API do n8n")
+
+
+def completo(conferir: Conferencias) -> None:
+    import hashlib
+    base = sql("select versao from app.kb_versao where ativa")
+    conferir(base and base[0]["versao"] == "provisoria-0", "a base ativa é a provisoria-0", base)
+    workflow = id_do_workflow(montar.NOME_AGENTE)
+    anterior = [(n8n("GET", f"/executions?workflowId={workflow}&limit=1")["data"] or [{}])[0].get("id")]
+    ce, conversa_ce = criar_usuario("CE", "2312908", "Sobral")
+    pe, conversa_pe = criar_usuario("PE", "2611606", "Recife")
+    linhas, sistemas = [], set()
+
+    def rodar(rotulo, usuario, conversa, uf, municipio, ufs, mensagem):
+        print(f"\n### {rotulo}: {mensagem}")
+        r = perguntar(pedido(usuario, conversa, uf, municipio, ufs, mensagem))
+        execucao = execucao_nova(workflow, anterior)
+        chamadas = [x for x in execucao["data"]["resultData"]["runData"].get("Anthropic Chat Model", []) if x.get("data")]
+        # Com streaming, o n8n só tem a estimativa (tokenUsageEstimate), com os tokens de cache somados na entrada.
+        uso = [(lambda j: j.get("tokenUsage") or j.get("tokenUsageEstimate") or {})(x["data"]["ai_languageModel"][0][0]["json"])
+               for x in chamadas]
+        entrada, saida = sum(u.get("promptTokens", 0) for u in uso), sum(u.get("completionTokens", 0) for u in uso)
+        for x in chamadas:
+            prompt = x["inputOverride"]["ai_languageModel"][0][0]["json"]["messages"][0]
+            sistemas.add(hashlib.sha256(prompt.split("\nHuman:")[0].encode()).hexdigest())
+        resposta = (mensagens(conversa, "agente") or [{}])[-1]
+        linhas.append((rotulo, r.primeiro_texto(), r.eventos[-1][0] if r.eventos else None, len(chamadas), entrada,
+                       saida, entrada * US_POR_TOKEN_ENTRADA + saida * US_POR_TOKEN_SAIDA))
+        print(f"> {(resposta.get('texto') or '')[:500]!r}")
+        conferir(not r.falhou, "stream completo", r.eventos[-3:])
+        conferir(resposta.get("erro") is None and resposta.get("modelo") == montar.MODELO
+                 and resposta.get("kb_versao") == "provisoria-0" and (resposta.get("latencia_ms") or 0) > 0,
+                 "registro da resposta: sem erro, com modelo, base e latência", resposta)
+        resposta["nomes"] = [f["nome"] for f in resposta.get("ferramentas") or []]
+        print(f"  ferramentas: {resposta['nomes']} | sem origem: {resposta.get('numeros_sem_origem')} "
+              f"{resposta.get('praticas_sem_origem')}")
+        return resposta
+
+    r = rodar("1. Ceará", ce, conversa_ce, "CE", "Sobral", ["CE"], "Como está o Ceará no IIE?")
+    conferir("21,2" in r["texto"] and re.search(r"7\s*(º|°|ª|\.º)|sétim", r["texto"], re.I), "cita 21,2 e a 7ª posição")
+    conferir("consultar_iie" in r["nomes"], "usou consultar_iie", r["nomes"])
+    conferir(r["numeros_sem_origem"] == [], "nenhum número sem origem", r["numeros_sem_origem"])
+
+    r = rodar("2. Evasão", ce, conversa_ce, "CE", "Sobral", ["CE"], "O que a secretaria pode fazer para reduzir a evasão?")
+    conferir({"buscar_praticas", "pacote_por_perfil", "praticas_para_indicador"} & set(r["nomes"]),
+             "usou uma ferramenta de práticas", r["nomes"])
+    conferir("SM-79" in r["texto"], "cita SM-79 (Busca Ativa Escolar)")
+    conferir(r["praticas_sem_origem"] == [], "nenhuma prática sem origem", r["praticas_sem_origem"])
+
+    r = rodar("3. Bahia", ce, conversa_ce, "CE", "Sobral", ["CE", "BA"], "Por que a Bahia está tão mal?")
+    conferir("77" in r["texto"], "menciona o alerta de dado da BA (queda de 77%)")
+
+    r = rodar("4. Fora de escopo", ce, conversa_ce, "CE", "Sobral", ["CE"], "Qual a capital da França?")
+    conferir(r["nomes"] == [] and r["texto"] and "Paris" not in r["texto"], "recusa sem ferramentas e sem responder",
+             r["nomes"])
+
+    r = rodar("5a. Pernambuco", pe, conversa_pe, "PE", "Recife", ["PE"], "Como está Pernambuco?")
+    conferir("consultar_iie" in r["nomes"], "usou consultar_iie", r["nomes"])
+    r = rodar("5b. Memória", pe, conversa_pe, "PE", "Recife", ["PE"],
+              "Pode explicar esse número de um jeito mais simples?")
+    conferir(r["numeros_sem_origem"] == [], "números lembrados da conversa têm origem", r["numeros_sem_origem"])
+    r = rodar("5c. Sem acesso", pe, conversa_pe, "PE", "Recife", ["PE"], "E como está o Ceará?")
+    conferir("Pernambuco" in r["texto"] and "liberad" in r["texto"].lower() and "21,2" not in r["texto"],
+             "recusa o CE, cita Pernambuco como liberado e não mostra números do CE")
+
+    print("\n### Geral")
+    conferir(len(mensagens(conversa_ce)) == 8 and len(mensagens(conversa_pe)) == 6,
+             "cada pergunta gravou 2 linhas em app.mensagem", (len(mensagens(conversa_ce)), len(mensagens(conversa_pe))))
+    conferir(len(sistemas) == 1, "mensagem de sistema idêntica para os dois usuários (sha256)", sistemas)
+    print("\n| Pergunta | 1º texto (s) | Total (s) | Chamadas ao modelo | Entrada | Saída | Custo máx. (US$) |")
+    print("|---|---:|---:|---:|---:|---:|---:|")
+    for rotulo, primeiro, total, n, entrada, saida, custo in linhas:
+        fmt = lambda v: "—" if v is None else f"{v:.1f}"
+        print(f"| {rotulo} | {fmt(primeiro)} | {fmt(total)} | {n} | {entrada} | {saida} | {custo:.3f} |")
+    print(f"| **Total** | | | {sum(x[3] for x in linhas)} | {sum(x[4] for x in linhas)} | {sum(x[5] for x in linhas)} "
+          f"| **{sum(x[6] for x in linhas):.3f}** |")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("modo", choices=["sem-custo"])
+    parser.add_argument("modo", choices=["sem-custo", "completo"])
     args = parser.parse_args(argv)
     conferir = Conferencias()
     # O agente fica ativo, protegido pela chave do site. O de erros também precisa estar publicado: no n8n 2.x,
@@ -227,7 +316,7 @@ def main(argv: list[str] | None = None) -> None:
         n8n("POST", f"/workflows/{id_do_workflow(nome)}/publish")
     print(f"## Fumaça {args.modo} — {time.strftime('%Y-%m-%d %H:%M')}")
     try:
-        sem_custo(conferir)
+        (sem_custo if args.modo == "sem-custo" else completo)(conferir)
     finally:
         print(f"\ncontas de teste apagadas: {limpar()}")
     print(f"\n{len(conferir.itens) - conferir.falhas}/{len(conferir.itens)} conferências passaram")

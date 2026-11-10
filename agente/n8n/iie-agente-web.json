@@ -349,7 +349,7 @@
       ],
       "parameters": {
         "operation": "executeQuery",
-        "query": "select coalesce(jsonb_agg(message->'data'->>'content' order by id), '[]'::jsonb) as saidas from agente.memoria where session_id = $1 and message->>'type' = 'tool'",
+        "query": "select coalesce(jsonb_agg(c order by id), '[]'::jsonb) as saidas from (select id, coalesce(message->>'content', message->'data'->>'content') as c from agente.memoria where session_id = $1 and message->>'type' = 'tool') m where c is not null",
         "options": {
           "queryReplacement": "={{ [ $('Webhook').first().json.body.conversa_id ] }}"
         }

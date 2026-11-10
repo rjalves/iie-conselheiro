@@ -206,6 +206,13 @@ def test_sql_de_gravacao_como_n8n(banco):
     assert _como_n8n(banco, montar.SQL_GRAVA_PERGUNTA, (conversa, "Como está o Ceará?"))[0]
     assert _como_n8n(banco, montar.SQL_BASE_ATIVA) == ("sem-base", "")
     assert _como_n8n(banco, montar.SQL_SAIDAS_DA_CONVERSA, (conversa,)) == ([],)
+    # Formato da memória do n8n (achatado: type e content no primeiro nível), visto na fumaça da P2.
+    for mensagem in ({"type": "human", "content": "Como está o Ceará?"},
+                     {"type": "tool", "content": '[{"resultado": {"valor": 21.2}}]', "tool_call_id": "t1",
+                      "name": "consultar_iie"}):
+        _como_n8n(banco, "insert into agente.memoria (session_id, message) values ($1, $2) returning id",
+                  (conversa, Jsonb(mensagem)))
+    assert _como_n8n(banco, montar.SQL_SAIDAS_DA_CONVERSA, (conversa,)) == (['[{"resultado": {"valor": 21.2}}]'],)
     ferramentas = [{"nome": "consultar_iie", "args": {"territorio": "CE"}}]
     _como_n8n(banco, montar.SQL_GRAVA_RESPOSTA, (conversa, "Resposta", json.dumps(ferramentas), "[]", "[]", 1200,
                                                  montar.MODELO, "sem-base", None))
