@@ -1,4 +1,4 @@
-// Ponta a ponta no ambiente local: cadastro, aprovação, conversa com resposta em streaming, avaliação e exclusão.
+// Ponta a ponta no ambiente local: cadastro com acesso imediato, conversa com resposta em streaming, avaliação e exclusão.
 // Usa o n8n simulado e o banco local; contra a homologação, roda o homologacao.spec.ts.
 import { execFileSync } from "node:child_process";
 import { mkdirSync } from "node:fs";
@@ -19,16 +19,12 @@ test.afterAll(() => {
   sql(`delete from auth.users where email like '%-${sufixo}@exemplo.test'`);
 });
 
-test("cadastro, aprovação, conversa, avaliação e exclusão da conversa", async ({ browser, page }) => {
+test("cadastro com acesso imediato, conversa, avaliação e exclusão da conversa", async ({ browser, page }) => {
   await cadastrar(page, gestora);
 
   const paginaAdmin = await (await browser.newContext()).newPage();
   await cadastrar(paginaAdmin, admin);
   sql(`update app.usuario set status = 'ativo', papel = 'admin' where email = '${admin.email}'`);
-  await paginaAdmin.goto("/admin");
-  await expect(paginaAdmin.getByRole("heading", { name: "Cadastros" })).toBeVisible();
-  await paginaAdmin.getByRole("row").filter({ hasText: gestora.email }).getByRole("button", { name: "Aprovar" }).click();
-  await expect(paginaAdmin.getByRole("row").filter({ hasText: gestora.email })).toHaveCount(0);
 
   // Acesso por UF: a gestora começa só com o CE; o administrador libera também Pernambuco.
   await paginaAdmin.goto("/admin?status=ativo");
@@ -84,7 +80,6 @@ test("falha do agente mostra o aviso e a pergunta pode ser refeita", async ({ br
   const email = `erro-${sufixo}@exemplo.test`;
   const pagina = await (await browser.newContext()).newPage();
   await cadastrar(pagina, { nome: "Teste de Erro", email });
-  sql(`update app.usuario set status = 'ativo' where email = '${email}'`);
   await pagina.goto("/");
   await pagina.getByLabel("Sua pergunta").fill("Teste de falha #erro");
   await pagina.getByRole("button", { name: "Enviar" }).click();

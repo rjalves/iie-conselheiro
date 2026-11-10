@@ -9,7 +9,7 @@ export default function PaginaCadastro() {
       <div>
         <h1 className="text-3xl font-bold">Criar conta</h1>
         <p className="mt-2 text-grafite-suave">
-          O acesso é para gestores da educação. Depois do cadastro, a equipe do IIE analisa e libera sua conta.
+          O acesso é para gestores da educação. Assim que criar a conta, você já pode conversar com o IIE Conselheiro.
         </p>
       </div>
       <FormCadastro />

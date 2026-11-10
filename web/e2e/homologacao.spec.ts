@@ -1,4 +1,4 @@
-// Jornada completa no site publicado, com o agente real do n8n: cadastro → aprovação → pergunta → resposta gravada
+// Jornada completa no site publicado, com o agente real do n8n: cadastro (acesso imediato) → pergunta → resposta gravada
 // → avaliação → exclusão da conversa. Gasta tokens do Claude (uma pergunta por execução); as contas são apagadas no fim.
 //   E2E_URL=https://<site> E2E_SUPABASE_URL=https://<supabase> E2E_SERVICE_ROLE_KEY=<chave> \
 //     npx playwright test e2e/homologacao.spec.ts
@@ -28,9 +28,9 @@ test.afterAll(async () => {
  */
 async function cadastrar(page: Page, pessoa: { nome: string; email: string }) {
   await preencherCadastro(page, pessoa);
-  const emAnalise = page.getByRole("heading", { name: "Seu cadastro está em análise" });
+  const noChat = page.getByRole("heading", { name: `Olá, ${pessoa.nome.split(" ")[0]}.` });
   const confirmar = page.getByText("Confirme seu e-mail para continuar.");
-  await expect(emAnalise.or(confirmar)).toBeVisible({ timeout: 20_000 });
+  await expect(noChat.or(confirmar)).toBeVisible({ timeout: 20_000 });
   if (!(await confirmar.isVisible())) return;
   const [usuario] = await sql<{ enviado: boolean }>(
     `select confirmation_sent_at is not null as enviado from auth.users where email = '${pessoa.email}'`,
@@ -41,7 +41,7 @@ async function cadastrar(page: Page, pessoa: { nome: string; email: string }) {
   await page.getByLabel("E-mail").fill(pessoa.email);
   await page.getByLabel("Senha").fill(senha);
   await page.getByRole("button", { name: "Entrar" }).click();
-  await expect(emAnalise).toBeVisible();
+  await expect(noChat).toBeVisible();
 }
 
 test("jornada completa com o agente real", async ({ browser, page }) => {
@@ -50,9 +50,6 @@ test("jornada completa com o agente real", async ({ browser, page }) => {
   const paginaAdmin = await (await browser.newContext()).newPage();
   await cadastrar(paginaAdmin, admin);
   await sql(`update app.usuario set status = 'ativo', papel = 'admin' where email = '${admin.email}'`);
-  await paginaAdmin.goto("/admin");
-  await paginaAdmin.getByRole("row").filter({ hasText: gestora.email }).getByRole("button", { name: "Aprovar" }).click();
-  await expect(paginaAdmin.getByRole("row").filter({ hasText: gestora.email })).toHaveCount(0);
 
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Olá, Gestora." })).toBeVisible();

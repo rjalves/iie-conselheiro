@@ -52,11 +52,11 @@ def mensagem(banco, conversa, papel="usuario", texto="Como está o Ceará?"):
                              (conversa, papel, texto)).fetchone()[0]
 
 
-def test_cadastro_cria_usuario_pendente(banco):
+def test_cadastro_cria_usuario_ja_ativo(banco):
     uid = cadastrar(banco)
-    u = banco.execute("""select status, papel, uf, municipio_nome, email, aceite_termo_em is not null
+    u = banco.execute("""select status, papel, uf, municipio_nome, email, aceite_termo_em is not null, decidido_por
                          from app.usuario where id = %s""", (uid,)).fetchone()
-    assert u == ("pendente", "usuario", "CE", "Sobral", f"{uid}@teste.gov.br", True)
+    assert u == ("ativo", "usuario", "CE", "Sobral", f"{uid}@teste.gov.br", True, None)
 
 
 @pytest.mark.parametrize("mudanca, motivo", [
@@ -91,6 +91,7 @@ def test_usuario_ve_so_os_proprios_dados(banco):
 
 def test_so_ativo_cria_conversa_e_so_para_si(banco):
     pendente = cadastrar(banco)
+    banco.execute("update app.usuario set status = 'pendente' where id = %s", (pendente,))
     with pytest.raises(NEGADO):
         nova_conversa(banco, pendente)
     a, b = ativar(banco, cadastrar(banco)), ativar(banco, cadastrar(banco))
@@ -103,15 +104,14 @@ def test_so_ativo_cria_conversa_e_so_para_si(banco):
 def test_so_admin_muda_status_e_fica_registrado(banco, sql):
     admin, comum, novo = ativar(banco, cadastrar(banco), "admin"), ativar(banco, cadastrar(banco)), cadastrar(banco)
     with como(banco, comum):
-        banco.execute("update app.usuario set status = 'ativo' where id = %s", (novo,))
+        banco.execute("update app.usuario set status = 'bloqueado' where id = %s", (novo,))
         banco.execute("update app.usuario set papel = 'admin' where id = %s", (comum,))
-    assert sql("select status from app.usuario where id = %s", novo) == "pendente"
+    assert sql("select status from app.usuario where id = %s", novo) == "ativo"
     assert sql("select papel from app.usuario where id = %s", comum) == "usuario"
     with como(banco, admin):
-        assert banco.execute("select count(*) from app.usuario where status = 'pendente'").fetchone()[0] >= 1
-        banco.execute("update app.usuario set status = 'ativo' where id = %s", (novo,))
+        banco.execute("update app.usuario set status = 'bloqueado' where id = %s", (novo,))
     assert banco.execute("select status, decidido_por, decidido_em is not null from app.usuario where id = %s",
-                         (novo,)).fetchone() == ("ativo", admin, True)
+                         (novo,)).fetchone() == ("bloqueado", admin, True)
 
 
 def test_admin_nao_muda_aceite_nem_email(banco):

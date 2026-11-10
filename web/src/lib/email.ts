@@ -1,6 +1,7 @@
 // E-mails da plataforma, enviados pela API do Resend com o domínio iiec.educacional.ia.br.
 // O Supabase Auth não envia nada: ele chama /api/auth/email (Send Email Hook), com o pedido assinado no padrão
 // Standard Webhooks, sempre que precisa de um e-mail (confirmação de cadastro, nova senha, convite, link de acesso).
+// As boas-vindas depois do cadastro saem pela rota /api/boas-vindas, que o próprio site chama.
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 const TOLERANCIA_MS = 5 * 60 * 1000;
@@ -24,17 +25,26 @@ export function assinaturaValida(
   });
 }
 
-type Modelo = { assunto: string; titulo: string; texto: string; botao: string; proxima: string };
+type Modelo = { assunto: string; titulo: string; texto: string; botao: string; proxima: string; vantagens?: true };
+
+/** As três vantagens do IIE Conselheiro para a gestão da educação (projeto/visao_de_negocio.md, seções 3 e 4). */
+export const VANTAGENS = [
+  "Mostra onde a geração se perde no seu estado (evasão, atraso escolar ou aprendizagem), com um semáforo para cada indicador.",
+  "Aponta onde agir primeiro, pelo ganho potencial de cada componente do índice.",
+  "Sugere práticas de gestão com fonte e indica o que acompanhar enquanto o resultado não aparece no IIE.",
+];
 
 const MODELOS: Record<string, Modelo> = {
+  // Só é usado se a confirmação de e-mail for ligada no Auth; hoje o cadastro entra direto e recebe as boas-vindas.
   signup: {
     assunto: "Confirme seu e-mail no IIE Conselheiro",
     titulo: "Confirme seu e-mail",
     texto:
-      "Recebemos seu cadastro no IIE Conselheiro. Confirme seu e-mail pelo botão abaixo. Depois, a equipe do IIE " +
-      "analisa o cadastro e libera o seu acesso. O link vale por 1 hora.",
+      "Sua conta no IIE Conselheiro foi criada. Confirme seu e-mail pelo botão abaixo e comece a conversar. " +
+      "O link vale por 1 hora.",
     botao: "Confirmar e-mail",
-    proxima: "/aguardando",
+    proxima: "/",
+    vantagens: true,
   },
   recovery: {
     assunto: "Crie uma nova senha no IIE Conselheiro",
@@ -80,30 +90,101 @@ export type Email = { para: string; assunto: string; html: string; texto: string
 const escapar = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
+const saudacao = (nome?: string) => {
+  const primeiro = nome?.trim().split(/\s+/)[0];
+  return primeiro ? `Olá, ${primeiro}.` : "Olá.";
+};
+
+type Conteudo = {
+  para: string;
+  assunto: string;
+  titulo: string;
+  ola: string;
+  texto: string;
+  vantagens?: boolean;
+  botao: string;
+  link: string;
+  nota: string;
+};
+
+const TITULO_VANTAGENS = "O que o IIE Conselheiro faz pela gestão da educação";
+
+/**
+ * Todos os e-mails na identidade do site: fundo azul-claro, cartão branco, faixa azul-escura com a marca e o ponto
+ * de marca-texto, botão azul e o rodapé de autoria. Tabelas e estilos em linha, como os clientes de e-mail pedem.
+ */
+function montar(c: Conteudo): Email {
+  const e = escapar;
+  const ponto = (tamanho: number) =>
+    `<span style="display:inline-block;width:${tamanho}px;height:${tamanho}px;border-radius:${tamanho}px;background:#ffe066"></span>`;
+  const vantagens = c.vantagens
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;background:#e8edf8;border-radius:12px">
+<tr><td style="padding:20px 24px 6px;font-size:15px;font-weight:bold;color:#152b66">${e(TITULO_VANTAGENS)}</td></tr>
+${VANTAGENS.map(
+  (v) => `<tr><td style="padding:8px 24px"><table role="presentation" cellpadding="0" cellspacing="0"><tr>
+<td valign="top" style="padding:6px 12px 0 0;line-height:0"><span style="display:inline-block;width:10px;height:10px;border-radius:10px;background:#ffe066;border:1px solid #d4b106"></span></td>
+<td style="font-size:15px;line-height:1.5;color:#1e2228">${e(v)}</td></tr></table></td></tr>`,
+).join("\n")}
+<tr><td style="height:14px;line-height:14px;font-size:0">&nbsp;</td></tr>
+</table>`
+    : "";
+  const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light only"><title>${e(c.assunto)}</title></head>
+<body style="margin:0;padding:0;background:#e8edf8;font-family:Arial,Helvetica,sans-serif;color:#1e2228">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#e8edf8"><tr><td align="center" style="padding:32px 12px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:20px">
+<tr><td style="padding:8px 8px 0">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#152b66;border-radius:14px"><tr><td style="padding:28px 32px 32px">
+<p style="margin:0;font-size:16px;font-weight:bold;color:#ffffff">${ponto(10)}&nbsp;&nbsp;IIE Conselheiro</p>
+<h1 style="margin:20px 0 0;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff">${e(c.titulo)}</h1>
+</td></tr></table>
+</td></tr>
+<tr><td style="padding:28px 32px 36px">
+<p style="margin:0 0 16px;font-size:16px;line-height:1.55">${e(c.ola)}</p>
+<p style="margin:0 0 24px;font-size:16px;line-height:1.55">${e(c.texto)}</p>
+${vantagens}
+<p style="margin:0 0 24px"><a href="${e(c.link)}" style="display:inline-block;background:#1d3a8a;color:#ffffff;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 24px;border-radius:8px">${e(c.botao)}</a></p>
+<p style="margin:0 0 8px;font-size:13px;color:#5a6170;line-height:1.5">Se o botão não funcionar, copie e cole este endereço no navegador:<br><a href="${e(c.link)}" style="color:#1d3a8a;word-break:break-all">${e(c.link)}</a></p>
+<p style="margin:16px 0 0;font-size:13px;color:#5a6170;line-height:1.5">${e(c.nota)}</p>
+</td></tr></table>
+<p style="margin:20px 0 0;font-size:12px;line-height:1.6;color:#5a6170">Criação e Desenvolvimento: Educacional.ia - Roberto Alves<br>Todos os direitos reservados - <a href="mailto:contato@educacional.ia.br" style="color:#5a6170">contato@educacional.ia.br</a></p>
+</td></tr></table></body></html>`;
+  const lista = c.vantagens ? `${TITULO_VANTAGENS}:\n${VANTAGENS.map((v) => `- ${v}`).join("\n")}\n\n` : "";
+  const texto =
+    `${c.ola}\n\n${c.texto}\n\n${lista}${c.botao}: ${c.link}\n\n${c.nota}\n\n` +
+    "IIE Conselheiro\nCriação e Desenvolvimento: Educacional.ia - Roberto Alves\n" +
+    "Todos os direitos reservados - contato@educacional.ia.br";
+  return { para: c.para, assunto: c.assunto, html, texto };
+}
+
 /** Monta o e-mail em português; devolve null para tipos sem modelo (troca de e-mail não existe no site). */
 export function montarEmail({ user, email_data: dados }: PedidoHook): Email | null {
   const modelo = MODELOS[dados.email_action_type];
   if (!modelo) return null;
-  const link = linkDeConfirmacao(dados.redirect_to, dados.token_hash, dados.email_action_type);
-  const nome = user.user_metadata?.nome?.trim().split(/\s+/)[0] ?? "";
-  const ola = nome ? `Olá, ${nome}.` : "Olá.";
-  const ignorar = "Se você não fez este pedido, ignore esta mensagem.";
-  const texto = `${ola}\n\n${modelo.texto}\n\n${modelo.botao}: ${link}\n\n${ignorar}\n\nIIE Conselheiro · Educacional.ia - Roberto Alves`;
-  const html = `<!doctype html><html lang="pt-BR"><body style="margin:0;background:#f6f7f9;font-family:Arial,sans-serif;color:#1e2228">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border:1px solid #dde1e8;border-radius:8px">
-<tr><td style="padding:32px">
-<p style="margin:0 0 24px;font-weight:bold;color:#1d3a8a">IIE Conselheiro</p>
-<h1 style="margin:0 0 16px;font-size:22px">${escapar(modelo.titulo)}</h1>
-<p style="margin:0 0 16px;line-height:1.5">${escapar(ola)}</p>
-<p style="margin:0 0 24px;line-height:1.5">${escapar(modelo.texto)}</p>
-<p style="margin:0 0 24px"><a href="${escapar(link)}" style="display:inline-block;background:#1d3a8a;color:#ffffff;text-decoration:none;font-weight:bold;padding:12px 20px;border-radius:6px">${escapar(modelo.botao)}</a></p>
-<p style="margin:0 0 8px;font-size:13px;color:#5a6170;line-height:1.5">Se o botão não funcionar, copie e cole este endereço no navegador:<br><a href="${escapar(link)}" style="color:#1d3a8a;word-break:break-all">${escapar(link)}</a></p>
-<p style="margin:16px 0 0;font-size:13px;color:#5a6170">${escapar(ignorar)}</p>
-</td></tr></table>
-<p style="margin:16px 0 0;font-size:12px;color:#5a6170">IIE Conselheiro · Educacional.ia - Roberto Alves</p>
-</td></tr></table></body></html>`;
-  return { para: user.email, assunto: modelo.assunto, html, texto };
+  return montar({
+    ...modelo,
+    para: user.email,
+    ola: saudacao(user.user_metadata?.nome),
+    vantagens: modelo.vantagens,
+    link: linkDeConfirmacao(dados.redirect_to, dados.token_hash, dados.email_action_type),
+    nota: "Se você não fez este pedido, ignore esta mensagem.",
+  });
+}
+
+/** Boas-vindas logo depois do cadastro: a conta já está ativa e o botão leva direto ao chat. */
+export function montarBoasVindas({ para, nome, site }: { para: string; nome?: string; site: string }): Email {
+  return montar({
+    para,
+    assunto: "Sua conta no IIE Conselheiro está pronta",
+    titulo: "Sua conta está pronta",
+    ola: saudacao(nome),
+    texto:
+      "Sua conta no IIE Conselheiro foi criada e já pode ser acessada. Para entrar, use o e-mail e a senha que " +
+      "você cadastrou.",
+    vantagens: true,
+    botao: "Acessar o IIE Conselheiro",
+    link: new URL("/", site).toString(),
+    nota: "Você recebeu este e-mail porque criou uma conta no IIE Conselheiro com este endereço.",
+  });
 }
 
 /** Envia pela API do Resend. A chave de idempotência evita e-mail repetido quando o Auth tenta de novo. */

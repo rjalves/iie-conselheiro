@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { assinaturaValida, linkDeConfirmacao, montarEmail, type PedidoHook } from "./email";
+import { VANTAGENS, assinaturaValida, linkDeConfirmacao, montarBoasVindas, montarEmail, type PedidoHook } from "./email";
 
 const SEGREDO = `v1,whsec_${Buffer.from("segredo-de-teste-com-32-bytes!!!").toString("base64")}`;
 
@@ -88,5 +88,22 @@ describe("montarEmail", () => {
   });
   it("tipo sem modelo (troca de e-mail) devolve null", () => {
     expect(montarEmail(pedido("email_change"))).toBeNull();
+  });
+});
+
+describe("montarBoasVindas", () => {
+  const email = montarBoasVindas({ para: "gestora@exemplo.gov.br", nome: "<b>Maria</b> Silva", site: "https://iiec.educacional.ia.br" });
+  it("avisa que a conta foi criada e já pode ser acessada, com o link do chat", () => {
+    expect(email.assunto).toBe("Sua conta no IIE Conselheiro está pronta");
+    expect(email.texto).toMatch(/^Olá, <b>Maria<\/b>\./);
+    expect(email.texto).toContain("foi criada e já pode ser acessada");
+    expect(email.html).toContain('href="https://iiec.educacional.ia.br/"');
+    expect(email.html).toContain("Olá, &lt;b&gt;Maria&lt;/b&gt;.");
+  });
+  it("traz as três vantagens e o rodapé de autoria", () => {
+    expect(VANTAGENS).toHaveLength(3);
+    for (const v of VANTAGENS) expect(email.texto).toContain(v);
+    expect(email.html).toContain("Educacional.ia - Roberto Alves");
+    expect(email.texto).toContain("contato@educacional.ia.br");
   });
 });

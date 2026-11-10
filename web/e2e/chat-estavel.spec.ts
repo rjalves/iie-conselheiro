@@ -39,7 +39,7 @@ async function perguntar(page: Page, pergunta: string, resposta: string, respost
 test("pergunta e resposta não somem quando a resposta termina", async ({ page }) => {
   await preencherCadastro(page, { nome: "Teste Estável", email });
   await expect(
-    page.getByRole("heading", { name: "Seu cadastro está em análise" }).or(page.getByText("Confirme seu e-mail para continuar.")),
+    page.getByRole("heading", { name: "Olá, Teste." }).or(page.getByText("Confirme seu e-mail para continuar.")),
   ).toBeVisible({ timeout: 20_000 });
   await sql(`update auth.users set email_confirmed_at = coalesce(email_confirmed_at, now()) where email = '${email}';
              update app.usuario set status = 'ativo' where email = '${email}'`);

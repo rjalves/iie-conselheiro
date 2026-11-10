@@ -58,7 +58,7 @@ export default async function PaginaConta() {
           </h2>
           <p>
             Apaga seu cadastro e todas as suas conversas, de forma definitiva. Para voltar a usar o IIE Conselheiro, será
-            preciso criar uma conta nova e esperar a aprovação.
+            preciso criar uma conta nova.
           </p>
           <ExcluirConta />
         </section>

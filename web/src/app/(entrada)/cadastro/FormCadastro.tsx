@@ -77,7 +77,7 @@ export function FormCadastro() {
       email: campos.email,
       password: campos.senha,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirmar?proxima=/aguardando`,
+        emailRedirectTo: `${window.location.origin}/auth/confirmar?proxima=/`,
         data: {
           nome: campos.nome.trim(),
           perfil: campos.perfil,
@@ -95,7 +95,9 @@ export function FormCadastro() {
       return;
     }
     if (data.session) {
-      router.replace("/aguardando");
+      // Conta já ativa: o e-mail de boas-vindas sai em segundo plano e não segura a entrada no chat.
+      void fetch("/api/boas-vindas", { method: "POST", keepalive: true }).catch(() => {});
+      router.replace("/");
       router.refresh();
     } else {
       setConfirmarEmail(campos.email);
@@ -107,8 +109,8 @@ export function FormCadastro() {
       <Aviso tipo="sucesso">
         <p className="font-semibold">Confirme seu e-mail para continuar.</p>
         <p className="mt-1">
-          Enviamos um link para <strong>{confirmarEmail}</strong>. Abra o link para ativar a conta. Depois, a equipe do
-          IIE analisa seu cadastro.
+          Enviamos um link para <strong>{confirmarEmail}</strong>. Abra o link para ativar a conta e começar a
+          conversar.
         </p>
       </Aviso>
     );

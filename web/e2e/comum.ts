@@ -20,7 +20,7 @@ export async function sql<T = Record<string, unknown>>(consulta: string): Promis
 
 export async function cadastrar(page: Page, pessoa: { nome: string; email: string }) {
   await preencherCadastro(page, pessoa);
-  await expect(page.getByRole("heading", { name: "Seu cadastro está em análise" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: `Olá, ${pessoa.nome.split(" ")[0]}.` })).toBeVisible();
 }
 
 /** Preenche e envia o cadastro (Sobral, CE). Quem chama confere o que aparece depois. */
