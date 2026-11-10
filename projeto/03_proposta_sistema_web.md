@@ -197,17 +197,21 @@ A mensagem final, com metadados, fica gravada em `app.mensagem`. O site não dep
 | # | Nó | Configuração |
 |---|---|---|
 | 1 | **Webhook** | `POST /iie-chat`; autenticação *Header Auth*; *Response Mode* = Streaming |
+| 1a | **Code** `validar-pedido` | Confere o contrato da §5.1 (UUIDs, perfil, `ufs_permitidas` com 1 a 27 siglas, `uf` dentro dela, mensagem de até 2.000 caracteres). Um pedido inválido para o workflow antes de gravar ou chamar o Claude. Também marca o início, para a latência |
 | 2 | **Postgres** `grava-pergunta` | `insert into app.mensagem (conversa_id, papel, texto) values (…, 'usuario', …)`. Credencial `iie-operacao` |
-| 3 | **Postgres** `base-ativa` | `select versao, conteudo from app.kb_versao where ativa` |
-| 4 | **AI Agent** (Tools Agent) | *System Message* = regras (seção 5.3) + `{{ conteudo }}` da base ativa; *Prompt* = bloco de contexto + pergunta; *Max Iterations* = 6; *Enable Streaming* ligado; *Return Intermediate Steps* ligado |
+| 3 | **Postgres** `base-ativa` | `select versao, conteudo from app.kb_versao where ativa`. Devolve sempre uma linha (`sem-base` e texto vazio quando não há base ativa) |
+| 4 | **AI Agent** (Tools Agent, **versão 3.1**) | *System Message* = regras (seção 5.3) + `{{ conteudo }}` da base ativa; *Prompt* = bloco de contexto + pergunta; *Max Iterations* = 6; *Enable Streaming* ligado; *Return Intermediate Steps* ligado. Depois de uma ferramenta, a resposta chega de uma vez; a versão 2.2 faz o mesmo (teste da P2). Enquanto isso, o site mostra "Consultando os dados do IIE…" |
 | 4a | ↳ **Anthropic Chat Model** (versão 1.6) | Modelo `claude-opus-5-5`; *Maximum Number of Tokens* = 16000; **Enable Prompt Caching** ligado; **Cache TTL** = 5 minutos (seção 11); raciocínio sem configuração, para que o modelo use o adaptativo padrão |
 | 4b | ↳ **Postgres Chat Memory** (v1.4) | Tabela `agente.memoria` (esquema próprio, fora da API: o nó roda `CREATE TABLE IF NOT EXISTS` a cada uso e precisa de CREATE no esquema — migração 0007); chave da sessão = `conversa_id` (`sessionIdType: customKey`); janela de 10 (a janela conta mensagens, e chamadas de ferramenta também gravam mensagens) |
 | 4c | ↳ **7 ferramentas Postgres** | Uma por função `iie.fn_*` (seção 5.4). Credencial `iie-leitura`, somente leitura |
-| 5 | **Code** `rastreabilidade` | Extrai os números e os códigos de prática da resposta e confere se cada um aparece nas saídas das ferramentas (passos intermediários) ou na lista de constantes. Monta `ferramentas`, `numeros_sem_origem` e `praticas_sem_origem`. Resposta vazia (recusa) vira o texto fixo de fora de escopo |
-| 6 | **Postgres** `grava-resposta` | `insert into app.mensagem (… 'agente', texto, ferramentas, numeros_sem_origem, latencia_ms, modelo, kb_versao)` |
-| E | **Saída de erro** do AI Agent | Grava `app.mensagem` com `erro` e responde com o texto fixo de instabilidade |
+| 5a | **Postgres** `saidas-da-conversa` | Resultados das ferramentas de perguntas anteriores da conversa (mensagens `tool` em `agente.memoria`), para que um número lembrado não conte como sem origem |
+| 5 | **Code** `rastreabilidade` | Extrai os números e os códigos de prática da resposta e confere se cada um aparece nas saídas das ferramentas (passos intermediários e nó 5a) ou na lista de constantes. Anos e códigos de prática não contam como números. Monta `ferramentas`, `numeros_sem_origem` e `praticas_sem_origem`. Resposta vazia (recusa) vira o texto fixo de fora de escopo |
+| 6 | **Postgres** `grava-resposta` | `insert into app.mensagem (… 'agente', texto, ferramentas, numeros_sem_origem, praticas_sem_origem, latencia_ms, modelo, kb_versao, erro)` |
+| E | **Saída de erro** do AI Agent → **Code** `erro-agente` | Monta o registro com o texto fixo de instabilidade e o `erro`, e grava pelo mesmo nó 6. No navegador, o *stream* com `error` vira o mesmo aviso |
 
-O *Settings* do workflow aponta para o workflow de erros (`iie-erros`), que registra as falhas não tratadas.
+O *Settings* do workflow aponta para o workflow de erros (`iie-erros`: Error Trigger → `grava-falha`), que grava as falhas não tratadas em `app.falha` (migração 0008): execução, workflow, último nó e mensagem.
+
+O JSON dos dois workflows é gerado por `agente/n8n/montar.py` a partir do prompt (`agente/n8n/prompt/sistema.md`), do código dos nós (`agente/n8n/codigo/`) e da tabela de ferramentas, e publicado por `agente/n8n/publicar.sh` (P2).
 
 Fontes sobre o cache do nó: [PR #34482](https://github.com/n8n-io/n8n/pull/34482), que traz as opções "Enable Prompt Caching" e "Cache TTL" no nó versão 1.6, publicado no n8n 2.37.0; e o [tópico da comunidade](https://community.n8n.io/t/anthropic-chat-model-node-add-cache-control-prompt-caching-support-got-created/294797).
 
@@ -216,13 +220,13 @@ Fontes sobre o cache do nó: [PR #34482](https://github.com/n8n-io/n8n/pull/3448
 - **Mensagem de sistema:** é o esqueleto da proposta 01 (seção 7.1), com três ajustes:
   - **Formato web:** markdown, com negrito, listas e no máximo uma tabela pequena; até cerca de 2.500 caracteres por resposta.
   - **Município:** "o usuário informa o município; os dados do IIE existem só por UF. Responda com a UF e diga, uma vez por conversa, que o dado municipal ainda não está disponível".
-  - **Contexto:** "o bloco `<contexto>` no começo da mensagem do usuário traz perfil, UF, município e data. Use a UF como padrão quando a pergunta não disser o território".
-  - **Acesso por UF:** "se uma ferramenta devolver `territorio_sem_acesso`, diga que os dados desse estado não estão liberados para a pessoa, cite os estados liberados (estão na dica do erro) e diga que ela pode pedir acesso à equipe do IIE. Nunca estime números de um estado sem acesso".
+  - **Contexto:** "o bloco `<contexto>` no começo da mensagem do usuário traz perfil, UF padrão, UFs liberadas, município e data. Use a UF padrão quando a pergunta não disser o território".
+  - **Acesso por UF:** "se uma ferramenta devolver `territorio_sem_acesso`, diga que os dados desse estado não estão liberados para a pessoa, cite os estados liberados e diga que ela pode pedir acesso à equipe do IIE. Nunca estime números de um estado sem acesso". Os estados liberados estão no `<contexto>` e na mensagem do erro: a ferramenta do n8n repassa ao modelo só a mensagem, sem a dica, e por isso a migração 0008 repete a dica na mensagem.
 - **Bytes estáveis:** a mensagem de sistema não muda entre usuários nem entre pedidos. Não pode conter data, nome ou UF.
 - **Mensagem do usuário:**
 
 ```
-<contexto>perfil: secretaria_estadual · UF: CE · município: Sobral · data: 2026-10-13</contexto>
+<contexto>perfil: secretaria_estadual · UF padrão: CE · UFs liberadas: CE, PE · município: Sobral · data: 2026-10-13</contexto>
 
 Como está o Ceará?
 ```

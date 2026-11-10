@@ -1,0 +1,55 @@
+{
+  "name": "IIE Conselheiro — erros",
+  "nodes": [
+    {
+      "id": "e50c4992-c07c-5dd6-9090-e3216d86133f",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "b4be2514-862f-505f-941f-543e43f5c6f2",
+      "name": "grava-falha",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "insert into app.falha (execucao, workflow, no, mensagem) values ($1, $2, $3, $4) returning id",
+        "options": {
+          "queryReplacement": "={{ [ $json.execution.id, $json.workflow.name, $json.execution.lastNodeExecuted, $json.execution.error.message ] }}"
+        }
+      },
+      "credentials": {
+        "postgres": {
+          "id": "iie-operacao",
+          "name": "iie-operacao"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "grava-falha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
