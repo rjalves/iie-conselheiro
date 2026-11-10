@@ -42,6 +42,26 @@ npm run build
 npm run e2e       # ponta a ponta (Playwright). Precisa dos passos 1 a 4 rodando; cria e apaga as contas de teste
 ```
 
+## Publicar (homologação, Easypanel)
+
+O site roda como um serviço *App* do Easypanel, no mesmo servidor do n8n, construído a partir do `web/Dockerfile`.
+
+1. **Fonte:** GitHub `rjalves/iie-conselheiro`, ramo `main`, caminho de build `/web`. **Build:** Dockerfile (`Dockerfile`).
+2. **Ambiente:** as variáveis de `.env.local.example`, com os valores da homologação. As `NEXT_PUBLIC_*` entram no código do navegador durante a construção; se não chegarem ao build, ele falha com "faltam NEXT_PUBLIC_SUPABASE_URL…".
+3. **Domínio:** HTTPS, apontando para a porta 3000.
+4. **Supabase:** o esquema `app` precisa estar exposto na API REST. Na homologação, isso foi feito no próprio banco, sem mexer nas variáveis do Easypanel:
+   ```sql
+   alter role authenticator set pgrst.db_schemas = 'public, storage, graphql_public, app';
+   notify pgrst, 'reload config'; notify pgrst, 'reload schema';
+   ```
+5. **Jornada completa** com o agente real (gasta tokens: uma pergunta; as contas de teste são apagadas no fim):
+   ```bash
+   E2E_URL=https://<site> E2E_SUPABASE_URL=https://<supabase> E2E_SERVICE_ROLE_KEY=<chave> \
+     npx playwright test e2e/homologacao.spec.ts
+   ```
+
+Na homologação, a confirmação de e-mail está desligada (`mailer_autoconfirm`), e o acesso é liberado pela aprovação em `/admin`. A recuperação de senha depende de um SMTP, que ainda não foi configurado.
+
 ## Estrutura
 
 | Caminho | O que é |

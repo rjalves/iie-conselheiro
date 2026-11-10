@@ -1,43 +1,18 @@
 // Ponta a ponta no ambiente local: cadastro, aprovação, conversa com resposta em streaming, avaliação e exclusão.
+// Usa o n8n simulado e o banco local; contra a homologação, roda o homologacao.spec.ts.
 import { execFileSync } from "node:child_process";
-import { randomBytes } from "node:crypto";
 import { mkdirSync } from "node:fs";
-import { devices, expect, test, type Browser, type Page } from "@playwright/test";
+import { devices, expect, test } from "@playwright/test";
+import { CAPTURAS, cadastrar, entrarComo, sufixo } from "./comum";
+
+test.skip(!!process.env.E2E_SERVICE_ROLE_KEY, "usa o n8n simulado e o banco local");
 
 const BANCO = process.env.E2E_DATABASE_URL ?? "postgresql://postgres:postgres@127.0.0.1:59322/postgres";
-const CAPTURAS = process.env.E2E_CAPTURAS ?? "e2e/capturas";
-const sufixo = `${Date.now()}-${randomBytes(3).toString("hex")}`;
-const senha = `Teste-${randomBytes(8).toString("hex")}`; // gerada a cada execução; só existe no banco local
 const gestora = { nome: "Gestora de Teste", email: `gestora-${sufixo}@exemplo.test` };
 const admin = { nome: "Administração de Teste", email: `admin-${sufixo}@exemplo.test` };
 
 function sql(consulta: string): string {
   return execFileSync("psql", [BANCO, "-v", "ON_ERROR_STOP=1", "-Atc", consulta], { encoding: "utf8" }).trim();
-}
-
-async function cadastrar(page: Page, pessoa: { nome: string; email: string }) {
-  await page.goto("/cadastro");
-  await page.getByLabel("Nome completo").fill(pessoa.nome);
-  await page.getByLabel("E-mail").fill(pessoa.email);
-  await page.getByLabel("Senha", { exact: true }).fill(senha);
-  await page.getByLabel("Onde você trabalha").selectOption("secretaria_estadual");
-  await page.getByLabel("Instituição").fill("Secretaria da Educação do Ceará");
-  await page.getByLabel("Estado").selectOption("CE");
-  await expect(page.locator('#lista-municipios option[value="Sobral"]')).toHaveCount(1);
-  await page.getByLabel("Município").fill("Sobral");
-  await page.getByLabel(/Li e aceito/).check();
-  await page.getByRole("button", { name: "Criar conta" }).click();
-  await expect(page.getByRole("heading", { name: "Seu cadastro está em análise" })).toBeVisible();
-}
-
-async function entrarComo(browser: Browser, email: string, opcoes = {}) {
-  const pagina = await (await browser.newContext(opcoes)).newPage();
-  await pagina.goto("/entrar");
-  await pagina.getByLabel("E-mail").fill(email);
-  await pagina.getByLabel("Senha").fill(senha);
-  await pagina.getByRole("button", { name: "Entrar" }).click();
-  await pagina.waitForURL((url) => !url.pathname.startsWith("/entrar"));
-  return pagina;
 }
 
 test.afterAll(() => {

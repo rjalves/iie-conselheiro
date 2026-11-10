@@ -1,0 +1,32 @@
+// Funções comuns aos testes ponta a ponta (local e homologação).
+import { randomBytes } from "node:crypto";
+import { expect, type Browser, type Page } from "@playwright/test";
+
+export const CAPTURAS = process.env.E2E_CAPTURAS ?? "e2e/capturas";
+export const sufixo = `${Date.now()}-${randomBytes(3).toString("hex")}`;
+export const senha = `Teste-${randomBytes(8).toString("hex")}`; // gerada a cada execução; as contas são apagadas no fim
+
+export async function cadastrar(page: Page, pessoa: { nome: string; email: string }) {
+  await page.goto("/cadastro");
+  await page.getByLabel("Nome completo").fill(pessoa.nome);
+  await page.getByLabel("E-mail").fill(pessoa.email);
+  await page.getByLabel("Senha", { exact: true }).fill(senha);
+  await page.getByLabel("Onde você trabalha").selectOption("secretaria_estadual");
+  await page.getByLabel("Instituição").fill("Secretaria da Educação do Ceará");
+  await page.getByLabel("Estado").selectOption("CE");
+  await expect(page.locator('#lista-municipios option[value="Sobral"]')).toHaveCount(1);
+  await page.getByLabel("Município").fill("Sobral");
+  await page.getByLabel(/Li e aceito/).check();
+  await page.getByRole("button", { name: "Criar conta" }).click();
+  await expect(page.getByRole("heading", { name: "Seu cadastro está em análise" })).toBeVisible();
+}
+
+export async function entrarComo(browser: Browser, email: string, opcoes = {}) {
+  const pagina = await (await browser.newContext(opcoes)).newPage();
+  await pagina.goto("/entrar");
+  await pagina.getByLabel("E-mail").fill(email);
+  await pagina.getByLabel("Senha").fill(senha);
+  await pagina.getByRole("button", { name: "Entrar" }).click();
+  await pagina.waitForURL((url) => !url.pathname.startsWith("/entrar"));
+  return pagina;
+}

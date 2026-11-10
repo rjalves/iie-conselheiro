@@ -1,0 +1,8 @@
+node_modules
+.next
+.env*
+!.env.local.example
+test-results
+playwright-report
+e2e/capturas
+tsconfig.tsbuildinfo
