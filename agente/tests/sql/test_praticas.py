@@ -61,6 +61,7 @@ def test_pacote_desconhecido_sugere(banco):
     with pytest.raises(psycopg.errors.NoDataFound) as erro:
         banco.execute("select iie.fn_pacote('gargalo mágico')")
     assert "fluxo" in erro.value.diag.message_hint
+    assert "Perfis: " in erro.value.diag.message_primary and "fluxo" in erro.value.diag.message_primary
 
 
 def test_praticas_traz_lacunas_do_indicador(sql):

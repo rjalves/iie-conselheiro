@@ -14,6 +14,8 @@ def test_territorio_inexistente_sugere(banco):
         banco.execute("select iie.fn_resolver_territorio('Cearaa')")
     assert "territorio_nao_encontrado" in str(erro.value)
     assert "Ceará" in erro.value.diag.message_hint
+    # O n8n repassa ao modelo só a mensagem do erro (migração 0008): a sugestão vai nela também.
+    assert "Talvez: " in erro.value.diag.message_primary and "Ceará" in erro.value.diag.message_primary
 
 
 def test_consultar_iie_ceara(sql):

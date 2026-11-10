@@ -39,6 +39,7 @@ def test_dados_de_uf_nao_liberada_sao_recusados(banco):
         banco.execute("select iie.fn_consultar_iie('CE', p_ufs => array['PE'])")
     assert "territorio_sem_acesso: Ceará" in str(erro.value)
     assert "Pernambuco" in erro.value.diag.message_hint
+    assert "Estados liberados para este usuário: Pernambuco" in erro.value.diag.message_primary  # lida pelo agente
     for consulta in ("select iie.fn_decompor('Cearense', 2019, array['PE'])",
                      "select iie.fn_comparar(array['PE', 'CE'], 'IIE', 2019, array['PE'])"):
         with pytest.raises(SEM_ACESSO, match="Ceará"):

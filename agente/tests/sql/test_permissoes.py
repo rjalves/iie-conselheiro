@@ -44,3 +44,15 @@ def test_memoria_do_agente_aceita_o_create_do_n8n(banco):
             with banco.transaction():
                 banco.execute(ddl.format("app", "memoria_indevida"))
         banco.execute("delete from agente.memoria where session_id = 's'")
+
+
+def test_n8n_registra_falha_e_agente_nao(banco):
+    """O workflow iie-erros grava as falhas não tratadas em app.falha (migração 0008)."""
+    with banco.transaction():
+        banco.execute("set local role n8n_operacao")
+        banco.execute("insert into app.falha (workflow, mensagem) values ('w', 'm')")
+        assert banco.execute("select count(*) from app.falha").fetchone()[0] >= 1
+    with banco.transaction():
+        banco.execute("set local role agente_leitura")
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            banco.execute("insert into app.falha (workflow, mensagem) values ('w', 'm')")

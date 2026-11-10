@@ -194,7 +194,7 @@ def test_anonimo_nao_acessa_app(banco):
             banco.execute("select count(*) from app.usuario")
 
 
-@pytest.mark.parametrize("tabela", ["app.kb_versao", "agente.memoria", "app.cota_diaria", "iie.pratica"])
+@pytest.mark.parametrize("tabela", ["app.kb_versao", "agente.memoria", "app.cota_diaria", "iie.pratica", "app.falha"])
 def test_logado_nao_le_tabelas_internas(banco, tabela):
     uid = ativar(banco, cadastrar(banco))
     with pytest.raises(NEGADO):

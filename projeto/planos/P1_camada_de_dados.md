@@ -2937,3 +2937,11 @@ Descoberta ao levantar o n8n 2.46.7: o nó Postgres Chat Memory roda `CREATE TAB
 - `n8n_operacao` cria tabelas em `agente`, mas não em `app`;
 - nenhuma tabela sem RLS;
 - recusa sem a lista de UFs e recusa de UF não liberada.
+
+### Migração 0008, da P2 (2026-11-10)
+
+`0008_agente_n8n.sql`, prevista na Tarefa 2 do [`P2_agente_n8n.md`](P2_agente_n8n.md):
+- `fn_checar_acesso`, `fn_resolver_territorio` e `fn_pacote` repetem a dica na mensagem do erro, porque a ferramenta Postgres do n8n repassa ao modelo só a mensagem;
+- tabela `app.falha`, para o workflow `iie-erros`.
+
+Resultado: 87 testes passando no Postgres 15 e no 17. Aplicada na homologação em 2026-11-10.
