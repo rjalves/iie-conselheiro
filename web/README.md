@@ -48,7 +48,7 @@ O site roda como um serviço *App* do Easypanel, no mesmo servidor do n8n, const
 
 1. **Fonte:** GitHub `rjalves/iie-conselheiro`, ramo `main`, caminho de build `/web`. **Build:** Dockerfile (`Dockerfile`).
 2. **Ambiente:** as variáveis de `.env.local.example`, com os valores da homologação. As `NEXT_PUBLIC_*` entram no código do navegador durante a construção; se não chegarem ao build, ele falha com "faltam NEXT_PUBLIC_SUPABASE_URL…".
-3. **Domínio:** HTTPS, apontando para a porta 3000.
+3. **Domínio:** `iiec.educacional.ia.br`, com HTTPS e apontando para a porta 3000. No DNS, crie um registro A para o IP do servidor.
 4. **Supabase:** o esquema `app` precisa estar exposto na API REST. Na homologação, isso foi feito no próprio banco, sem mexer nas variáveis do Easypanel:
    ```sql
    alter role authenticator set pgrst.db_schemas = 'public, storage, graphql_public, app';
@@ -60,7 +60,28 @@ O site roda como um serviço *App* do Easypanel, no mesmo servidor do n8n, const
      npx playwright test e2e/homologacao.spec.ts
    ```
 
-Na homologação, a confirmação de e-mail está desligada (`mailer_autoconfirm`), e o acesso é liberado pela aprovação em `/admin`. A recuperação de senha depende de um SMTP, que ainda não foi configurado.
+### E-mails (Resend, domínio `iiec.educacional.ia.br`)
+
+O Supabase Auth não envia e-mail por SMTP. A cada confirmação de cadastro, nova senha, convite ou link de acesso, ele chama `POST /api/auth/email` (*Send Email Hook*), com o pedido assinado no padrão Standard Webhooks. O site monta o e-mail em português (`src/lib/email.ts`) e envia pela API do Resend. Usa como chave de idempotência o `webhook-id`, porque o Auth pode repetir o pedido.
+
+Para ligar:
+1. **Resend:** cadastre o domínio `iiec.educacional.ia.br`, publique no DNS os registros que o Resend mostrar (DKIM e SPF) e crie uma chave de API com acesso de envio.
+2. **Site:** defina `RESEND_API_KEY`, `EMAIL_REMETENTE` e `SUPABASE_HOOK_EMAIL_SEGREDO` (veja `.env.local.example`).
+3. **Auth:** o compose do Supabase precisa repassar o hook. No `auth.environment`:
+   ```yaml
+   GOTRUE_HOOK_SEND_EMAIL_ENABLED: ${SEND_EMAIL_HOOK_ENABLED:-false}
+   GOTRUE_HOOK_SEND_EMAIL_URI: ${SEND_EMAIL_HOOK_URI:-}
+   GOTRUE_HOOK_SEND_EMAIL_SECRETS: ${SEND_EMAIL_HOOK_SECRETS:-}
+   ```
+   Depois defina, no `.env` do Supabase:
+   - `SEND_EMAIL_HOOK_ENABLED=true` e `SEND_EMAIL_HOOK_URI=https://iiec.educacional.ia.br/api/auth/email`;
+   - `SEND_EMAIL_HOOK_SECRETS`, com o mesmo segredo do site;
+   - `SITE_URL=https://iiec.educacional.ia.br` e `ADDITIONAL_REDIRECT_URLS=https://iiec.educacional.ia.br/**`;
+   - por último, `ENABLE_EMAIL_AUTOCONFIRM=false`.
+
+   Enquanto o hook não estiver ligado, deixe `ENABLE_EMAIL_AUTOCONFIRM=true`. Sem ele, o Auth tenta o SMTP de exemplo e o cadastro falha.
+
+O teste da homologação usa os endereços de teste do Resend (`delivered+…@resend.dev`). Ele confere que o e-mail de confirmação foi aceito (`confirmation_sent_at`) e confirma a conta direto no banco.
 
 ## Estrutura
 

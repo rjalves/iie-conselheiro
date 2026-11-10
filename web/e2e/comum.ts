@@ -7,6 +7,12 @@ export const sufixo = `${Date.now()}-${randomBytes(3).toString("hex")}`;
 export const senha = `Teste-${randomBytes(8).toString("hex")}`; // gerada a cada execução; as contas são apagadas no fim
 
 export async function cadastrar(page: Page, pessoa: { nome: string; email: string }) {
+  await preencherCadastro(page, pessoa);
+  await expect(page.getByRole("heading", { name: "Seu cadastro está em análise" })).toBeVisible();
+}
+
+/** Preenche e envia o cadastro (Sobral, CE). Quem chama confere o que aparece depois. */
+export async function preencherCadastro(page: Page, pessoa: { nome: string; email: string }) {
   await page.goto("/cadastro");
   await page.getByLabel("Nome completo").fill(pessoa.nome);
   await page.getByLabel("E-mail").fill(pessoa.email);
@@ -18,7 +24,6 @@ export async function cadastrar(page: Page, pessoa: { nome: string; email: strin
   await page.getByLabel("Município").fill("Sobral");
   await page.getByLabel(/Li e aceito/).check();
   await page.getByRole("button", { name: "Criar conta" }).click();
-  await expect(page.getByRole("heading", { name: "Seu cadastro está em análise" })).toBeVisible();
 }
 
 export async function entrarComo(browser: Browser, email: string, opcoes = {}) {
