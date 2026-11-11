@@ -44,7 +44,7 @@ test("pergunta e resposta não somem quando a resposta termina", async ({ page }
   await sql(`update auth.users set email_confirmed_at = coalesce(email_confirmed_at, now()) where email = '${email}';
              update app.usuario set status = 'ativo' where email = '${email}'`);
   const [{ id: usuarioId }] = await sql<{ id: string }>(`select id from app.usuario where email = '${email}'`);
-  await page.goto("/");
+  await page.goto("/entrar"); // com sessão, volta para o chat; sem sessão, entra
   if (page.url().includes("/entrar")) {
     await page.getByLabel("E-mail").fill(email);
     await page.getByLabel("Senha").fill(senha);

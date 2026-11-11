@@ -1,0 +1,439 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-11T05:26:05+00:00",
+  "title": "Design System: IIE Conselheiro",
+  "extensions": {
+    "colorMeta": {
+      "tinta": {
+        "role": "primary",
+        "displayName": "Tinta (caneta azul)",
+        "canonical": "#1d3a8a",
+        "tonalRamp": [
+          "#0d1b3f",
+          "#183072",
+          "#2345a4",
+          "#305cd4",
+          "#6384de",
+          "#96ace9",
+          "#c4d0f3",
+          "#eaeefb"
+        ]
+      },
+      "tinta-escura": {
+        "role": "primary",
+        "displayName": "Tinta escura",
+        "canonical": "#152b66",
+        "tonalRamp": [
+          "#0d1b3f",
+          "#183072",
+          "#2246a5",
+          "#305cd4",
+          "#6384df",
+          "#95ace9",
+          "#c4d1f3",
+          "#eaeefb"
+        ]
+      },
+      "tinta-clara": {
+        "role": "primary",
+        "displayName": "Tinta clara",
+        "canonical": "#e8edf8",
+        "tonalRamp": [
+          "#121f3b",
+          "#20376a",
+          "#2e5098",
+          "#3f69c5",
+          "#6e8ed3",
+          "#9db3e1",
+          "#c8d4ee",
+          "#ebf0f9"
+        ]
+      },
+      "marca": {
+        "role": "secondary",
+        "displayName": "Marca-texto",
+        "canonical": "#ffe066",
+        "tonalRamp": [
+          "#4c3d00",
+          "#8a6e00",
+          "#c79f00",
+          "#ffcc05",
+          "#ffd942",
+          "#ffe580",
+          "#fff1b8",
+          "#fffae5"
+        ]
+      },
+      "grafite": {
+        "role": "neutral",
+        "displayName": "Grafite",
+        "canonical": "#1e2228",
+        "tonalRamp": [
+          "#21252c",
+          "#3b434f",
+          "#556172",
+          "#707e94",
+          "#939eae",
+          "#b6bdc8",
+          "#d6dae0",
+          "#f0f2f4"
+        ]
+      },
+      "grafite-suave": {
+        "role": "neutral",
+        "displayName": "Grafite suave",
+        "canonical": "#5a6170",
+        "tonalRamp": [
+          "#22252a",
+          "#3d424c",
+          "#59606e",
+          "#747d90",
+          "#969dab",
+          "#b8bdc6",
+          "#d7dadf",
+          "#f1f2f4"
+        ]
+      },
+      "papel": {
+        "role": "neutral",
+        "displayName": "Papel",
+        "canonical": "#f6f7f9",
+        "tonalRamp": [
+          "#1f242e",
+          "#374053",
+          "#505d77",
+          "#697a9b",
+          "#8e9ab4",
+          "#b3bbcc",
+          "#d4d9e2",
+          "#f0f1f5"
+        ]
+      },
+      "linha": {
+        "role": "neutral",
+        "displayName": "Linha",
+        "canonical": "#dde1e8",
+        "tonalRamp": [
+          "#1f242e",
+          "#384152",
+          "#505e77",
+          "#6a7b9a",
+          "#8e9cb3",
+          "#b3bccc",
+          "#d4d9e2",
+          "#f0f2f5"
+        ]
+      },
+      "folha": {
+        "role": "neutral",
+        "displayName": "Folha",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#262626",
+          "#454545",
+          "#636363",
+          "#828282",
+          "#a1a1a1",
+          "#bfbfbf",
+          "#dbdbdb",
+          "#f2f2f2"
+        ]
+      },
+      "erro": {
+        "role": "error",
+        "displayName": "Erro",
+        "canonical": "#b42318",
+        "tonalRamp": [
+          "#440d09",
+          "#7a1810",
+          "#b02217",
+          "#e23022",
+          "#e96358",
+          "#f0958f",
+          "#f7c4c0",
+          "#fceae8"
+        ]
+      },
+      "erro-fundo": {
+        "role": "error",
+        "displayName": "Fundo de erro",
+        "canonical": "#fdecea",
+        "tonalRamp": [
+          "#460d07",
+          "#7e180c",
+          "#b62311",
+          "#e9311b",
+          "#ef6353",
+          "#f4968b",
+          "#f9c4be",
+          "#fdeae8"
+        ]
+      },
+      "sucesso": {
+        "role": "success",
+        "displayName": "Sucesso",
+        "canonical": "#1f7a4d",
+        "tonalRamp": [
+          "#0f3d27",
+          "#1c6e45",
+          "#289f64",
+          "#38cc83",
+          "#69d9a1",
+          "#99e5c0",
+          "#c6f1dc",
+          "#ebfaf2"
+        ]
+      },
+      "sucesso-fundo": {
+        "role": "success",
+        "displayName": "Fundo de sucesso",
+        "canonical": "#e7f4ec",
+        "tonalRamp": [
+          "#183423",
+          "#2b5e3f",
+          "#3f885b",
+          "#54b077",
+          "#7ec499",
+          "#a8d7ba",
+          "#cee9d8",
+          "#eef7f1"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Título de abertura da apresentação."
+      },
+      "headline": {
+        "displayName": "Título de seção",
+        "purpose": "Títulos de seção da apresentação."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "Números grandes dos cartões, algarismos tabulares."
+      },
+      "title-lg": {
+        "displayName": "Título de cartão grande",
+        "purpose": "Cartões grandes e blocos escuros."
+      },
+      "title": {
+        "displayName": "Título",
+        "purpose": "Títulos de cartão e de item, frases de destaque."
+      },
+      "body": {
+        "displayName": "Corpo",
+        "purpose": "Texto corrido; respostas até 72ch."
+      },
+      "lead": {
+        "displayName": "Abertura",
+        "purpose": "Parágrafo sob um título, em grafite suave."
+      },
+      "label": {
+        "displayName": "Rótulo",
+        "purpose": "Rótulos, fontes de dado, etiquetas; caixa normal."
+      },
+      "caption": {
+        "displayName": "Legenda",
+        "purpose": "Rodapé de autoria e avisos discretos."
+      }
+    },
+    "shadows": [
+      {
+        "name": "folha",
+        "value": "0 32px 72px -32px rgb(21 43 102 / 0.45), 0 2px 8px rgb(21 43 102 / 0.06)",
+        "purpose": "A folha branca sobre o fundo azul-claro (entrada e apresentação)."
+      },
+      {
+        "name": "botao-tinta",
+        "value": "0 10px 22px -12px rgb(29 58 138 / 0.75)",
+        "purpose": "Só o botão principal; some quando desabilitado."
+      },
+      {
+        "name": "hachura-contorno",
+        "value": "inset 0 0 0 2px #1d3a8a",
+        "purpose": "Contorno da barra hachurada de dado preliminar (não é elevação)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ponto-entra",
+        "value": "320ms ease-out, 45ms entre pontos, uma vez",
+        "purpose": "Entrada dos pontos cheios da geração em 100 pontos; a única entrada animada."
+      },
+      {
+        "name": "pulsar",
+        "value": "1.2s ease-in-out infinite, opacidade até 0.35",
+        "purpose": "Indicador de espera (resposta chegando, conversa abrindo)."
+      },
+      {
+        "name": "transicao-cor",
+        "value": "150ms (transition-colors)",
+        "purpose": "Hover de botões e pílulas."
+      },
+      {
+        "name": "movimento-reduzido",
+        "value": "prefers-reduced-motion: reduce desliga todas as animações",
+        "purpose": "Obrigatório para qualquer animação nova."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão principal",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação principal do app (entrar, enviar, salvar).",
+      "html": "<button class=\"ds-btn\">Entrar</button>",
+      "css": ".ds-btn { font-family: var(--font-sans, 'Atkinson Hyperlegible Next', system-ui, sans-serif); display:inline-flex; align-items:center; gap:8px; padding:10px 16px; border:0; border-radius:6px; background:var(--color-tinta,#1d3a8a); color:#fff; font-weight:600; font-size:17px; box-shadow:0 10px 22px -12px rgb(29 58 138 / 0.75); cursor:pointer; } .ds-btn:hover { background:var(--color-tinta-escura,#152b66); } .ds-btn:focus-visible { outline: 3px solid var(--color-tinta, #1d3a8a); outline-offset: 2px; }"
+    },
+    {
+      "name": "Botão principal em pílula",
+      "kind": "button",
+      "refersTo": "button-primary-pilula",
+      "description": "Chamada principal da página de apresentação.",
+      "html": "<a class=\"ds-btn-pilula\" href=\"#\">Criar conta</a>",
+      "css": ".ds-btn-pilula { font-family: var(--font-sans, 'Atkinson Hyperlegible Next', system-ui, sans-serif); display:inline-flex; padding:14px 28px; border-radius:9999px; background:var(--color-tinta,#1d3a8a); color:#fff; font-weight:600; text-decoration:none; box-shadow:0 10px 22px -12px rgb(29 58 138 / 0.75); transition:background-color .15s; } .ds-btn-pilula:hover { background:var(--color-tinta-escura,#152b66); } .ds-btn-pilula:focus-visible { outline: 3px solid var(--color-tinta, #1d3a8a); outline-offset: 2px; }"
+    },
+    {
+      "name": "Botão secundário",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ação alternativa no app.",
+      "html": "<button class=\"ds-btn-sec\">Cancelar</button>",
+      "css": ".ds-btn-sec { font-family: var(--font-sans, 'Atkinson Hyperlegible Next', system-ui, sans-serif); padding:10px 16px; border:1px solid var(--color-tinta,#1d3a8a); border-radius:6px; background:#fff; color:var(--color-tinta,#1d3a8a); font-weight:600; font-size:17px; cursor:pointer; } .ds-btn-sec:hover { background:var(--color-tinta-clara,#e8edf8); } .ds-btn-sec:focus-visible { outline: 3px solid var(--color-tinta, #1d3a8a); outline-offset: 2px; }"
+    },
+    {
+      "name": "Pílula de contorno",
+      "kind": "chip",
+      "refersTo": "pilula-contorno",
+      "description": "Navegação dentro de cartões da apresentação.",
+      "html": "<a class=\"ds-pilula\" href=\"#\">Entenda o IIE</a>",
+      "css": ".ds-pilula { font-family: var(--font-sans, 'Atkinson Hyperlegible Next', system-ui, sans-serif); display:inline-flex; padding:6px 16px; border:1px solid var(--color-grafite,#1e2228); border-radius:9999px; color:var(--color-grafite,#1e2228); font-size:14px; font-weight:600; text-decoration:none; transition:background-color .15s,color .15s; } .ds-pilula:hover { background:var(--color-grafite,#1e2228); color:#fff; } .ds-pilula:focus-visible { outline: 3px solid var(--color-tinta, #1d3a8a); outline-offset: 2px; }"
+    },
+    {
+      "name": "Campo",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo de formulário com rótulo semibold.",
+      "html": "<label class=\"ds-campo\"><span>E-mail</span><input class=\"ds-input\" placeholder=\"voce@secretaria.gov.br\"></label>",
+      "css": ".ds-campo { font-family: var(--font-sans, 'Atkinson Hyperlegible Next', system-ui, sans-serif); display:flex; flex-direction:column; gap:6px; font-weight:600; color:var(--color-grafite,#1e2228); } .ds-input { font-family: var(--font-sans, 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-size:17px; font-weight:400; padding:10px 12px; border:1px solid var(--color-linha,#dde1e8); border-radius:6px; background:#fff; color:var(--color-grafite,#1e2228); caret-color:var(--color-tinta,#1d3a8a); } .ds-input::placeholder { color:rgb(90 97 112 / .7); } .ds-input:focus-visible { outline:3px solid var(--color-tinta,#1d3a8a); outline-offset:2px; }"
+    },
+    {
+      "name": "Etiqueta de pergunta",
+      "kind": "chip",
+      "refersTo": "etiqueta-pergunta",
+      "description": "Sugestão do que perguntar ao Conselheiro.",
+      "html": "<span class=\"ds-etiqueta\">Onde agir primeiro?</span>",
+      "css": ".ds-etiqueta { font-family: var(--font-sans, 'Atkinson Hyperlegible Next', system-ui, sans-serif); display:inline-block; padding:4px 10px; border-radius:6px; background:var(--color-tinta-clara,#e8edf8); color:var(--color-tinta-escura,#152b66); font-size:14px; }"
+    },
+    {
+      "name": "Cartão pautado com a geração",
+      "kind": "card",
+      "refersTo": "cartao-pautado",
+      "description": "Cartão claro de caderno, com margem, pauta e a grade de 100 pontos.",
+      "html": "<div class=\"ds-pautado\"><div class=\"ds-grade\" role=\"img\" aria-label=\"De cada 100 jovens, 15 concluem o Ensino Médio até os 18 anos com o básico.\"><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto ds-cheio\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span><span class=\"ds-ponto\"></span></div><p class=\"ds-frase\">De cada 100 jovens, <span class=\"ds-marcado\">15 concluem</span> o Ensino Médio até os 18 anos com o básico.</p></div>",
+      "css": ".ds-pautado { font-family: var(--font-sans, 'Atkinson Hyperlegible Next', system-ui, sans-serif); max-width:360px; display:flex; flex-direction:column; gap:20px; padding:24px 24px 24px 48px; border-radius:25.6px; background-color:var(--color-tinta-clara,#e8edf8); background-image:linear-gradient(90deg,transparent 36px,rgb(29 58 138 / .22) 36px,rgb(29 58 138 / .22) 37px,transparent 37px),repeating-linear-gradient(180deg,transparent 0 27px,rgb(29 58 138 / .065) 27px 28px); color:var(--color-grafite,#1e2228); } .ds-grade { display:grid; grid-template-columns:repeat(10,12px); gap:6px; } .ds-ponto { width:12px; height:12px; border-radius:9999px; border:1px solid rgb(29 58 138 / .35); box-sizing:border-box; } .ds-cheio { background:var(--color-tinta,#1d3a8a); border-color:transparent; } .ds-frase { margin:0; font-size:20px; line-height:1.375; font-weight:700; } .ds-marcado { background:linear-gradient(180deg,transparent 58%,#ffe066 58%,#ffe066 92%,transparent 92%); padding:0 .08em; }"
+    },
+    {
+      "name": "Painel de tinta escura com conversa",
+      "kind": "card",
+      "refersTo": "painel-tinta-escura",
+      "description": "Painel escuro com gradientes radiais; exemplo de pergunta e resposta.",
+      "html": "<figure class=\"ds-escuro\"><p class=\"ds-balao\">Como está o Ceará no IIE?</p><div class=\"ds-resp\"><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\"><circle cx=\"10.5\" cy=\"10.5\" r=\"6.5\"/><path d=\"m15.5 15.5 5 5\" stroke-linecap=\"round\"/><circle cx=\"10.5\" cy=\"10.5\" r=\"2.2\" fill=\"#ffe066\" stroke=\"none\"/></svg><p><strong>Ceará: IIE 2023 de 18,1</strong>, 5º entre as 27 UFs (Brasil: 15,5).</p></div><a class=\"ds-claro\" href=\"#\">Experimente agora</a></figure>",
+      "css": ".ds-escuro { font-family: var(--font-sans, 'Atkinson Hyperlegible Next', system-ui, sans-serif); margin:0; max-width:460px; display:flex; flex-direction:column; gap:16px; padding:28px; border-radius:25.6px; color:#fff; background-color:var(--color-tinta-escura,#152b66); background-image:radial-gradient(110% 70% at 100% 0%,rgb(61 96 186 / .5) 0%,transparent 70%),radial-gradient(80% 50% at 0% 100%,rgb(9 22 56 / .7) 0%,transparent 75%); } .ds-balao { margin:0 0 0 auto; padding:10px 16px; border-radius:16px 16px 6px 16px; background:rgb(255 255 255 / .12); } .ds-resp { display:flex; gap:12px; line-height:1.625; color:rgb(255 255 255 / .9); } .ds-resp p { margin:0; } .ds-resp svg { flex-shrink:0; } .ds-resp strong { color:#ffe066; } .ds-claro { align-self:flex-end; padding:8px 20px; border:1px solid rgb(255 255 255 / .7); border-radius:9999px; color:#fff; font-weight:600; font-size:14px; text-decoration:none; } .ds-claro:hover { background:#fff; color:var(--color-tinta-escura,#152b66); } .ds-claro:focus-visible { outline: 3px solid var(--color-tinta, #1d3a8a); outline-offset: 2px; }"
+    },
+    {
+      "name": "Resposta do agente",
+      "kind": "custom",
+      "refersTo": "balao-pergunta",
+      "description": "Pergunta em balão claro à direita; resposta em texto corrido com negrito em marca-texto.",
+      "html": "<div class=\"ds-chat\"><p class=\"ds-perg\">Onde o Amazonas deve agir primeiro?</p><div class=\"ds-resposta\"><p>A prioridade é a <strong>aprendizagem dos concluintes</strong>: ela renderia <strong class=\"ds-num\">+9,6</strong> pontos de IIE.</p></div></div>",
+      "css": ".ds-chat { font-family: var(--font-sans, 'Atkinson Hyperlegible Next', system-ui, sans-serif); display:flex; flex-direction:column; gap:28px; max-width:640px; background:var(--color-papel,#f6f7f9); padding:24px; color:var(--color-grafite,#1e2228); font-size:17px; line-height:1.55; } .ds-perg { margin:0 0 0 auto; max-width:75%; padding:12px 16px; border-radius:8px; background:var(--color-tinta-clara,#e8edf8); } .ds-resposta { max-width:72ch; } .ds-resposta p { margin:0; } .ds-resposta strong { font-weight:700; background:linear-gradient(180deg,transparent 52%,#ffe066 52%,#ffe066 94%,transparent 94%); padding:0 .12em; } .ds-num { font-variant-numeric:tabular-nums; }"
+    },
+    {
+      "name": "Barra lateral do chat",
+      "kind": "nav",
+      "refersTo": "barra-lateral",
+      "description": "Lista de conversas em tinta escura.",
+      "html": "<nav class=\"ds-lateral\"><a class=\"ds-nova\" href=\"#\">Nova conversa</a><p class=\"ds-grupo\">Hoje</p><a class=\"ds-conv ds-atual\" href=\"#\" aria-current=\"page\">Como está meu estado?</a><a class=\"ds-conv\" href=\"#\">Busca ativa no Ensino Médio</a></nav>",
+      "css": ".ds-lateral { font-family: var(--font-sans, 'Atkinson Hyperlegible Next', system-ui, sans-serif); width:288px; display:flex; flex-direction:column; gap:2px; padding:20px 8px; background:var(--color-tinta-escura,#152b66); color:#fff; } .ds-nova { margin:0 8px 12px; padding:10px 12px; border-radius:6px; background:#fff; color:var(--color-tinta-escura,#152b66); font-weight:600; text-align:center; text-decoration:none; } .ds-nova:hover { background:var(--color-tinta-clara,#e8edf8); } .ds-grupo { margin:4px 12px; font-size:12px; font-weight:600; color:rgb(255 255 255 / .6); } .ds-conv { display:block; padding:8px 12px; border-radius:6px; color:#fff; text-decoration:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .ds-conv:hover { background:rgb(255 255 255 / .1); } .ds-atual { background:rgb(255 255 255 / .15); } .ds-conv:focus-visible, .ds-nova:focus-visible { outline:3px solid #ffe066; outline-offset:2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "O Caderno do Gestor",
+    "overview": "**Creative North Star: \"O Caderno do Gestor\"**\n\nO IIE Conselheiro se apresenta como o caderno de quem estuda o próprio território: folha branca, caneta azul e marca-texto amarelo. O gestor lê relatório, não mensageiro; por isso o texto corre em linhas de leitura confortável, os números vêm em algarismos tabulares e o que importa aparece sublinhado com marca-texto, como faria quem estuda um documento com atenção. Os materiais vêm todos do mesmo estojo: a tinta azul escreve (títulos destacados, botões, gráficos), o marca-texto destaca (o trecho que decide, o dado principal, a seleção de texto) e a pauta e a margem do caderno organizam os cartões claros.\n\nO sistema é de serviço público. Uma família tipográfica de alta legibilidade (Atkinson Hyperlegible Next), foco sempre visível em tinta e contraste conferido valem para todas as telas. A densidade é média: as telas de entrada e a página de apresentação respiram, com uma folha branca arredondada sobre fundo azul-claro; o chat é sóbrio, com papel cinza-claro, barra lateral em tinta escura e respostas em texto corrido de até 72 caracteres por linha.\n\nRejeições confirmadas na direção visual de origem (P3): rótulos em maiúsculas, setas nos botões, cartões iguais com sombra e animações de entrada em tudo. A paleta evita o creme com terracota e o escuro com neon. O usuário pediu para manter as cores atuais.",
+    "keyCharacteristics": [
+      "Caneta azul (tinta), marca-texto amarelo (marca) e grafite sobre folha branca ou papel cinza-claro.",
+      "Negrito vira marca-texto: o destaque é uma faixa amarela atrás da palavra, não cor nem tamanho.",
+      "Cartões claros com pauta fina e margem de caderno em tinta translúcida.",
+      "A geração em 100 pontos como elemento marcante (\"de cada 100 jovens…\").",
+      "Uma família tipográfica, pesos 400, 600 e 700, algarismos tabulares nos números.",
+      "Profundidade quase nula: tons de superfície fazem o trabalho; sombra só na folha e no botão principal."
+    ],
+    "rules": [
+      {
+        "name": "The Marca-texto Rule",
+        "body": "O amarelo destaca, não decora. Ele marca o trecho que decide (uma expressão por título, o negrito da resposta, o dado principal) ou preenche um cartão de número; nunca vira cor de texto sobre fundo claro, e o texto sobre ele é sempre grafite.",
+        "section": "colors"
+      },
+      {
+        "name": "The Uma Tinta Rule",
+        "body": "Só existe um azul, em três tons (tinta, tinta escura, tinta clara) e em opacidades sobre branco. Nenhum segundo matiz de destaque entra no sistema; verde e vermelho servem apenas a sucesso e erro.",
+        "section": "colors"
+      },
+      {
+        "name": "The Caixa Normal Rule",
+        "body": "Nenhum rótulo, botão ou título vai em maiúsculas nem com espaçamento aberto. Hierarquia é tamanho e peso.",
+        "section": "typography"
+      },
+      {
+        "name": "The Algarismo Tabular Rule",
+        "body": "Todo número que se compara (gráficos, cartões de número, fórmulas, tabelas das respostas, contador de perguntas) usa algarismos tabulares e vírgula decimal (15,5).",
+        "section": "typography"
+      },
+      {
+        "name": "The Uma Folha Rule",
+        "body": "Apenas a folha e o botão principal têm sombra. Cartões dentro da folha se separam por cor, nunca por sombra.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do destacar com marca-texto (#ffe066) atrás do texto, uma expressão por título, e usar negrito nas respostas só para o que o gestor deve sublinhar.",
+      "Do usar a tinta (#1d3a8a) para a palavra-chave dos títulos, os botões principais e as barras dos gráficos.",
+      "Do separar cartões por cor de superfície (tinta clara, marca-texto, tinta escura), com cantos de 25,6px, e combinar cartões de tipos diferentes numa mesma grade.",
+      "Do usar a pauta e a margem de caderno nos cartões claros que levam lista ou dado.",
+      "Do manter o foco visível em 3px de tinta com 2px de folga em todo elemento interativo.",
+      "Do escrever a fonte e o ano de todo número, e marcar o dado preliminar com hachura.",
+      "Do usar algarismos tabulares e vírgula decimal em todo número comparável.",
+      "Do manter \"Criação e Desenvolvimento: Educacional.ia - Roberto Alves\" e contato@educacional.ia.br no pé de todas as telas."
+    ],
+    "donts": [
+      "Don't escrever rótulos, botões ou títulos em maiúsculas ou com espaçamento aberto.",
+      "Don't pôr setas nos botões.",
+      "Don't montar fileiras de cartões iguais com sombra; a sombra é só da folha e do botão principal.",
+      "Don't animar a entrada de tudo; a única entrada animada é a dos pontos da grade, uma vez, e toda animação para com `prefers-reduced-motion`.",
+      "Don't trocar as cores atuais nem acrescentar um segundo matiz de destaque; o sistema não usa creme com terracota nem escuro com neon.",
+      "Don't usar o marca-texto como cor de texto sobre fundo claro, nem pôr texto branco sobre ele.",
+      "Don't atribuir a autoria do site a Lupa Social ou ao Instituto Natura."
+    ]
+  }
+}

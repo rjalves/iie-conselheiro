@@ -1,0 +1,44 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "web/src/app/inicio/page.tsx"
+        ],
+        "createdAt": "2026-11-11T05:36:54.927Z",
+        "reason": "Claude: o rounded-full é do pseudo-elemento before: (nó da linha do tempo), não do li com border-t-2"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "4.25rem",
+        "createdAt": "2026-11-11T05:36:54.969Z",
+        "reason": "Claude: degrau lg do título da apresentação, entre 3,75rem e 4,4rem do display do DESIGN.md; aprovado na revisão final"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "10.5px",
+        "createdAt": "2026-11-11T05:36:55.010Z",
+        "reason": "Claude: texto em círculo do selo SVG, medido para caber em textLength=292; não é texto corrido"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "1.75rem",
+        "createdAt": "2026-11-11T05:36:55.056Z",
+        "reason": "Claude: degrau sm da citação de 'O que é o IIE' (1,5rem no celular); aprovado na revisão final"
+      },
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "files": [
+          "web/src/lib/email.ts"
+        ],
+        "createdAt": "2026-11-11T05:36:55.099Z",
+        "reason": "Claude: decisão anterior registrada em web/.impeccable/config.json; HTML de e-mail transacional, Arial é a pilha segura"
+      }
+    ]
+  }
+}

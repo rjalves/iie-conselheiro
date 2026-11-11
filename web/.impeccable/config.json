@@ -8,6 +8,15 @@
         "value": "arial",
         "createdAt": "2026-11-10T18:19:31.345Z",
         "reason": "Claude: HTML de e-mail transacional (src/lib/email.ts); clientes de e-mail não carregam fontes da web, Arial é a pilha segura"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "src/app/inicio/page.tsx"
+        ],
+        "createdAt": "2026-11-11T05:37:31.914Z",
+        "reason": "Claude: o rounded-full é do pseudo-elemento before: (nó da linha do tempo), não do li com border-t-2"
       }
     ]
   }
