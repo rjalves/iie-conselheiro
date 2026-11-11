@@ -36,7 +36,7 @@ Um site onde gestores da educação se cadastram, informam estado e município e
 | W4 | Região | O cadastro pede **UF e município**. Hoje o agente responde com os dados da **UF** e informa que o dado municipal ainda não está disponível. O município fica guardado para quando houver dados |
 | W5 | Acesso por UF (revista em 2026-10-13) | Cada usuário vê os dados **só das UFs liberadas**, uma lista que começa com a UF do cadastro. O administrador libera ou retira UFs, inclusive "todas". **Administradores veem todas.** O Brasil, a posição nacional da própria UF e as práticas de gestão ficam sempre liberados. A regra é aplicada no banco (migração 0006). Antes, qualquer usuário via qualquer UF |
 | W6 | Agente | **n8n auto-hospedado, versão 2.37 ou mais nova** (que traz o cache do nó Anthropic) |
-| W7 | Modelo | `claude-opus-5-5`, com raciocínio adaptativo e esforço `medium`, que são os padrões do modelo |
+| W7 | Modelo | `claude-opus-5-5`, com raciocínio adaptativo e esforço `medium`, que são os padrões do modelo. **Trocado para `claude-sonnet-5-5` (esforço `medium`) em 11/11/2026, depois da avaliação comparativa** |
 | W8 | Workflows | O JSON dos workflows é **gerado pelo Claude**, versionado no git e publicado no n8n **via MCP** |
 | W9 | Banco | O **Supabase** já em uso, com projeto ou *branch* de desenvolvimento separado |
 | W10 | Base de práticas | **No Supabase:** o catálogo completo das **541 práticas** dos três referenciais e toda a relação do doc 09 (vínculos com indicadores, pré-condições, pacotes por perfil de território e lacunas) |

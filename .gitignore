@@ -72,3 +72,6 @@ venv/
 .vscode/
 *.swp
 *.swo
+
+# Resultados da avaliação de modelos (python -m n8n.avaliacao); casos.md sai de --listar
+agente/n8n/avaliacao/

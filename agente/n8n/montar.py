@@ -19,7 +19,7 @@ PASTA = Path(__file__).resolve().parent
 WEBHOOK = "$('Webhook').first().json.body"
 NOME_AGENTE = "IIE Conselheiro — agente web"
 NOME_ERROS = "IIE Conselheiro — erros"
-MODELO = "claude-opus-5-5"
+MODELO = "claude-sonnet-5-5"  # fase A (2026-11-11): corretude igual à do Opus 5.5, metade do custo, 6,6 s até o 1º texto
 VERSAO_AGENTE = 3.1  # a 2.2 também entrega de uma vez a resposta que vem depois da ferramenta (P2, Tarefa 1)
 _NS = uuid.UUID("6f1c1d2e-0000-4000-8000-000000000000")  # ids de nó e de webhook fixos: JSON determinístico
 
@@ -189,7 +189,7 @@ def _ligar(*destinos: str) -> list[dict]:
 
 
 def workflow_agente(*, nome: str = NOME_AGENTE, caminho: str = "iie-chat",
-                    credencial_anthropic: str = "anthropic-iie") -> dict:
+                    credencial_anthropic: str = "anthropic-iie", modelo: str = MODELO, esforco: str = "medium") -> dict:
     """Workflow iie-agente-web (proposta 03, §5.2), no formato aceito por POST /api/v1/workflows."""
     b = WEBHOOK
     registro = "return [{ json: { ...registro, kb_versao: $('base-ativa').first().json.versao } }];"
@@ -209,8 +209,8 @@ def workflow_agente(*, nome: str = NOME_AGENTE, caminho: str = "iie-chat",
                          "enableStreaming": True}},
             onError="continueErrorOutput"),
         _no("Anthropic Chat Model", "@n8n/n8n-nodes-langchain.lmChatAnthropic", 1.6, (700, 260),
-            {"model": {"__rl": True, "mode": "id", "value": MODELO},
-             "options": {"maxTokensToSample": 16000, "thinkingMode": "adaptive", "effort": "medium",
+            {"model": {"__rl": True, "mode": "id", "value": modelo},
+             "options": {"maxTokensToSample": 16000, "thinkingMode": "adaptive", "effort": esforco,
                          "promptCaching": "5m"}},
             credentials=_credencial("anthropicApi", credencial_anthropic)),
         _no("Postgres Chat Memory", "@n8n/n8n-nodes-langchain.memoryPostgresChat", 1.4, (880, 260),
@@ -233,7 +233,7 @@ def workflow_agente(*, nome: str = NOME_AGENTE, caminho: str = "iie-chat",
         _postgres("grava-resposta", (1540, 0), SQL_GRAVA_RESPOSTA,
                   [f"{b}.conversa_id", "$json.texto", "JSON.stringify($json.ferramentas)",
                    "JSON.stringify($json.numeros_sem_origem)", "JSON.stringify($json.praticas_sem_origem)",
-                   "$json.latencia_ms", f"'{MODELO}'", "$json.kb_versao", "$json.erro"]),
+                   "$json.latencia_ms", f"'{modelo}'", "$json.kb_versao", "$json.erro"]),
     ]
     conexoes = {
         "Webhook": {"main": [_ligar("validar-pedido")]},

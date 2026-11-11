@@ -218,7 +218,7 @@ def test_sql_de_gravacao_como_n8n(banco):
                                                  montar.MODELO, "sem-base", None))
     assert banco.execute("select ferramentas, modelo, latencia_ms, erro from app.mensagem "
                          "where conversa_id = %s and papel = 'agente'", (conversa,)).fetchone() == (
-        ferramentas, "claude-opus-5-5", 1200, None)
+        ferramentas, montar.MODELO, 1200, None)
     assert _como_n8n(banco, montar.SQL_GRAVA_FALHA, ("1", montar.NOME_AGENTE, "grava-pergunta", "falhou"))[0]
 
 

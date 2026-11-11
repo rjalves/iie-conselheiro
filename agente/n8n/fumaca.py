@@ -217,7 +217,7 @@ def sem_custo(conferir: Conferencias) -> None:
         conferir(apagados == [wf["id"], credencial["id"]], "variante e credencial de teste apagadas do n8n", apagados)
 
 
-US_POR_TOKEN_ENTRADA, US_POR_TOKEN_SAIDA = 4 / 1e6, 20 / 1e6  # claude-opus-5-5 sem cache: o teto do custo
+US_POR_TOKEN_ENTRADA, US_POR_TOKEN_SAIDA = 2 / 1e6, 10 / 1e6  # claude-sonnet-5-5 (montar.MODELO) sem cache: o teto
 
 
 def execucao_nova(workflow: str, anterior: list[str | None], espera_s: int = 30) -> dict:

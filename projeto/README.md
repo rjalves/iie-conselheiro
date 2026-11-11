@@ -15,7 +15,7 @@ O IIE Conselheiro é um agente de IA para gestores da educação. Ele explica os
 ## Resumo da solução
 
 ```
-Gestor ⇄ Site (Next.js) ⇄ n8n: AI Agent + Claude (claude-opus-5-5)
+Gestor ⇄ Site (Next.js) ⇄ n8n: AI Agent + Claude (claude-sonnet-5-5)
              │                 │
              └─ Supabase: login e app (RLS) ─┴─ Supabase iie: números só via funções SQL
 ```

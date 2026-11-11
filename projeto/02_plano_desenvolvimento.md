@@ -287,7 +287,7 @@ Toda liberação do agente é registrada em `agente/CHANGELOG.md`, com a versão
 | Seguir com o agente no n8n (ou voltar ao serviço Python) | Fim da F0 | Responsável pelo projeto | Prova técnica |
 | TTL do cache (5 min ou 1 h) | F2 | Responsável + Claude | Intervalo medido entre perguntas |
 | *Proxy* com ponto de cache explícito | F4 | Responsável pelo projeto | Custo médio medido acima de US$ 0,15 |
-| Modelo (`claude-opus-5-5` ou `claude-sonnet-5-5`) | Fim da F4 | Responsável pelo projeto | Avaliação comparativa; só trocar se os critérios continuarem atendidos |
+| Modelo (`claude-opus-5-5` ou `claude-sonnet-5-5`) | **Decidido em 11/11/2026: `claude-sonnet-5-5`** | Responsável pelo projeto | Avaliação da fase A (`agente/n8n/avaliacao.py`, 30 perguntas no agente real): mesma corretude do Opus 5.5, metade do custo e 6,6 s até o 1º texto; juiz cego com leve perda nas respostas abertas |
 | Limite diário por usuário (padrão 40) | F4 | Responsável pelo projeto | Custo por pergunta |
 | Secretarias do piloto | Até 15/01/2027 | Responsável + Instituto Natura | Critérios da P5.2 |
 | Expansão e início do WhatsApp | Fim da F5 | Responsável + Instituto Natura | Relatório do piloto |

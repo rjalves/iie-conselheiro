@@ -118,7 +118,7 @@
         "model": {
           "__rl": true,
           "mode": "id",
-          "value": "claude-opus-5-5"
+          "value": "claude-sonnet-5-5"
         },
         "options": {
           "maxTokensToSample": 16000,
@@ -401,7 +401,7 @@
         "operation": "executeQuery",
         "query": "insert into app.mensagem (conversa_id, papel, texto, ferramentas, numeros_sem_origem, praticas_sem_origem, latencia_ms, modelo, kb_versao, erro) values ($1::uuid, 'agente', $2, $3::jsonb, $4::jsonb, $5::jsonb, $6::int, $7, $8, $9) returning id",
         "options": {
-          "queryReplacement": "={{ [ $('Webhook').first().json.body.conversa_id, $json.texto, JSON.stringify($json.ferramentas), JSON.stringify($json.numeros_sem_origem), JSON.stringify($json.praticas_sem_origem), $json.latencia_ms, 'claude-opus-5-5', $json.kb_versao, $json.erro ] }}"
+          "queryReplacement": "={{ [ $('Webhook').first().json.body.conversa_id, $json.texto, JSON.stringify($json.ferramentas), JSON.stringify($json.numeros_sem_origem), JSON.stringify($json.praticas_sem_origem), $json.latencia_ms, 'claude-sonnet-5-5', $json.kb_versao, $json.erro ] }}"
         }
       },
       "credentials": {
