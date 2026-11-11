@@ -16,19 +16,3 @@ export async function decidirCadastro(formData: FormData) {
   await supabase.from("usuario").update({ status }).eq("id", id);
   revalidatePath("/admin");
 }
-
-export type ResultadoEstados = { ok: true } | { ok: false; erro: string } | null;
-
-/** Salva os estados liberados de um usuário. O banco normaliza e recusa lista vazia ou sigla inválida (0006). */
-export async function salvarEstados(_anterior: ResultadoEstados, formData: FormData): Promise<ResultadoEstados> {
-  const admin = await obterUsuario();
-  if (admin?.papel !== "admin" || admin.status !== "ativo") return { ok: false, erro: "Só administradores mudam os estados." };
-  const id = String(formData.get("id") ?? "");
-  const ufs = formData.getAll("uf").map(String);
-  if (ufs.length === 0) return { ok: false, erro: "Libere ao menos um estado." };
-  const supabase = await criarClienteServidor();
-  const { error, count } = await supabase.from("usuario").update({ ufs_acesso: ufs }, { count: "exact" }).eq("id", id);
-  if (error || count !== 1) return { ok: false, erro: "Não foi possível salvar os estados. Tente de novo." };
-  revalidatePath("/admin");
-  return { ok: true };
-}

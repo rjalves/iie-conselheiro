@@ -45,7 +45,6 @@ def num(valor: float) -> str:
     assert inteiro == i1, valor
     return rf"\b{inteiro}[,.](?:{d2}|{d1})(?!\d)"
 PRATICAS = ("praticas_para_indicador", "buscar_praticas", "pacote_por_perfil")
-TODAS = "todas"  # usuário com todas as UFs liberadas (como um administrador)
 
 
 @dataclass(frozen=True)
@@ -54,7 +53,6 @@ class Caso:
     categoria: str
     perguntas: tuple[str, ...]  # mais de uma: conversa com memória; a correção olha a última resposta
     uf: str = "CE"
-    ufs: tuple[str, ...] | str | None = None  # None: só a UF do usuário
     contem: tuple[str, ...] = ()  # regex que precisam aparecer (todas)
     nao_contem: tuple[str, ...] = ()  # regex proibidas
     ferramentas: tuple[str, ...] = ()  # ao menos uma usada; vazio: não confere
@@ -63,61 +61,62 @@ class Caso:
 
 CASOS = (
     # Consultas diretas (C02 é pergunta real do teste manual)
-    Caso("C01", "consulta", ("Como está o Ceará no IIE?",), "CE", None, (num(18.14), r"5\s*(º|°|ª|\.º)|quint"),
+    Caso("C01", "consulta", ("Como está o Ceará no IIE?",), "CE", (num(18.14), r"5\s*(º|°|ª|\.º)|quint"),
          (), ("consultar_iie",)),
-    Caso("C02", "consulta", ("Como está Pernambuco no IIE?",), "PE", None, (num(16.16),), (), ("consultar_iie",)),
-    Caso("C03", "consulta", ("Como o IIE do Brasil evoluiu desde 2015?",), "CE", None, (num(9.47), num(18.88), num(15.49)),
+    Caso("C02", "consulta", ("Como está Pernambuco no IIE?",), "PE", (num(16.16),), (), ("consultar_iie",)),
+    Caso("C03", "consulta", ("Como o IIE do Brasil evoluiu desde 2015?",), "CE", (num(9.47), num(18.88), num(15.49)),
          (), ("consultar_iie",)),
-    Caso("C04", "consulta", ("Qual a posição de São Paulo no IIE de 2023?",), "SP", None,
+    Caso("C04", "consulta", ("Qual a posição de São Paulo no IIE de 2023?",), "SP",
          (r"4\s*(º|°|ª|\.º)|quart", num(18.63)), (), ("consultar_iie", "ranking")),
-    Caso("C05", "consulta", ("Quais são os três estados com maior IIE em 2023?",), "CE", TODAS,
+    Caso("C05", "consulta", ("Quais são os três estados com maior IIE em 2023?",), "CE",
          ("Paraná", "Espírito Santo", "Goiás", num(20.43)), (), ("ranking", "comparar_territorios")),
-    Caso("C06", "consulta", ("Qual estado do Nordeste tem o maior IIE hoje?",), "CE", TODAS, ("Ceará", num(18.14)), (),
+    Caso("C06", "consulta", ("Qual estado do Nordeste tem o maior IIE hoje?",), "CE", ("Ceará", num(18.14)), (),
          ("ranking", "comparar_territorios", "consultar_iie")),
-    Caso("C07", "consulta", ("Qual era o IIE de Pernambuco em 2021?",), "PE", None, (num(19.37),), (), ("consultar_iie",)),
+    Caso("C07", "consulta", ("Qual era o IIE de Pernambuco em 2021?",), "PE", (num(19.37),), (), ("consultar_iie",)),
     # Comparações
-    Caso("P01", "comparacao", ("Compare Ceará e Pernambuco no IIE de 2023.",), "CE", ("CE", "PE"),
+    Caso("P01", "comparacao", ("Compare Ceará e Pernambuco no IIE de 2023.",), "CE",
          (num(18.14), num(16.16)), (), ("comparar_territorios", "consultar_iie")),
-    Caso("P02", "comparacao", ("A evasão na Bahia é maior que a média do Brasil?",), "BA", None, ("7[,.]3", "5[,.]7"), (),
+    Caso("P02", "comparacao", ("A evasão na Bahia é maior que a média do Brasil?",), "BA", ("7[,.]3", "5[,.]7"), (),
          ("comparar_territorios", "decompor_iie")),
     Caso("P03", "comparacao", ("Minas Gerais ou Rio de Janeiro: onde há mais jovens com 2 anos ou mais de atraso?",),
-         "RJ", ("MG", "RJ"), ("Rio de Janeiro", "34[,.]9", "26[,.]3"), (), ("comparar_territorios", "decompor_iie")),
+         "RJ", ("Rio de Janeiro", "34[,.]9", "26[,.]3"), (), ("comparar_territorios", "decompor_iie")),
     # Diagnóstico
-    Caso("D01", "diagnostico", ("Onde o Ceará deveria agir primeiro para melhorar o IIE?",), "CE", None,
+    Caso("D01", "diagnostico", ("Onde o Ceará deveria agir primeiro para melhorar o IIE?",), "CE",
          ("evas|fora da escola", "5[,.]9"), (), ("decompor_iie",), True),
-    Caso("D02", "diagnostico", ("Por que o IIE do Amazonas é tão baixo?",), "AM", None, ("aprendiz", num(6.62)), (),
+    Caso("D02", "diagnostico", ("Por que o IIE do Amazonas é tão baixo?",), "AM", ("aprendiz", num(6.62)), (),
          ("decompor_iie",), True),
-    Caso("D03", "diagnostico", ("O que explica a queda do IIE de São Paulo entre 2019 e 2023?",), "SP", None,
+    Caso("D03", "diagnostico", ("O que explica a queda do IIE de São Paulo entre 2019 e 2023?",), "SP",
          (num(27.04), num(18.63)), (), ("decompor_iie", "consultar_iie"), True),
-    Caso("D04", "diagnostico", ("Qual componente mais pesa no IIE do Rio de Janeiro?",), "RJ", None,
+    Caso("D04", "diagnostico", ("Qual componente mais pesa no IIE do Rio de Janeiro?",), "RJ",
          ("aprendiz", "atraso|reten"), (), ("decompor_iie",), True),
-    Caso("D05", "diagnostico", ("No Pará, o problema é mais de fluxo ou de aprendizagem?",), "PA", None,
+    Caso("D05", "diagnostico", ("No Pará, o problema é mais de fluxo ou de aprendizagem?",), "PA",
          ("fluxo|atraso|reten", "aprendiz"), (), ("decompor_iie",), True),
-    Caso("D06", "diagnostico", ("Como estavam os componentes do IIE do Ceará em 2021?",), "CE", None, (num(21.35),), (),
+    Caso("D06", "diagnostico", ("Como estavam os componentes do IIE do Ceará em 2021?",), "CE", (num(21.35),), (),
          ("decompor_iie",)),
     # Práticas (R01 é pergunta real do teste manual)
-    Caso("R01", "praticas", ("como posso melhorar a evasão em PE ?",), "PE", None, (CODIGO_PRATICA,), (), PRATICAS, True),
-    Caso("R02", "praticas", ("Que práticas de gestão ajudam a reduzir o atraso escolar de 2 anos ou mais?",), "CE", None,
+    Caso("R01", "praticas", ("como posso melhorar a evasão em PE ?",), "PE", (CODIGO_PRATICA,), (), PRATICAS, True),
+    Caso("R02", "praticas", ("Que práticas de gestão ajudam a reduzir o atraso escolar de 2 anos ou mais?",), "CE",
          (CODIGO_PRATICA,), (), PRATICAS, True),
     Caso("R03", "praticas", ("Sou da secretaria estadual do Amazonas. Que ações devo priorizar para melhorar a "
-                             "aprendizagem no ensino médio?",), "AM", None, (CODIGO_PRATICA,), (), PRATICAS, True),
+                             "aprendizagem no ensino médio?",), "AM", (CODIGO_PRATICA,), (), PRATICAS, True),
     Caso("R04", "praticas", ("O que a escola pode fazer, na prática, para buscar os jovens que estão fora da escola?",),
-         "CE", None, (CODIGO_PRATICA,), (), PRATICAS, True),
+         "CE", (CODIGO_PRATICA,), (), PRATICAS, True),
     # Conceitos
-    Caso("K01", "conceito", ("O que é o IIE e como ele é calculado?",), "CE", None, ("18 anos", "básico|300"), (), (),
+    Caso("K01", "conceito", ("O que é o IIE e como ele é calculado?",), "CE", ("18 anos", "básico|300"), (), (),
          True),
-    Caso("K02", "conceito", ("Por que o IIE de 2023 é preliminar?",), "CE", None, ("Censo", "2024")),
-    Caso("K03", "conceito", ("Qual a diferença entre os indicadores F1 e F2?",), "CE", None, ("conclu", "atraso")),
-    # Acesso por UF: a pessoa só tem PE liberado
-    Caso("A01", "acesso", ("Como está o Ceará no IIE?",), "PE", None, ("liberad",), (num(18.14), num(21.04), num(21.35))),
-    Caso("A02", "acesso", ("Compare Pernambuco com o Ceará.",), "PE", None, ("liberad|acesso",), (num(18.14),)),
+    Caso("K02", "conceito", ("Por que o IIE de 2023 é preliminar?",), "CE", ("Censo", "2024")),
+    Caso("K03", "conceito", ("Qual a diferença entre os indicadores F1 e F2?",), "CE", ("conclu", "atraso")),
+    # Outra UF: dados públicos; quem se cadastrou em PE consulta e compara o CE
+    Caso("A01", "outra_uf", ("Como está o Ceará no IIE?",), "PE", (num(18.14),), ("liberad",), ("consultar_iie",)),
+    Caso("A02", "outra_uf", ("Compare Pernambuco com o Ceará.",), "PE", (num(16.16), num(18.14)), ("liberad",),
+         ("comparar_territorios", "consultar_iie")),
     # Dado que não existe
-    Caso("S01", "sem_dado", ("Qual o IIE de Sobral?",), "CE", None, ("Sobral", NAO_HA)),
-    Caso("S02", "sem_dado", ("Qual o IIE do Brasil em 2025?",), "CE", None, ("2023", NAO_HA)),
-    Caso("S03", "sem_dado", ("Qual era o IIE do Ceará em 2011?",), "CE", None, ("2013", NAO_HA)),
+    Caso("S01", "sem_dado", ("Qual o IIE de Sobral?",), "CE", ("Sobral", NAO_HA)),
+    Caso("S02", "sem_dado", ("Qual o IIE do Brasil em 2025?",), "CE", ("2023", NAO_HA)),
+    Caso("S03", "sem_dado", ("Qual era o IIE do Ceará em 2011?",), "CE", ("2013", NAO_HA)),
     # Memória da conversa
-    Caso("M01", "memoria", ("Como está Pernambuco no IIE?", "E em 2021, como estava?"), "PE", None, (num(19.37),)),
-    Caso("M02", "memoria", ("Onde o Pará deveria agir primeiro?", "Que práticas você sugere para isso?"), "PA", None,
+    Caso("M01", "memoria", ("Como está Pernambuco no IIE?", "E em 2021, como estava?"), "PE", (num(19.37),)),
+    Caso("M02", "memoria", ("Onde o Pará deveria agir primeiro?", "Que práticas você sugere para isso?"), "PA",
          (CODIGO_PRATICA,), (), (), True),  # as práticas podem vir do 1º turno: vale a origem dos códigos
 )
 
@@ -159,12 +158,11 @@ def rodar_variante(nome: str, casos: tuple[Caso, ...], ufs_todas: list[str], sai
         usuario, _ = fumaca.criar_usuario("CE", "2312908", "Sobral")
         for caso in casos:
             conversa = fumaca.nova_conversa(usuario)
-            ufs = ufs_todas if caso.ufs == TODAS else list(caso.ufs or (caso.uf,))
             chamadas = entrada = saida_tok = 0
             primeiro = total = None
             completa = True
             for pergunta in caso.perguntas:
-                r = fumaca.perguntar(fumaca.pedido(usuario, conversa, caso.uf, MUNICIPIO[caso.uf], ufs, pergunta),
+                r = fumaca.perguntar(fumaca.pedido(usuario, conversa, caso.uf, MUNICIPIO[caso.uf], ufs_todas, pergunta),
                                      caminho=caminho)
                 n, e, s = uso(fumaca.execucao_nova(wf["id"], anterior, espera_s=60))
                 chamadas, entrada, saida_tok = chamadas + n, entrada + e, saida_tok + s
@@ -224,12 +222,11 @@ def trecho(texto: str, alvo: str, margem: int = 70) -> str:
 
 def casos_md() -> str:
     """As perguntas e a correção de cada uma, para revisão humana."""
-    linhas = ["| Id | Categoria | Pergunta(s) | UF (liberadas) | Precisa conter | Não pode conter | Ferramenta | Juiz |",
+    linhas = ["| Id | Categoria | Pergunta(s) | UF do usuário | Precisa conter | Não pode conter | Ferramenta | Juiz |",
               "|---|---|---|---|---|---|---|---|"]
     for c in CASOS:
-        ufs = "todas" if c.ufs == TODAS else ", ".join(c.ufs or (c.uf,))
         cod = lambda xs: "<br>".join(f"`{x}`" for x in xs).replace("|", "\\|") or "—"
-        linhas.append(f"| {c.id} | {c.categoria} | {' → '.join(c.perguntas)} | {c.uf} ({ufs}) | {cod(c.contem)} "
+        linhas.append(f"| {c.id} | {c.categoria} | {' → '.join(c.perguntas)} | {c.uf} | {cod(c.contem)} "
                       f"| {cod(c.nao_contem)} | {', '.join(c.ferramentas) or '—'} | {'sim' if c.juiz else ''} |")
     return "\n".join(linhas)
 

@@ -1,4 +1,3 @@
-import { acessoDoUsuario, descreverAcesso } from "./acesso";
 import { LIMITE_PADRAO } from "./chat";
 import { TEXTO_INSTABILIDADE } from "./ndjson";
 import { criarClienteServidor } from "./supabase/servidor";
@@ -45,16 +44,12 @@ export async function carregarConversa(id: string) {
   return { conversa, mensagens: tela };
 }
 
-/** O que o chat precisa saber do usuário: UF padrão e os estados liberados (acesso por UF). */
+/** O que o chat precisa saber do usuário. A UF do cadastro é só o ponto de partida: os dados de todas são públicos. */
 export function usuarioDoChat(usuario: Usuario) {
-  const acesso = acessoDoUsuario(usuario);
   return {
     id: usuario.id,
     nome: usuario.nome,
-    uf: acesso.padrao,
+    uf: usuario.uf,
     municipio: usuario.municipio_nome,
-    estados: descreverAcesso(acesso),
-    todosEstados: acesso.todas,
-    variosEstados: acesso.ufs.length > 1,
   };
 }

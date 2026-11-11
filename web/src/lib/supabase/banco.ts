@@ -212,7 +212,6 @@ export type Database = {
           status: string
           telefone_e164: string | null
           uf: string
-          ufs_acesso: string[]
         }
         Insert: {
           aceite_termo_em: string
@@ -230,7 +229,6 @@ export type Database = {
           status?: string
           telefone_e164?: string | null
           uf: string
-          ufs_acesso: string[]
         }
         Update: {
           aceite_termo_em?: string
@@ -248,7 +246,6 @@ export type Database = {
           status?: string
           telefone_e164?: string | null
           uf?: string
-          ufs_acesso?: string[]
         }
         Relationships: [
           {

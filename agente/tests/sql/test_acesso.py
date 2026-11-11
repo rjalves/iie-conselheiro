@@ -1,37 +1,20 @@
-"""Acesso por UF (migração 0006): lista de UFs por usuário e recusa, no banco, dos dados de UFs não liberadas."""
+"""Contrato de UFs das funções de dados (0006): recusam UF fora da lista recebida e pedido sem lista.
+Desde a 0012, os dados são públicos: o site sempre manda as 27 UFs, e não há lista por usuário."""
 import psycopg
 import pytest
 
-from tests.sql.test_site import NEGADO, ativar, cadastrar, como
+from tests.sql.test_site import NEGADO, cadastrar
 
 SEM_ACESSO = psycopg.errors.InsufficientPrivilege
 
 
-def test_cadastro_libera_so_a_uf_do_cadastro(sql, banco):
-    uid = cadastrar(banco)
-    assert sql("select ufs_acesso from app.usuario where id = %s", uid) == ["CE"]
-
-
-def test_admin_edita_a_lista_que_e_normalizada(banco, sql):
-    admin, outro = ativar(banco, cadastrar(banco), "admin"), cadastrar(banco)
-    with como(banco, admin):
-        banco.execute("update app.usuario set ufs_acesso = array['pe', 'CE', 'PE'] where id = %s", (outro,))
-    assert sql("select ufs_acesso from app.usuario where id = %s", outro) == ["CE", "PE"]
-
-
-def test_usuario_comum_nao_muda_a_propria_lista(banco, sql):
-    uid = ativar(banco, cadastrar(banco))
-    with como(banco, uid):
-        banco.execute("update app.usuario set ufs_acesso = array['SP'] where id = %s", (uid,))
-    assert sql("select ufs_acesso from app.usuario where id = %s", uid) == ["CE"]
-
-
-@pytest.mark.parametrize("lista", ["array['XX']", "array['BR']", "array[]::text[]"])
-def test_lista_invalida_ou_vazia_e_recusada(banco, lista):
-    uid = cadastrar(banco)
-    with pytest.raises(psycopg.errors.InvalidParameterValue, match="ufs_acesso"):
-        with banco.transaction():
-            banco.execute(f"update app.usuario set ufs_acesso = {lista} where id = %s", (uid,))
+def test_dados_sao_publicos_sem_lista_por_usuario(sql, banco):
+    """0012: não há mais UFs por usuário; o site manda todas, e qualquer UF responde."""
+    cadastrar(banco)
+    assert sql("select count(*) from information_schema.columns where table_schema = 'app' "
+               "and table_name = 'usuario' and column_name = 'ufs_acesso'") == 0
+    r = sql("select iie.fn_consultar_iie('CE', p_ufs => iie.ufs_todas())")
+    assert r["territorio"]["sigla"] == "CE" and r["serie"]
 
 
 def test_dados_de_uf_nao_liberada_sao_recusados(banco):
@@ -75,4 +58,4 @@ def test_agente_usa_a_lista_e_nao_escreve(banco):
         assert banco.execute("select cardinality(iie.ufs_todas())").fetchone()[0] == 27
         with pytest.raises(NEGADO):
             with banco.transaction():
-                banco.execute("update app.usuario set ufs_acesso = array['SP']")
+                banco.execute("update app.usuario set papel = 'admin'")

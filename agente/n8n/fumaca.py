@@ -232,6 +232,7 @@ def execucao_nova(workflow: str, anterior: list[str | None], espera_s: int = 30)
 
 
 def completo(conferir: Conferencias) -> None:
+    todas = [r["sigla"] for r in sql("select sigla from iie.territorio where tipo = 'UF' order by sigla")]
     import hashlib
     base = sql("select versao from app.kb_versao where ativa")
     conferir(base and base[0]["versao"] == BASE_ATIVA, f"a base ativa é a {BASE_ATIVA}", base)
@@ -266,33 +267,33 @@ def completo(conferir: Conferencias) -> None:
               f"{resposta.get('praticas_sem_origem')}")
         return resposta
 
-    r = rodar("1. Ceará", ce, conversa_ce, "CE", "Sobral", ["CE"], "Como está o Ceará no IIE?")
+    r = rodar("1. Ceará", ce, conversa_ce, "CE", "Sobral", todas, "Como está o Ceará no IIE?")
     conferir("18,1" in r["texto"] and re.search(r"5\s*(º|°|ª|\.º)|quint", r["texto"], re.I),
              "cita 18,1 (IIE 2023) e a 5ª posição")
     conferir("consultar_iie" in r["nomes"], "usou consultar_iie", r["nomes"])
     conferir(r["numeros_sem_origem"] == [], "nenhum número sem origem", r["numeros_sem_origem"])
 
-    r = rodar("2. Evasão", ce, conversa_ce, "CE", "Sobral", ["CE"], "O que a secretaria pode fazer para reduzir a evasão?")
+    r = rodar("2. Evasão", ce, conversa_ce, "CE", "Sobral", todas, "O que a secretaria pode fazer para reduzir a evasão?")
     conferir({"buscar_praticas", "pacote_por_perfil", "praticas_para_indicador"} & set(r["nomes"]),
              "usou uma ferramenta de práticas", r["nomes"])
     conferir("SM-79" in r["texto"], "cita SM-79 (Busca Ativa Escolar)")
     conferir(r["praticas_sem_origem"] == [], "nenhuma prática sem origem", r["praticas_sem_origem"])
 
-    r = rodar("3. Bahia", ce, conversa_ce, "CE", "Sobral", ["CE", "BA"], "Por que a Bahia está tão mal?")
+    r = rodar("3. Bahia", ce, conversa_ce, "CE", "Sobral", todas, "Por que a Bahia está tão mal?")
     conferir("77" in r["texto"], "menciona o alerta de dado da BA (queda de 77%)")
 
-    r = rodar("4. Fora de escopo", ce, conversa_ce, "CE", "Sobral", ["CE"], "Qual a capital da França?")
+    r = rodar("4. Fora de escopo", ce, conversa_ce, "CE", "Sobral", todas, "Qual a capital da França?")
     conferir(r["nomes"] == [] and r["texto"] and "Paris" not in r["texto"], "recusa sem ferramentas e sem responder",
              r["nomes"])
 
-    r = rodar("5a. Pernambuco", pe, conversa_pe, "PE", "Recife", ["PE"], "Como está Pernambuco?")
+    r = rodar("5a. Pernambuco", pe, conversa_pe, "PE", "Recife", todas, "Como está Pernambuco?")
     conferir("consultar_iie" in r["nomes"], "usou consultar_iie", r["nomes"])
-    r = rodar("5b. Memória", pe, conversa_pe, "PE", "Recife", ["PE"],
+    r = rodar("5b. Memória", pe, conversa_pe, "PE", "Recife", todas,
               "Pode explicar esse número de um jeito mais simples?")
     conferir(r["numeros_sem_origem"] == [], "números lembrados da conversa têm origem", r["numeros_sem_origem"])
-    r = rodar("5c. Sem acesso", pe, conversa_pe, "PE", "Recife", ["PE"], "E como está o Ceará?")
-    conferir("Pernambuco" in r["texto"] and "liberad" in r["texto"].lower() and "18,1" not in r["texto"],
-             "recusa o CE, cita Pernambuco como liberado e não mostra números do CE")
+    r = rodar("5c. Outra UF", pe, conversa_pe, "PE", "Recife", todas, "E como está o Ceará?")
+    conferir("18,1" in r["texto"] and "liberad" not in r["texto"].lower(),
+             "dados públicos: mostra o IIE do CE (18,1) a quem se cadastrou em PE, sem falar em liberação")
 
     print("\n### Geral")
     conferir(len(mensagens(conversa_ce)) == 8 and len(mensagens(conversa_pe)) == 6,

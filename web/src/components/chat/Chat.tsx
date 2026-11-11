@@ -18,9 +18,6 @@ type Props = {
     nome: string;
     uf: string;
     municipio: string;
-    estados: string;
-    todosEstados: boolean;
-    variosEstados: boolean;
   };
   restantes: number;
   limite: number;
@@ -152,11 +149,8 @@ export function Chat({ conversa, mensagensIniciais, usuario, restantes, limite }
             <section className="flex flex-col gap-5 pt-6 sm:pt-14">
               <h1 className="text-3xl font-bold">Olá, {primeiroNome(usuario.nome)}.</h1>
               <p className="max-w-[60ch] text-lg text-grafite-suave">
-                {usuario.todosEstados
-                  ? "Pergunte sobre o IIE de qualquer estado: resultados, comparações e o que fazer para melhorar."
-                  : usuario.variosEstados
-                    ? `Pergunte sobre o IIE dos estados liberados para você (${usuario.estados}): resultados, comparações e o que fazer para melhorar.`
-                    : `Pergunte sobre o IIE ${uf ? comDe(uf) : "do seu estado"}: resultados, comparação com o Brasil e o que fazer para melhorar.`}
+                Pergunte sobre o IIE {uf ? comDe(uf) : "do seu estado"} ou de qualquer outro estado: resultados, comparações e o
+                que fazer para melhorar.
               </p>
               <ul className="flex flex-col gap-2" aria-label="Sugestões de pergunta">
                 {sugestoes.map((s) => (
@@ -252,7 +246,7 @@ export function Chat({ conversa, mensagensIniciais, usuario, restantes, limite }
             ) : (
               <>
                 <p className="min-w-0 flex-1 basis-80">
-                  Estados liberados: {usuario.estados}. Dados oficiais do IIE por estado; ainda não há dados de{" "}
+                  Dados oficiais do IIE de todos os estados; ainda não há dados de{" "}
                   {usuario.municipio}. O Conselheiro pode errar: confira as fontes citadas.
                 </p>
                 <p className={`numeros shrink-0 ${restantes <= 5 ? "font-semibold text-grafite" : ""}`}>

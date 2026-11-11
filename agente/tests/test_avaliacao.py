@@ -29,9 +29,10 @@ def test_resposta_ideal_passa_e_as_ruins_nao():
         assert not corrigir(CASO["C01"], ruim)["passou"]
 
 
-def test_recusa_por_uf_e_praticas():
-    assert corrigir(CASO["A01"], linha("Só Pernambuco está liberado para você.", ferramentas=()))["passou"]
-    assert not corrigir(CASO["A01"], linha("Pernambuco está liberado. O Ceará tem 18,1.", ferramentas=()))["passou"]
+def test_outra_uf_e_praticas():
+    # Dados públicos: quem se cadastrou em PE vê o CE; recusar por "estado não liberado" é erro.
+    assert corrigir(CASO["A01"], linha("O Ceará tem IIE 2023 de 18,14, o 5º do país."))["passou"]
+    assert not corrigir(CASO["A01"], linha("Os dados do Ceará não estão liberados para você.", ferramentas=()))["passou"]
     pratica = linha("Busca Ativa Escolar (Itaú Social, SM-79).", ferramentas=("praticas_para_indicador",))
     assert corrigir(CASO["R01"], pratica)["passou"]
     assert not corrigir(CASO["R01"], {**pratica, "praticas_sem_origem": ["SM-999"]})["passou"]

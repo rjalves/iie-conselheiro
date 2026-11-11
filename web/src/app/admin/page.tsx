@@ -3,12 +3,10 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Rodape } from "@/components/Rodape";
 import { TopoSimples } from "@/components/TopoSimples";
-import { acessoDoUsuario, resumirAcesso } from "@/lib/acesso";
 import { PERFIS, STATUS, type Perfil, type Status } from "@/lib/rotulos";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 import { obterUsuario } from "@/lib/usuario";
 import { BotaoDecisao } from "./BotaoDecisao";
-import { EditarEstados } from "./EditarEstados";
 
 export const metadata: Metadata = { title: "Cadastros" };
 
@@ -31,7 +29,7 @@ export default async function PaginaAdmin({ searchParams }: PageProps<"/admin">)
   // ponytail: carrega todos os cadastros e filtra aqui; paginar quando passar de alguns milhares.
   const { data } = await supabase
     .from("usuario")
-    .select("id, nome, email, perfil, instituicao, uf, ufs_acesso, municipio_nome, status, papel, criado_em")
+    .select("id, nome, email, perfil, instituicao, uf, municipio_nome, status, papel, criado_em")
     .order("criado_em", { ascending: false });
   const usuarios = data ?? [];
   const contagem = Object.fromEntries(ABAS.map((s) => [s, usuarios.filter((u) => u.status === s).length]));
@@ -64,13 +62,12 @@ export default async function PaginaAdmin({ searchParams }: PageProps<"/admin">)
         ) : (
           <div className="relative overflow-x-auto rounded-md border border-linha bg-white">
             {/* relative: o rótulo sr-only da última coluna fica dentro da rolagem, sem alargar a página no celular. */}
-            <table className="w-full min-w-[54rem] text-left">
+            <table className="w-full min-w-[46rem] text-left">
               <thead className="border-b border-linha text-sm whitespace-nowrap text-grafite-suave">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-semibold">Pessoa</th>
                   <th scope="col" className="px-4 py-3 font-semibold">Onde trabalha</th>
                   <th scope="col" className="px-4 py-3 font-semibold">Município</th>
-                  <th scope="col" className="px-4 py-3 font-semibold">Estados liberados</th>
                   <th scope="col" className="px-4 py-3 font-semibold">Cadastro</th>
                   <th scope="col" className="px-4 py-3 font-semibold">
                     <span className="sr-only">Ações</span>
@@ -90,16 +87,6 @@ export default async function PaginaAdmin({ searchParams }: PageProps<"/admin">)
                     </td>
                     <td className="px-4 py-3 align-top">
                       {u.municipio_nome}, {u.uf}
-                    </td>
-                    <td className="px-4 py-3 align-top">
-                      {u.papel === "admin" ? (
-                        <span>Todos (administrador)</span>
-                      ) : (
-                        <div className="flex flex-col items-start gap-1">
-                          <span>{resumirAcesso(acessoDoUsuario(u))}</span>
-                          <EditarEstados id={u.id} nome={u.nome} ufs={u.ufs_acesso} />
-                        </div>
-                      )}
                     </td>
                     <td className="numeros px-4 py-3 align-top text-sm">
                       {new Date(u.criado_em).toLocaleDateString("pt-BR")}

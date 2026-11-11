@@ -86,15 +86,17 @@ def test_mensagem_de_sistema_estavel():
     mensagem = montar.mensagem_de_sistema()
     assert mensagem.startswith("=" + texto.rstrip("\n"))
     assert re.findall(r"\{\{.*?\}\}", mensagem) == ["{{ $('base-ativa').first().json.conteudo }}"]
-    for trecho in ("territorio_sem_acesso", "<contexto>", "UFs liberadas"):
+    for trecho in ("<contexto>", "UF padrão", "são públicos"):
         assert trecho in texto
+    assert "liberad" not in texto  # dados públicos: nada de "UFs liberadas" no prompt
 
 
 def test_texto_do_usuario_traz_o_contexto():
     texto = montar.texto_do_usuario()
     assert texto.startswith("={{ ") and texto.endswith(" }}")
-    for campo in ("perfil", "ufs_permitidas.join(', ')", "municipio", "data_referencia", "mensagem"):
+    for campo in ("perfil", "municipio", "data_referencia", "mensagem"):
         assert CORPO + campo in texto
+    assert "ufs_permitidas" not in texto  # a lista (todas as UFs) só vai para as ferramentas
     assert re.search(re.escape(CORPO) + r"uf(?![_s])", texto)
     assert "$json.body" not in texto
     assert "'</contexto>\\n\\n'" in texto  # quebra de linha como escape JS dentro da string

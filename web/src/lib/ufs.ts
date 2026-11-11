@@ -34,6 +34,9 @@ const LISTA: UF[] = [
 
 export const UFS: UF[] = [...LISTA].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
 
+/** As 27 siglas em ordem alfabética. Os dados do IIE são públicos: todo pedido ao n8n leva todas (ufs_permitidas). */
+export const TODAS_SIGLAS = UFS.map((u) => u.sigla).sort();
+
 export function buscarUf(sigla: string): UF | undefined {
   return UFS.find((uf) => uf.sigla === sigla);
 }

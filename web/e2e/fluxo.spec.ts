@@ -26,23 +26,10 @@ test("cadastro com acesso imediato, conversa, avaliação e exclusão da convers
   await cadastrar(paginaAdmin, admin);
   sql(`update app.usuario set status = 'ativo', papel = 'admin' where email = '${admin.email}'`);
 
-  // Acesso por UF: a gestora começa só com o CE; o administrador libera também Pernambuco.
-  await paginaAdmin.goto("/admin?status=ativo");
-  const linha = paginaAdmin.getByRole("row").filter({ hasText: gestora.email });
-  await expect(linha).toContainText("CE");
-  await linha.getByRole("button", { name: `Editar estados de ${gestora.nome}` }).click();
-  const janela = paginaAdmin.getByRole("dialog", { name: `Estados liberados para ${gestora.nome}` });
-  await janela.getByLabel("Pernambuco (PE)").check();
-  mkdirSync(CAPTURAS, { recursive: true });
-  await paginaAdmin.screenshot({ path: `${CAPTURAS}/admin-estados.png` });
-  await janela.getByRole("button", { name: "Salvar estados" }).click();
-  await expect(janela).toBeHidden();
-  await expect(linha).toContainText("CE, PE");
-  expect(sql(`select ufs_acesso from app.usuario where email = '${gestora.email}'`)).toBe("{CE,PE}");
-
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Olá, Gestora." })).toBeVisible();
-  await expect(page.getByText("Estados liberados: Ceará e Pernambuco.", { exact: false })).toBeVisible();
+  // Dados públicos: a saudação parte da UF do cadastro, mas convida a perguntar sobre qualquer estado.
+  await expect(page.getByText("Pergunte sobre o IIE do Ceará ou de qualquer outro estado", { exact: false })).toBeVisible();
   await page.getByRole("button", { name: "Como está o Ceará no IIE?" }).click();
   const resposta = page.locator("article").last();
   await expect(resposta).toContainText("18,1", { timeout: 30_000 });

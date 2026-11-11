@@ -110,8 +110,7 @@ FERRAMENTAS: tuple[Ferramenta, ...] = (
     ),
     Ferramenta(
         "ranking",
-        "Ranking das UFs num indicador e ano, do melhor para o pior, com semáforo. Mostra só as UFs liberadas para "
-        "a pessoa, com a posição nacional.",
+        "Ranking das UFs num indicador e ano, do melhor para o pior, com semáforo e a posição nacional.",
         "select iie.fn_ranking($1, $2::int, nullif($3, 'todas'), $4::int, $5::text[]) as resultado",
         (_INDICADOR,
          _ANO,
@@ -137,10 +136,10 @@ def mensagem_de_sistema() -> str:
 
 
 def texto_do_usuario() -> str:
-    """Bloco <contexto> (perfil, UF padrão, UFs liberadas, município, data) e a pergunta (proposta 03, §5.3)."""
+    """Bloco <contexto> (perfil, UF padrão, município, data) e a pergunta (proposta 03, §5.3)."""
     b = WEBHOOK
     return ("={{ '<contexto>perfil: ' + " + b + ".perfil + ' · UF padrão: ' + " + b + ".uf"
-            " + ' · UFs liberadas: ' + " + b + ".ufs_permitidas.join(', ') + ' · município: ' + " + b + ".municipio"
+            " + ' · município: ' + " + b + ".municipio"
             " + ' · data: ' + " + b + ".data_referencia + '</contexto>\\n\\n' + " + b + ".mensagem }}")
 
 

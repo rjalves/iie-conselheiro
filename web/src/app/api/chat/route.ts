@@ -1,8 +1,8 @@
-import { acessoDoUsuario } from "@/lib/acesso";
 import { avaliarPedido, hojeEmBrasilia, tituloDaConversa } from "@/lib/chat";
 import { limiteDiario } from "@/lib/conversa";
 import { TEXTO_INSTABILIDADE, ndjsonParaTexto } from "@/lib/ndjson";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
+import { TODAS_SIGLAS } from "@/lib/ufs";
 
 const TEMPO_LIMITE_MS = 120_000;
 
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   const usuario = user
-    ? (await supabase.from("usuario").select("id, status, papel, perfil, uf, ufs_acesso, municipio_nome").eq("id", user.id).maybeSingle())
+    ? (await supabase.from("usuario").select("id, status, papel, perfil, uf, municipio_nome").eq("id", user.id).maybeSingle())
         .data
     : null;
 
@@ -43,7 +43,6 @@ export async function POST(request: Request) {
     conversaId = data.id;
   }
 
-  const acesso = acessoDoUsuario(usuario!);
   const url = process.env.N8N_CHAT_URL;
   const resposta = url
     ? await fetch(url, {
@@ -54,10 +53,10 @@ export async function POST(request: Request) {
           conversa_id: conversaId,
           mensagem: pedido.mensagem,
           perfil: usuario!.perfil,
-          uf: acesso.padrao,
+          uf: usuario!.uf, // UF padrão: a do cadastro
           municipio: usuario!.municipio_nome,
           data_referencia: hojeEmBrasilia(),
-          ufs_permitidas: acesso.ufs, // as ferramentas do n8n usam esta lista; o modelo não a escolhe
+          ufs_permitidas: TODAS_SIGLAS, // dados públicos: todas as UFs (as funções do banco exigem a lista)
         }),
         signal: AbortSignal.timeout(TEMPO_LIMITE_MS),
       }).catch(() => null)
