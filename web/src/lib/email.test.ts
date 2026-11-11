@@ -78,9 +78,13 @@ describe("montarEmail", () => {
       linkDeConfirmacao("https://iiec.educacional.ia.br/auth/confirmar?proxima=/aguardando", "abc", "signup"),
     );
   });
-  it("nova senha avisa a validade de 1 hora", () => {
-    const email = montarEmail(pedido("recovery"))!;
-    expect(email.assunto).toBe("Crie uma nova senha no IIE Conselheiro");
+  it("nova senha manda o código de 6 dígitos, sem link, e avisa a validade", () => {
+    const base = pedido("recovery");
+    const email = montarEmail({ ...base, email_data: { ...base.email_data, token: "482913" } })!;
+    expect(email.assunto).toBe("Seu código para criar uma nova senha no IIE Conselheiro");
+    expect(email.texto).toContain("Seu código: 482913");
+    expect(email.html).toContain(">482913</span>");
+    expect(email.html).not.toContain("token_hash=");
     expect(email.texto).toContain("1 hora");
   });
   it("sem nome no cadastro, cumprimenta sem nome", () => {

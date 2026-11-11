@@ -25,7 +25,16 @@ export function assinaturaValida(
   });
 }
 
-type Modelo = { assunto: string; titulo: string; texto: string; botao: string; proxima: string; vantagens?: true };
+type Modelo = {
+  assunto: string;
+  titulo: string;
+  texto: string;
+  botao: string;
+  proxima: string;
+  vantagens?: true;
+  /** Mostra o código de 6 dígitos (email_data.token) no lugar do botão com o link. */
+  codigo?: true;
+};
 
 /** As três vantagens do IIE Conselheiro para a gestão da educação (projeto/visao_de_negocio.md, seções 3 e 4). */
 export const VANTAGENS = [
@@ -47,11 +56,14 @@ const MODELOS: Record<string, Modelo> = {
     vantagens: true,
   },
   recovery: {
-    assunto: "Crie uma nova senha no IIE Conselheiro",
+    assunto: "Seu código para criar uma nova senha no IIE Conselheiro",
     titulo: "Crie uma nova senha",
-    texto: "Recebemos um pedido para criar uma nova senha na sua conta do IIE Conselheiro. O link vale por 1 hora.",
+    texto:
+      "Recebemos um pedido para criar uma nova senha na sua conta do IIE Conselheiro. Digite o código abaixo na tela " +
+      "de recuperação de senha. Ele vale por 1 hora.",
     botao: "Criar nova senha",
     proxima: "/nova-senha",
+    codigo: true,
   },
   invite: {
     assunto: "Convite para o IIE Conselheiro",
@@ -82,7 +94,7 @@ export function linkDeConfirmacao(redirectTo: string, tokenHash: string, tipo: s
 
 export type PedidoHook = {
   user: { email: string; user_metadata?: { nome?: string } };
-  email_data: { token_hash: string; redirect_to: string; email_action_type: string };
+  email_data: { token?: string; token_hash: string; redirect_to: string; email_action_type: string };
 };
 
 export type Email = { para: string; assunto: string; html: string; texto: string };
@@ -104,6 +116,7 @@ type Conteudo = {
   vantagens?: boolean;
   botao: string;
   link: string;
+  codigo?: string;
   nota: string;
 };
 
@@ -128,6 +141,11 @@ ${VANTAGENS.map(
 <tr><td style="height:14px;line-height:14px;font-size:0">&nbsp;</td></tr>
 </table>`
     : "";
+  const acao = c.codigo
+    ? `<p style="margin:0 0 8px;font-size:14px;color:#5a6170">Seu código</p>
+<p style="margin:0 0 24px"><span style="display:inline-block;padding:14px 22px;border-radius:12px;background:#e8edf8;font-family:'Courier New',Courier,monospace;font-size:34px;line-height:1;font-weight:bold;letter-spacing:10px;color:#152b66">${e(c.codigo)}</span></p>`
+    : `<p style="margin:0 0 24px"><a href="${e(c.link)}" style="display:inline-block;background:#1d3a8a;color:#ffffff;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 24px;border-radius:8px">${e(c.botao)}</a></p>
+<p style="margin:0 0 8px;font-size:13px;color:#5a6170;line-height:1.5">Se o botão não funcionar, copie e cole este endereço no navegador:<br><a href="${e(c.link)}" style="color:#1d3a8a;word-break:break-all">${e(c.link)}</a></p>`;
   const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light only"><title>${e(c.assunto)}</title></head>
 <body style="margin:0;padding:0;background:#e8edf8;font-family:Arial,Helvetica,sans-serif;color:#1e2228">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#e8edf8"><tr><td align="center" style="padding:32px 12px">
@@ -142,15 +160,14 @@ ${VANTAGENS.map(
 <p style="margin:0 0 16px;font-size:16px;line-height:1.55">${e(c.ola)}</p>
 <p style="margin:0 0 24px;font-size:16px;line-height:1.55">${e(c.texto)}</p>
 ${vantagens}
-<p style="margin:0 0 24px"><a href="${e(c.link)}" style="display:inline-block;background:#1d3a8a;color:#ffffff;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 24px;border-radius:8px">${e(c.botao)}</a></p>
-<p style="margin:0 0 8px;font-size:13px;color:#5a6170;line-height:1.5">Se o botão não funcionar, copie e cole este endereço no navegador:<br><a href="${e(c.link)}" style="color:#1d3a8a;word-break:break-all">${e(c.link)}</a></p>
+${acao}
 <p style="margin:16px 0 0;font-size:13px;color:#5a6170;line-height:1.5">${e(c.nota)}</p>
 </td></tr></table>
 <p style="margin:20px 0 0;font-size:12px;line-height:1.6;color:#5a6170">Criação e Desenvolvimento: Educacional.ia - Roberto Alves<br>Todos os direitos reservados - <a href="mailto:contato@educacional.ia.br" style="color:#5a6170">contato@educacional.ia.br</a></p>
 </td></tr></table></body></html>`;
   const lista = c.vantagens ? `${TITULO_VANTAGENS}:\n${VANTAGENS.map((v) => `- ${v}`).join("\n")}\n\n` : "";
   const texto =
-    `${c.ola}\n\n${c.texto}\n\n${lista}${c.botao}: ${c.link}\n\n${c.nota}\n\n` +
+    `${c.ola}\n\n${c.texto}\n\n${lista}${c.codigo ? `Seu código: ${c.codigo}` : `${c.botao}: ${c.link}`}\n\n${c.nota}\n\n` +
     "IIE Conselheiro\nCriação e Desenvolvimento: Educacional.ia - Roberto Alves\n" +
     "Todos os direitos reservados - contato@educacional.ia.br";
   return { para: c.para, assunto: c.assunto, html, texto };
@@ -165,6 +182,7 @@ export function montarEmail({ user, email_data: dados }: PedidoHook): Email | nu
     para: user.email,
     ola: saudacao(user.user_metadata?.nome),
     vantagens: modelo.vantagens,
+    codigo: modelo.codigo ? dados.token : undefined,
     link: linkDeConfirmacao(dados.redirect_to, dados.token_hash, dados.email_action_type),
     nota: "Se você não fez este pedido, ignore esta mensagem.",
   });

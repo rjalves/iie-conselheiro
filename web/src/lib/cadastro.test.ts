@@ -45,6 +45,9 @@ describe("traduzirErroAuth", () => {
     ["Invalid login credentials", "E-mail ou senha incorretos."],
     ["Email not confirmed", "Confirme seu e-mail"],
     ["email rate limit exceeded", "Aguarde alguns minutos"],
+    ["Token has expired or is invalid", "Código inválido ou vencido"],
+    ["For security purposes, you can only request this after 52 seconds.", "Aguarde um minuto"],
+    ["Error sending recovery email", "Não conseguimos enviar o e-mail"],
     ["algo inesperado", "Tente de novo em alguns minutos"],
   ])("%s", (original, esperado) => {
     expect(traduzirErroAuth(original)).toContain(esperado);

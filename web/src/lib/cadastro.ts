@@ -50,6 +50,11 @@ export function traduzirErroAuth(mensagem: string | undefined): string {
   }
   if (m.includes("invalid login credentials")) return "E-mail ou senha incorretos.";
   if (m.includes("email not confirmed")) return "Confirme seu e-mail pelo link que enviamos antes de entrar.";
+  if (m.includes("expired or is invalid") || m.includes("otp")) {
+    return "Código inválido ou vencido. Confira os 6 dígitos ou peça um novo código.";
+  }
+  if (m.includes("security purposes")) return "Aguarde um minuto antes de pedir outro código.";
+  if (m.includes("error sending")) return "Não conseguimos enviar o e-mail agora. Tente de novo em alguns minutos.";
   if (m.includes("rate limit") || m.includes("too many")) {
     return "Muitas tentativas seguidas. Aguarde alguns minutos e tente de novo.";
   }
