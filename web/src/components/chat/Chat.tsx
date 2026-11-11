@@ -246,8 +246,7 @@ export function Chat({ conversa, mensagensIniciais, usuario, restantes, limite }
             ) : (
               <>
                 <p className="min-w-0 flex-1 basis-80">
-                  Dados oficiais do IIE de todos os estados; ainda não há dados de{" "}
-                  {usuario.municipio}. O Conselheiro pode errar: confira as fontes citadas.
+                  O IIE Conselheiro é um agente de Inteligência Artificial e pode cometer erros.
                 </p>
                 <p className={`numeros shrink-0 ${restantes <= 5 ? "font-semibold text-grafite" : ""}`}>
                   {restantes} de {limite} perguntas restantes hoje
